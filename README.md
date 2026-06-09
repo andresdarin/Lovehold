@@ -52,8 +52,36 @@ pnpm --filter @lovehold/api dev
 1. Crear un proyecto en [supabase.com](https://supabase.com)
 2. Ir a **Project Settings > Database > Connection string** y copiar la URI
 3. Copiar los archivos `.env.example` a `.env` en cada app:
-   - `apps/api/.env` → pegar `DATABASE_URL`
-   - `apps/web/.env` → pegar `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `apps/api/.env` → pegar `DATABASE_URL`, `SUPABASE_URL` y `SUPABASE_JWT_SECRET`
+   - `apps/web/.env` → pegar `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+
+### Verificar algoritmo JWT del proyecto
+
+Supabase puede usar HS256 (simétrico, default) o RS256/ES256 (asimétrico, con JWT Signing Keys).
+
+Para saber cuál usa tu proyecto sin exponer secretos:
+
+```bash
+# 1. Copiá un access token de Supabase Auth (desde la consola del navegador,
+#    o desde la respuesta de sign-in en Supabase).
+
+# 2. Decodificá solo el header (primera parte del JWT):
+echo "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" | base64 -d 2>/dev/null || echo "{\"alg\": \"HS256\"}"
+```
+
+O desde la app, usando el helper incluido:
+
+```bash
+# Arrancá la API y ejecutá esto en otro terminal:
+pnpm tsx -e "
+const {debugTokenAlgorithm} = require('./apps/api/src/common/utils/decode-token-header');
+debugTokenAlgorithm('copiá-acá-tu-token-sin-verificar');
+"
+```
+
+Si el `alg` es:
+- **HS256** → el AuthGuard actual funciona con `SUPABASE_JWT_SECRET`.
+- **RS256** o **ES256** → el AuthGuard necesita migrarse a JWKS (ver `auth.guard.ts`).
 
 ## Prisma
 

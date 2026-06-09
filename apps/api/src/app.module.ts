@@ -1,7 +1,16 @@
 import { Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
 import { PrismaModule } from './prisma/prisma.module'
+import { ProfilesModule } from './profiles/profiles.module'
 
 @Module({
-  imports: [PrismaModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+    PrismaModule,
+    ProfilesModule,
+  ],
 })
 export class AppModule {}
