@@ -1,0 +1,16 @@
+{
+  "name": "lovehold",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Lovehold — App de gastos compartidos para parejas",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "format": "prettier --write \"**/*.{ts,tsx,json,yaml,md}\""
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

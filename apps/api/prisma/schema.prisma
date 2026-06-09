@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Profile {
+  id         String   @id @default(cuid())
+  authUserId String   @unique
+  email      String   @unique
+  displayName String?
+  avatarUrl  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  paidExpenses       Expense[]         @relation("paidBy")
+  createdExpenses    Expense[]         @relation("createdBy")
+  householdMembers   HouseholdMember[]
+  expenseSplits      ExpenseSplit[]
+  settlementsSent    Settlement[]      @relation("settlementSender")
+  settlementsReceived Settlement[]     @relation("settlementReceiver")
+}
+
+model Household {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members    HouseholdMember[]
+  expenses   Expense[]
+  categories Category[]
+}
+
+model HouseholdMember {
+  id          String   @id @default(cuid())
+  householdId String
+  profileId   String
+  role        String   @default("member")
+  joinedAt    DateTime @default(now())
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  profile   Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([householdId, profileId])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  householdId String
+  name        String
+  icon        String   @default("tag")
+  color       String   @default("#6366f1")
+  createdAt   DateTime @default(now())
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  expenses  Expense[]
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  householdId String
+  categoryId  String
+  paidById    String
+  createdById String
+  amount      Decimal  @db.Decimal(10, 2)
+  description String
+  date        DateTime
+  splitType   String   @default("equal")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  household  Household      @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  category   Category       @relation(fields: [categoryId], references: [id])
+  paidBy     Profile        @relation("paidBy", fields: [paidById], references: [id])
+  createdBy  Profile        @relation("createdBy", fields: [createdById], references: [id])
+  splits     ExpenseSplit[]
+}
+
+model ExpenseSplit {
+  id         String  @id @default(cuid())
+  expenseId  String
+  profileId  String
+  amount     Decimal @db.Decimal(10, 2)
+  percentage Float?
+
+  expense Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([expenseId, profileId])
+}
+
+model Settlement {
+  id          String   @id @default(cuid())
+  householdId String?
+  fromId      String
+  toId        String
+  amount      Decimal  @db.Decimal(10, 2)
+  note        String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  from Profile @relation("settlementSender", fields: [fromId], references: [id])
+  to   Profile @relation("settlementReceiver", fields: [toId], references: [id])
+}
