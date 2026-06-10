@@ -4,6 +4,7 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'Lovehold',
   description: 'Gastos compartidos para parejas',
+  icons: { icon: '/icons/favicon.png' },
 }
 
 export default function RootLayout({
