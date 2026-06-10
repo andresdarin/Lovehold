@@ -92,7 +92,7 @@ export default function SignUpPage() {
         className="h-16 w-16 mx-auto focus:outline-none"
       />
 
-      <h1 className="mt-6 text-center text-4xl lg:text-5xl font-bold leading-tight text-[#2D255F]">
+      <h1 className="mt-6 text-center text-4xl lg:text-5xl font-bold leading-tight text--lh-navy">
         Welcome to
         <br />
         L<span
@@ -100,17 +100,17 @@ export default function SignUpPage() {
           style={{ height: '1em' }}
         >
           <Heart
-            className="block h-[0.62em] w-[0.62em] text-[#FF6B6B] stroke-[3.5px] translate-y-[0.04em]"
+            className="block h-[0.62em] w-[0.62em] text--lh-primary stroke-[3.5px] translate-y-[0.04em]"
             style={{ display: 'block' }}
           />
         </span>vehold
       </h1>
 
-      <p className="mt-2 lg:mt-6 text-center text-lg text-[#2D255F]/60">
+      <p className="mt-2 lg:mt-6 text-center text-lg text--lh-navy/60">
         Compartan todo. Lleven cuentas de lo que importa.
       </p>
 
-      <h2 className="mt-6 text-center text-xl font-semibold text-[#2D255F]">
+      <h2 className="mt-6 text-center text-xl font-semibold text--lh-navy">
         Crear cuenta
       </h2>
 
@@ -118,12 +118,12 @@ export default function SignUpPage() {
         <div>
           <label
             htmlFor="displayName"
-            className="mb-2 block text-sm font-medium text-[#2D255F]/70"
+            className="mb-2 block text-sm font-medium text--lh-navy/70"
           >
             Nombre visible
           </label>
           <div className="relative">
-            <User className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#2D255F]/40" />
+            <User className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text--lh-navy/40" />
             <input
               id="displayName"
               type="text"
@@ -132,7 +132,7 @@ export default function SignUpPage() {
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="Tu nombre o apodo"
-              className="w-full rounded-xl border border-[#E5E0D6] bg-white py-3.5 pl-11 pr-4 text-[#2D255F] placeholder:text-[#2D255F]/40 outline-none transition-all focus:border-[#FF6B6B] focus:ring-2 focus:ring-[#FF6B6B]/40 focus-visible:ring-2 focus-visible:ring-[#FF6B6B]/40"
+              className="w-full rounded-xl border border--lh-border-light bg-lh-surface py-3.5 pl-11 pr-4 text--lh-navy placeholder:text--lh-navy/40 outline-none transition-all focus:border--lh-primary focus:ring-2 focus:ring--lh-primary/40 focus-visible:ring-2 focus-visible:ring--lh-primary/40"
             />
           </div>
         </div>
@@ -140,12 +140,12 @@ export default function SignUpPage() {
         <div>
           <label
             htmlFor="email"
-            className="mb-2 block text-sm font-medium text-[#2D255F]/70"
+            className="mb-2 block text-sm font-medium text--lh-navy/70"
           >
             Email
           </label>
           <div className="relative">
-            <Mail className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#2D255F]/40" />
+            <Mail className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text--lh-navy/40" />
             <input
               id="email"
               type="email"
@@ -154,7 +154,7 @@ export default function SignUpPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="tu@email.com"
-              className="w-full rounded-xl border border-[#E5E0D6] bg-white py-3.5 pl-11 pr-4 text-[#2D255F] placeholder:text-[#2D255F]/40 outline-none transition-all focus:border-[#FF6B6B] focus:ring-2 focus:ring-[#FF6B6B]/40 focus-visible:ring-2 focus-visible:ring-[#FF6B6B]/40"
+              className="w-full rounded-xl border border--lh-border-light bg-lh-surface py-3.5 pl-11 pr-4 text--lh-navy placeholder:text--lh-navy/40 outline-none transition-all focus:border--lh-primary focus:ring-2 focus:ring--lh-primary/40 focus-visible:ring-2 focus-visible:ring--lh-primary/40"
             />
           </div>
         </div>
@@ -162,12 +162,12 @@ export default function SignUpPage() {
         <div>
           <label
             htmlFor="password"
-            className="mb-2 block text-sm font-medium text-[#2D255F]/70"
+            className="mb-2 block text-sm font-medium text--lh-navy/70"
           >
             Contraseña
           </label>
           <div className="relative">
-            <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#2D255F]/40" />
+            <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text--lh-navy/40" />
             <input
               id="password"
               type="password"
@@ -177,7 +177,7 @@ export default function SignUpPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Mín. 6 caracteres"
-              className="w-full rounded-xl border border-[#E5E0D6] bg-white py-3.5 pl-11 pr-4 text-[#2D255F] placeholder:text-[#2D255F]/40 outline-none transition-all focus:border-[#FF6B6B] focus:ring-2 focus:ring-[#FF6B6B]/40 focus-visible:ring-2 focus-visible:ring-[#FF6B6B]/40"
+              className="w-full rounded-xl border border--lh-border-light bg-lh-surface py-3.5 pl-11 pr-4 text--lh-navy placeholder:text--lh-navy/40 outline-none transition-all focus:border--lh-primary focus:ring-2 focus:ring--lh-primary/40 focus-visible:ring-2 focus-visible:ring--lh-primary/40"
             />
           </div>
         </div>
@@ -185,12 +185,12 @@ export default function SignUpPage() {
         <div>
           <label
             htmlFor="confirmPassword"
-            className="mb-2 block text-sm font-medium text-[#2D255F]/70"
+            className="mb-2 block text-sm font-medium text--lh-navy/70"
           >
             Repetir contraseña
           </label>
           <div className="relative">
-            <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#2D255F]/40" />
+            <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text--lh-navy/40" />
             <input
               id="confirmPassword"
               type="password"
@@ -199,7 +199,7 @@ export default function SignUpPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Repetí tu contraseña"
-              className="w-full rounded-xl border border-[#E5E0D6] bg-white py-3.5 pl-11 pr-4 text-[#2D255F] placeholder:text-[#2D255F]/40 outline-none transition-all focus:border-[#FF6B6B] focus:ring-2 focus:ring-[#FF6B6B]/40 focus-visible:ring-2 focus-visible:ring-[#FF6B6B]/40"
+              className="w-full rounded-xl border border--lh-border-light bg-lh-surface py-3.5 pl-11 pr-4 text--lh-navy placeholder:text--lh-navy/40 outline-none transition-all focus:border--lh-primary focus:ring-2 focus:ring--lh-primary/40 focus-visible:ring-2 focus-visible:ring--lh-primary/40"
             />
           </div>
         </div>
@@ -207,12 +207,12 @@ export default function SignUpPage() {
         <div>
           <label
             htmlFor="phone"
-            className="mb-2 block text-sm font-medium text-[#2D255F]/70"
+            className="mb-2 block text-sm font-medium text--lh-navy/70"
           >
             Teléfono (opcional)
           </label>
           <div className="relative">
-            <Phone className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#2D255F]/40" />
+            <Phone className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text--lh-navy/40" />
             <input
               id="phone"
               type="tel"
@@ -220,43 +220,43 @@ export default function SignUpPage() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+54 11 1234-5678"
-              className="w-full rounded-xl border border-[#E5E0D6] bg-white py-3.5 pl-11 pr-4 text-[#2D255F] placeholder:text-[#2D255F]/40 outline-none transition-all focus:border-[#FF6B6B] focus:ring-2 focus:ring-[#FF6B6B]/40 focus-visible:ring-2 focus-visible:ring-[#FF6B6B]/40"
+              className="w-full rounded-xl border border--lh-border-light bg-lh-surface py-3.5 pl-11 pr-4 text--lh-navy placeholder:text--lh-navy/40 outline-none transition-all focus:border--lh-primary focus:ring-2 focus:ring--lh-primary/40 focus-visible:ring-2 focus-visible:ring--lh-primary/40"
             />
           </div>
         </div>
 
         {error && (
-          <p className="rounded-xl border border-[#FF6B6B]/20 bg-[#FF6B6B]/10 px-4 py-3 text-sm text-[#FF6B6B]">
+          <p className="rounded-xl border border--lh-primary/20 bg--lh-primary/10 px-4 py-3 text-sm text--lh-primary">
             {error}
           </p>
         )}
 
         {emailConfirmMessage && (
-          <p className="rounded-xl border border-[#2D255F]/10 bg-[#2D255F]/5 px-4 py-3 text-sm text-[#2D255F]/70">
+          <p className="rounded-xl border border--lh-navy/10 bg--lh-navy/5 px-4 py-3 text-sm text--lh-navy/70">
             {emailConfirmMessage}
           </p>
         )}
 
         <div className="flex items-center justify-center gap-3 py-1" aria-hidden="true">
-          <span className="h-px flex-1 bg-[#2D255F]/[0.06]" />
-          <Heart className="h-5 w-5 text-[#FF6B6B]/25" />
-          <span className="h-px flex-1 bg-[#2D255F]/[0.06]" />
+          <span className="h-px flex-1 bg--lh-navy/[0.06]" />
+          <Heart className="h-5 w-5 text--lh-primary/25" />
+          <span className="h-px flex-1 bg--lh-navy/[0.06]" />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-xl bg-gradient-to-r from-[#FF6B6B] to-[#FF3D8B] py-[14px] font-semibold text-white shadow-lg shadow-[#FF6B6B]/25 transition-all hover:shadow-xl hover:shadow-[#FF6B6B]/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B6B]/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full rounded-xl bg-gradient-to-r from--lh-primary to--lh-primary-rose py-[14px] font-semibold text-white shadow-lg shadow--lh-primary/25 transition-all hover:shadow-xl hover:shadow--lh-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring--lh-primary/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Creando cuenta…' : 'Crear cuenta'}
         </button>
       </form>
 
-      <p className="mt-8 text-center text-sm text-[#2D255F]/50">
+      <p className="mt-8 text-center text-sm text--lh-navy/50">
         ¿Ya tenés cuenta?{' '}
         <Link
           href="/login"
-          className="rounded font-medium text-[#FF6B6B] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B6B]/50 focus-visible:ring-offset-2"
+          className="rounded font-medium text--lh-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring--lh-primary/50 focus-visible:ring-offset-2"
         >
           Iniciar sesión
         </Link>

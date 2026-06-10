@@ -69,7 +69,7 @@ export default function AuthLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#FFF8F1] overflow-hidden">
+    <div className="min-h-screen bg-lh-cream overflow-hidden">
       {/* ═══════════ DESKTOP LAYOUT (lg) ═══════════ */}
       <div className="hidden min-h-screen lg:relative lg:flex lg:items-center">
         {/* Contenedor flotante de los formularios */}
@@ -106,7 +106,7 @@ export default function AuthLayout({
         </div>
 
         {/* Formulario */}
-        <div className="relative -mt-8 flex flex-1 flex-col rounded-t-[32px] bg-[#FFF8F1] px-6 py-8">
+        <div className="relative -mt-8 flex flex-1 flex-col rounded-t-[32px] bg-lh-cream px-6 py-8">
           <div className="mx-auto w-full max-w-sm">
             {children}
           </div>
