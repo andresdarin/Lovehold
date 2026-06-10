@@ -6,38 +6,28 @@ import {
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import jwt from 'jsonwebtoken'
+import { createRemoteJWKSet, jwtVerify } from 'jose'
 
 export interface AuthenticatedUser {
   authUserId: string
   email: string
 }
 
-/**
- * AuthGuard que valida JWTs de Supabase Auth.
- *
- * Algoritmo actualmente soportado: **HS256** (simétrico).
- *
- * Usa `SUPABASE_JWT_SECRET` del environment, que es el secreto compartido
- * del proyecto en Supabase (Settings → API → JWT Secret).
- *
- * ── Pendiente: soporte para RS256 / ES256 ──
- * Si el proyecto de Supabase está configurado con **JWT Signing Keys**
- * (asimétricas, tipo RS256 o ES256), este guard NO va a funcionar.
- *
- * Para migrar a JWKS:
- * 1. Reemplazar `jsonwebtoken` por `jose`.
- * 2. Obtener la JWKS desde:
- *    `{SUPABASE_URL}/auth/v1/.well-known/jwks.json`
- * 3. Verificar el token contra la key indicada por el `kid` del header.
- *
- * @see decodeTokenHeader() en common/utils/decode-token-header.ts
- *   para inspeccionar el algoritmo de un token real sin verificarlo.
- */
+let jwksCache: ReturnType<typeof createRemoteJWKSet> | null = null
+
+function getJWKS(supabaseUrl: string) {
+  if (!jwksCache) {
+    const url = new URL('/auth/v1/.well-known/jwks.json', supabaseUrl)
+    jwksCache = createRemoteJWKSet(url)
+  }
+  return jwksCache
+}
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private configService: ConfigService) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest()
     const authHeader = request.headers.authorization
 
@@ -48,23 +38,39 @@ export class AuthGuard implements CanActivate {
     const token = authHeader.split(' ')[1]!
 
     try {
-      const secret = this.configService.get<string>('SUPABASE_JWT_SECRET')
-      if (!secret) {
-        throw new UnauthorizedException('JWT secret not configured')
+      const supabaseUrl = this.configService.get<string>('SUPABASE_URL')
+      const jwtSecret = this.configService.get<string>('SUPABASE_JWT_SECRET')
+
+      if (!supabaseUrl && !jwtSecret) {
+        throw new UnauthorizedException('Auth credentials not configured')
       }
 
-      const payload = jwt.verify(token, secret, { algorithms: ['HS256'] }) as {
-        sub: string
-        email: string
+      let payload: { sub: string; email: string }
+
+      try {
+        const { payload: verified } = await jwtVerify(
+          token,
+          getJWKS(supabaseUrl ?? ''),
+        )
+        payload = verified as unknown as { sub: string; email: string }
+      } catch {
+        if (!jwtSecret) {
+          throw new UnauthorizedException('Invalid or expired token')
+        }
+
+        payload = jwt.verify(token, jwtSecret, {
+          algorithms: ['HS256'],
+        }) as { sub: string; email: string }
       }
 
       request.user = {
         authUserId: payload.sub,
-        email: payload.email,
+        email: payload.email ?? '',
       } satisfies AuthenticatedUser
 
       return true
-    } catch {
+    } catch (err) {
+      if (err instanceof UnauthorizedException) throw err
       throw new UnauthorizedException('Invalid or expired token')
     }
   }
