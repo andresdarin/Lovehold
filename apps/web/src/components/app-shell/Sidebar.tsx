@@ -46,7 +46,7 @@ export default function Sidebar({ profile, onLogout, collapsed, onToggle }: Side
   ], [])
 
   const userInitial = (profile?.displayName?.[0] ?? profile?.email[0] ?? '?').toUpperCase()
-  const activeHref = navItems.find((item) => pathname === item.href)?.href ?? navItems[0].href
+  const activeHref = navItems.find((item) => pathname === item.href)?.href ?? '/dashboard'
   const targetHref = hoveredHref ?? activeHref
 
   const updateIndicator = useCallback(() => {

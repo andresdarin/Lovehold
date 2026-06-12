@@ -1,8 +1,10 @@
 export {
+  createExpenseItemSchema,
   createExpenseSchema,
+  ExpenseItemCategoryEnum,
   SplitTypeEnum,
 } from './expense'
-export type { CreateExpenseInput } from './expense'
+export type { CreateExpenseInput, CreateExpenseItemInput } from './expense'
 
 export { createCategorySchema } from './category'
 export type { CreateCategoryInput } from './category'

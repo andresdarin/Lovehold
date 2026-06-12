@@ -64,6 +64,22 @@ model Category {
   expenses  Expense[]
 }
 
+enum ExpenseItemCategory {
+  ALIMENTOS
+  VERDURAS
+  FRUTAS
+  LACTEOS
+  CARNES_FIAMBRES
+  PANIFICADOS
+  BEBIDAS
+  ALCOHOL
+  SNACKS_DULCES
+  HIGIENE
+  LIMPIEZA_HOGAR
+  MASCOTAS
+  OTROS
+}
+
 model Expense {
   id          String   @id @default(cuid())
   householdId String
@@ -72,6 +88,10 @@ model Expense {
   createdById String
   amount      Decimal  @db.Decimal(10, 2)
   description String
+  merchant    String?
+  paymentMethod String?
+  receiptDate DateTime?
+  notes       String?
   date        DateTime
   splitType   String   @default("equal")
   createdAt   DateTime @default(now())
@@ -82,6 +102,7 @@ model Expense {
   paidBy     Profile        @relation("paidBy", fields: [paidById], references: [id])
   createdBy  Profile        @relation("createdBy", fields: [createdById], references: [id])
   splits     ExpenseSplit[]
+  items      ExpenseItem[]
 }
 
 model ExpenseSplit {
@@ -95,6 +116,22 @@ model ExpenseSplit {
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@unique([expenseId, profileId])
+}
+
+model ExpenseItem {
+  id           String              @id @default(cuid())
+  expenseId    String
+  name         String
+  itemCategory ExpenseItemCategory
+  quantity     Decimal?            @db.Decimal(10, 3)
+  unit         String?
+  unitPrice    Decimal?            @db.Decimal(10, 2)
+  total        Decimal             @db.Decimal(10, 2)
+  rawText      String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  expense Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
 }
 
 model Settlement {

@@ -1,7 +1,8 @@
 'use client'
 
+import Link from 'next/link'
 import React from 'react'
-import { Check, Circle, Coffee, Heart, Home, Plus, QrCode, Repeat, Search, TrendingUp, Wallet } from 'lucide-react'
+import { Check, Circle, Coffee, Heart, Home, Plus, QrCode, Repeat, Search, ShoppingBasket, TrendingUp, Wallet } from 'lucide-react'
 import { useProfile } from '@/components/auth/ProfileProvider'
 import LiquidGlass from '@/components/ui/LiquidGlass'
 
@@ -35,14 +36,14 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <LiquidGlass variant="button" intensity="medium" disabled className="inline-flex">
-            <button
-              disabled
+          <LiquidGlass variant="button" intensity="medium" className="inline-flex">
+            <Link
+              href="/expenses/new"
               className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-foreground disabled:cursor-not-allowed"
             >
               <Plus className="h-4 w-4 text-primary" />
               Agregar gasto
-            </button>
+            </Link>
           </LiquidGlass>
         </div>
       </header>
@@ -123,6 +124,8 @@ export default function DashboardPage() {
         <MetricCard icon={Coffee} label="Delivery este mes" value="$0" description="Ideal para pedidos compartidos" colorClass="text-primary bg-primary/10" dotClass="bg-primary/50" />
       </section>
 
+      <SupermarketCategoriesCard />
+
       {/* ═══ ONBOARDING HELPERS ═══ */}
       <section className="grid gap-6 lg:grid-cols-2">
         <FirstStepsCard />
@@ -185,6 +188,45 @@ function MetricCard({
         <p className="mt-2 text-xs leading-4 text-muted-foreground">{description}</p>
       </div>
     </div>
+  )
+}
+
+function SupermarketCategoriesCard() {
+  const categories = [
+    { label: 'Alimentos', value: '$0' },
+    { label: 'Higiene', value: '$0' },
+    { label: 'Snacks', value: '$0' },
+  ]
+
+  return (
+    <section className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
+            <ShoppingBasket className="h-5 w-5 text-accent" />
+          </div>
+          <div>
+            <h2 className="text-base font-bold text-foreground">Top categorías de súper</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Cuando carguen productos del ticket, vas a ver dónde se concentra el gasto.
+            </p>
+          </div>
+        </div>
+        <span className="rounded-full border border-border bg-surface-soft px-3 py-1 text-xs font-semibold text-muted-foreground">
+          Próximamente
+        </span>
+      </div>
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+        {categories.map((category) => (
+          <div key={category.label} className="rounded-2xl border border-border bg-surface-soft p-4">
+            <p className="text-sm font-semibold text-foreground">{category.label}</p>
+            <p className="mt-2 text-2xl font-bold text-foreground">{category.value}</p>
+            <p className="mt-1 text-xs text-muted-foreground">Aparecerá con ítems registrados.</p>
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }
 
