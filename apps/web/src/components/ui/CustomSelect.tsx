@@ -44,7 +44,7 @@ export default function CustomSelect({ value, options, onChange, placeholder, cl
 
       {open && createPortal(
         <div data-cs role="listbox" aria-label={placeholder ?? 'Seleccionar'} style={popoverStyle}>
-          <div className="overflow-hidden rounded-2xl border border-border bg-surface py-1 shadow-2xl" onClick={e => e.stopPropagation()}>
+          <div className="max-h-[min(320px,calc(100vh-24px))] overflow-y-auto rounded-2xl border border-border bg-surface py-1 shadow-2xl" onClick={e => e.stopPropagation()}>
             {options.map(opt => {
               const isSelected = opt.value === value
               return (

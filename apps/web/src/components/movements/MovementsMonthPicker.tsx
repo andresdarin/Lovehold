@@ -48,7 +48,7 @@ export default function MovementsMonthPicker({ value, onChange }: Props) {
 
       {open && createPortal(
         <div data-mp role="dialog" aria-modal="true" aria-label="Seleccionar mes" style={popoverStyle}>
-          <div className="rounded-2xl border border-border bg-surface p-4 shadow-2xl" onClick={e => e.stopPropagation()}>
+          <div className="max-h-[min(400px,calc(100vh-24px))] overflow-y-auto rounded-2xl border border-border bg-surface p-4 shadow-2xl" onClick={e => e.stopPropagation()}>
             <div className="mb-3 flex items-center justify-between">
               <button type="button" onClick={() => setYear(y => y - 1)}
                 className="flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground transition hover:bg-surface-soft hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
