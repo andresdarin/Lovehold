@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { ApiError } from '@/lib/api'
 import { submitExpense } from '../expense-form/submitExpense'
@@ -14,14 +15,17 @@ export function useExpenseSubmit({
   declaredTotal: number
   hasBlockingDifference: boolean
 }) {
+  const router = useRouter()
   const supabase = createClient()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [createdId, setCreatedId] = useState<string | null>(null)
 
   const handleSubmit = useCallback(async () => {
     setError(null)
     setSuccess(null)
+    setCreatedId(null)
     if (hasBlockingDifference) {
       setError('La diferencia entre el total declarado y los ítems supera $0.05.')
       return
@@ -31,8 +35,9 @@ export function useExpenseSubmit({
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('Tu sesión expiró. Volvé a iniciar sesión.')
-      await submitExpense({ token: session.access_token, form, items, declaredTotal })
-      setSuccess('Gasto cargado. Cuando activemos el listado, va a aparecer en movimientos.')
+      const result = await submitExpense({ token: session.access_token, form, items, declaredTotal })
+      setCreatedId(result.id)
+      setSuccess('Gasto cargado correctamente.')
     } catch (err) {
       if (err instanceof ApiError) {
         setError(Array.isArray(err.message) ? err.message.join(', ') : err.message)
@@ -44,5 +49,13 @@ export function useExpenseSubmit({
     }
   }, [form, items, declaredTotal, hasBlockingDifference, supabase])
 
-  return { isSubmitting, error, success, setError, setSuccess, handleSubmit }
+  const goToMovements = useCallback(() => {
+    if (createdId) {
+      router.push(`/expenses?highlight=${createdId}`)
+    } else {
+      router.push('/expenses')
+    }
+  }, [createdId, router])
+
+  return { isSubmitting, error, success, setError, setSuccess, handleSubmit, createdId, goToMovements }
 }

@@ -1,19 +1,20 @@
 'use client'
 
-import { AlertTriangle, CheckCircle2, Calculator, Save } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Calculator, Save, ArrowRight } from 'lucide-react'
 import LiquidGlass from '@/components/ui/LiquidGlass'
 import { money } from './constants'
 
 export default function ExpenseSummary({
   itemsTotal, declaredTotal, discounts, difference, hasBlockingDifference, isSupermarketExpense,
   itemsCount, canSubmit, isSubmitting, error, success,
-  onSubmit,
+  onSubmit, onGoToMovements,
 }: {
   itemsTotal: number; declaredTotal: number; discounts: number; difference: number
   hasBlockingDifference: boolean; isSupermarketExpense: boolean
   itemsCount: number; canSubmit: boolean; isSubmitting: boolean
   error: string | null; success: string | null
   onSubmit: () => void
+  onGoToMovements: () => void
 }) {
   const hasItems = itemsCount > 0
   const hasAnyDifference = hasItems && Math.abs(difference) > 0
@@ -63,9 +64,16 @@ export default function ExpenseSummary({
       )}
 
       {success && (
-        <div className="mt-4 flex gap-3 rounded-xl border border-success/40 bg-success/10 p-4 text-sm text-success">
-          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
-          <span>{success}</span>
+        <div className="mt-4 space-y-3">
+          <div className="flex gap-3 rounded-xl border border-success/40 bg-success/10 p-4 text-sm text-success">
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>{success}</span>
+          </div>
+          <button type="button" onClick={onGoToMovements}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white shadow-lg shadow-primary/25 transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
+            Ver en movimientos
+            <ArrowRight className="h-4 w-4" />
+          </button>
         </div>
       )}
 

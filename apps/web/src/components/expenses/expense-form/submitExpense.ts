@@ -9,10 +9,10 @@ export async function submitExpense({
   form: ExpenseForm
   items: ExpenseItemForm[]
   declaredTotal: number
-}) {
+}): Promise<{ id: string }> {
   const isPersonal = form.scope === 'personal'
 
-  await apiFetch('/api/expenses', {
+  return apiFetch<{ id: string }>('/api/expenses', {
     method: 'POST',
     body: JSON.stringify({
       scope: form.scope,

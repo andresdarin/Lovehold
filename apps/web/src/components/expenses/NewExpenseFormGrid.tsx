@@ -30,6 +30,7 @@ export default function NewExpenseFormGrid({
         error={form.error}
         success={form.success}
         onSubmit={form.handleSubmit}
+        onGoToMovements={form.goToMovements}
       />
       <div className="space-y-6">
         <ExpenseFormFields form={form.form} profileName={profileName} onUpdate={form.updateForm} />
