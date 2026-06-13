@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { User } from 'lucide-react'
-import { useProfile } from '@/components/auth/ProfileProvider'
+import { useProfile } from '@/features/auth/ProfileProvider'
 
 export default function ProfilePage() {
   const { profile } = useProfile()

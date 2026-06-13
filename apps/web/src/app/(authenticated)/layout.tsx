@@ -1,8 +1,8 @@
 'use client'
 
 import React from 'react'
-import { ThemeProvider } from '@/components/theme/ThemeProvider'
-import { ProfileProvider } from '@/components/auth/ProfileProvider'
+import { ThemeProvider } from '@/features/theme/ThemeProvider'
+import { ProfileProvider } from '@/features/auth/ProfileProvider'
 
 /**
  * Layout común para el route group autenticado.

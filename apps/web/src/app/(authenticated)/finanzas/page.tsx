@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { BadgeDollarSign } from 'lucide-react'
-import PersonalFinancePageContent from '@/components/personal-finance/PersonalFinancePageContent'
+import PersonalFinancePageContent from '@/features/personal-finance/PersonalFinancePageContent'
 
 export default function FinanzasPage() {
   return (

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Heart } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { apiFetch, ApiError } from '@/lib/api'
-import AppShell from '../app-shell/AppShell'
+import AppShell from '../shell/AppShell'
 
 interface Profile {
   id: string

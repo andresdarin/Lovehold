@@ -1,13 +1,13 @@
 'use client'
 
-import { useProfile } from '@/components/auth/ProfileProvider'
-import ExpenseItemList from '@/components/expenses/ExpenseItemList'
-import NewExpenseFormGrid from '@/components/expenses/NewExpenseFormGrid'
-import NewExpenseHeader from '@/components/expenses/NewExpenseHeader'
-import ReceiptScanSection from '@/components/expenses/receipt-scan/ReceiptScanSection'
-import { useExpenseForm } from '@/components/expenses/hooks'
-import { useReceiptScan } from '@/components/expenses/receipt-scan/hooks'
-import { scanResultToFormItems } from '@/components/expenses/receipt-scan/utils'
+import { useProfile } from '@/features/auth/ProfileProvider'
+import ExpenseItemList from '@/features/expenses/ExpenseItemList'
+import NewExpenseFormGrid from '@/features/expenses/NewExpenseFormGrid'
+import NewExpenseHeader from '@/features/expenses/NewExpenseHeader'
+import ReceiptScanSection from '@/features/expenses/receipt-scan/ReceiptScanSection'
+import { useExpenseForm } from '@/features/expenses/hooks'
+import { useReceiptScan } from '@/features/expenses/receipt-scan/hooks'
+import { scanResultToFormItems } from '@/features/expenses/receipt-scan/utils'
 
 export default function NewExpensePage() {
   const { profile } = useProfile()

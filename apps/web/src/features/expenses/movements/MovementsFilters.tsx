@@ -2,7 +2,7 @@
 
 import { Search, X } from 'lucide-react'
 import MovementsMonthPicker from './MovementsMonthPicker'
-import CustomSelect from '../ui/CustomSelect'
+import CustomSelect from '@/components/ui/CustomSelect'
 import type { MovementFilters } from './types'
 import { KIND_OPTIONS, SCOPE_OPTIONS } from './constants'
 

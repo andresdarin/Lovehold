@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
-import { useFloatingPopover } from '../ui/useFloatingPopover'
+import { useFloatingPopover } from '@/components/ui/useFloatingPopover'
 import { MONTH_LABELS_ES, getCurrentMonth, formatMonthLabel } from './constants'
 
 interface Props {

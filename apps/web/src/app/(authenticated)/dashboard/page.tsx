@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import React from 'react'
 import { Check, Circle, Coffee, Heart, Home, Plus, QrCode, Repeat, Search, ShoppingBasket, TrendingUp, Wallet } from 'lucide-react'
-import { useProfile } from '@/components/auth/ProfileProvider'
+import { useProfile } from '@/features/auth/ProfileProvider'
 import LiquidGlass from '@/components/ui/LiquidGlass'
 
 /**
