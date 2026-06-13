@@ -8,7 +8,7 @@ import type { DetectedReceiptItem } from './types'
 interface ExpenseFormProps {
   onSubmit: (data: {
     title: string; merchant?: string; amount: number; date: string; type: string
-    category: string; notes?: string; isRecurring?: boolean; recurrenceDay?: number; items?: DetectedReceiptItem[]
+    category: string; notes?: string; isRecurring?: boolean; recurrenceDay?: number; items?: Omit<DetectedReceiptItem, 'id'>[]
   }) => void
   onCancel: () => void
   submitting: boolean
@@ -44,7 +44,7 @@ export default function ExpenseForm({ onSubmit, onCancel, submitting, initialIte
       notes: notes || undefined,
       isRecurring: type === 'fixed' ? isRecurring : undefined,
       recurrenceDay: type === 'fixed' && isRecurring ? recurrenceDay : undefined,
-      items: type === 'supermarket' ? items : undefined,
+      items: type === 'supermarket' ? items.map(({ id, ...rest }) => rest) : undefined,
     })
   }
 
