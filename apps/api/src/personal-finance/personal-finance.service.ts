@@ -63,8 +63,8 @@ export class PersonalFinanceService {
                 create: dto.items.map((item) => ({
                   name: item.name.trim(),
                   category: item.category,
-                  quantity: item.quantity === undefined ? undefined : item.quantity.toFixed(3),
-                  unitPrice: item.unitPrice === undefined ? undefined : item.unitPrice.toFixed(2),
+                  quantity: (item.quantity === undefined || item.quantity === null) ? null : item.quantity.toFixed(3),
+                  unitPrice: (item.unitPrice === undefined || item.unitPrice === null) ? null : item.unitPrice.toFixed(2),
                   totalPrice: item.totalPrice.toFixed(2),
                   rawLine: item.rawLine?.trim() || null,
                 })),
