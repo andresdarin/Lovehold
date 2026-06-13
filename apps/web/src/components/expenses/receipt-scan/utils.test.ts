@@ -44,6 +44,34 @@ describe('scanResultToFormItems', () => {
 
     expect(scanResultToFormItems(response)).toHaveLength(0)
   })
+
+  it('spreads a receipt discount across item totals so the form matches the paid total', () => {
+    const response: ScanReceiptResponse = {
+      merchant: 'ADENDA',
+      receiptDate: '2026-06-12',
+      currency: 'UYU',
+      total: 813.21,
+      subtotal: 841.21,
+      discounts: 28,
+      paymentMethod: 'MASTER',
+      items: [
+        { name: 'CHOCO AVELLANA COFLER', quantity: 1, unitPrice: 199, totalPrice: 199, category: 'SNACKS_DULCES' },
+        { name: 'MUZARELLA CONAPROLE', quantity: 0.225, unitPrice: 590, totalPrice: 132.75, category: 'LACTEOS' },
+        { name: 'JAMON COCIDO SCHNECK', quantity: 0.205, unitPrice: 820, totalPrice: 168.1, category: 'CARNES_FIAMBRES' },
+        { name: 'BIZCOCHOS PAGNIFIQUE', quantity: 0.295, unitPrice: 669.02, totalPrice: 197.36, category: 'PANIFICADOS' },
+        { name: '3D MEGATUBE BARBACOA', quantity: 1, unitPrice: 52, totalPrice: 52, category: 'SNACKS_DULCES' },
+        { name: 'KNORR SSA FILETTO', quantity: 1, unitPrice: 92, totalPrice: 92, category: 'ALIMENTOS' },
+      ],
+      confidence: 0.9,
+      warnings: [],
+    }
+
+    const formItems = scanResultToFormItems(response)
+    const formTotal = formItems.reduce((sum, item) => sum + Number(item.total), 0)
+
+    expect(formTotal).toBe(813.21)
+    expect(Number(formItems[0]?.total)).toBeLessThan(199)
+  })
 })
 
 describe('confidenceColor', () => {

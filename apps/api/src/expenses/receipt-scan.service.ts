@@ -2,13 +2,12 @@ import { BadRequestException, Injectable, ServiceUnavailableException } from '@n
 import { ConfigService } from '@nestjs/config'
 import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from './receipt-scan.types'
 import type { ScanReceiptResponse } from './receipt-scan.types'
+import { parseGeminiResponse } from './receipt-scan.parser'
 import { validateAndNormalize } from './receipt-scan.utils'
 
-const GEMINI_MODEL = 'gemini-3-flash'
-
 const SYSTEM_PROMPT = `Analiza esta imagen de un ticket de supermercado de Uruguay.
-Extrae los datos visibles y devuelve únicamente JSON válido.
-No incluyas markdown, explicación ni texto fuera del JSON.
+Extrae SOLO JSON válido. No incluyas markdown, explicación ni texto fuera del JSON.
+Sé CONCISO: no repitas info, usá nombres cortos de producto.
 
 Estructura:
 {
@@ -46,14 +45,18 @@ Reglas:
 @Injectable()
 export class ReceiptScanService {
   private readonly apiKey: string | undefined
+  private readonly model: string
 
   constructor(private configService: ConfigService) {
-    this.apiKey = this.configService.get<string>('GEMINI_API_KEY')
+    this.apiKey = this.configService.get<string>('GEMINI_API_KEY') || process.env.GEMINI_API_KEY
+    this.model = this.configService.get<string>('GEMINI_API_MODEL') || process.env.GEMINI_API_MODEL || 'gemini-2.5-flash'
   }
 
   async scan(imageBuffer: Buffer, mimeType: string): Promise<ScanReceiptResponse> {
     if (!this.apiKey) {
-      throw new ServiceUnavailableException('GEMINI_API_KEY no está configurada en el servidor.')
+      throw new ServiceUnavailableException(
+        'GEMINI_API_KEY no está configurada. Agregala en apps/api/.env o en las variables de entorno del servidor.',
+      )
     }
 
     if (!ALLOWED_MIME_TYPES.includes(mimeType)) {
@@ -67,7 +70,7 @@ export class ReceiptScanService {
     const base64 = imageBuffer.toString('base64')
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${this.apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -82,7 +85,7 @@ export class ReceiptScanService {
           ],
           generationConfig: {
             temperature: 0.1,
-            maxOutputTokens: 4096,
+            maxOutputTokens: 16384,
           },
         }),
       },
@@ -94,7 +97,12 @@ export class ReceiptScanService {
     }
 
     const geminiResponse = await response.json() as {
-      candidates?: { content?: { parts?: { text?: string }[] } }[]
+      candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[]
+    }
+
+    const finishReason = geminiResponse?.candidates?.[0]?.finishReason
+    if (finishReason && finishReason !== 'STOP') {
+      console.error(`[ReceiptScan] Gemini finishReason: ${finishReason} — response may be incomplete.`)
     }
 
     const text = geminiResponse?.candidates?.[0]?.content?.parts?.[0]?.text
@@ -103,17 +111,11 @@ export class ReceiptScanService {
       throw new BadRequestException('Gemini no devolvió contenido en la respuesta.')
     }
 
-    const cleaned = text
-      .replace(/```(?:json)?\s*/gi, '')
-      .replace(/```/g, '')
-      .trim()
-
-    let parsed: unknown
-    try {
-      parsed = JSON.parse(cleaned)
-    } catch {
+    const parsed = parseGeminiResponse(text)
+    if (!parsed) {
+      const snippet = text.length > 500 ? text.slice(0, 500) + '…' : text
       throw new BadRequestException(
-        'Gemini devolvió JSON inválido. Revisá la calidad de la imagen e intentá de nuevo.',
+        `Gemini devolvió una respuesta que no pudo interpretarse como JSON. Respuesta: ${snippet}`,
       )
     }
 

@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest'
+import { BadRequestException } from '@nestjs/common'
+import { ReceiptScanService } from './receipt-scan.service'
 import { normalizeDate, parseUruguayanPrice, mapCategory, validateAndNormalize } from './receipt-scan.utils'
 
 describe('normalizeDate', () => {
@@ -99,7 +101,7 @@ describe('validateAndNormalize', () => {
     })
 
     expect(result.warnings.length).toBeGreaterThanOrEqual(1)
-    expect(result.warnings[0]).toContain('difiere')
+    expect(result.warnings[0]).toContain('es menor')
   })
 
   it('handles null total gracefully', () => {
@@ -130,5 +132,77 @@ describe('validateAndNormalize', () => {
 
   it('rejects non-object', () => {
     expect(() => validateAndNormalize('not-json')).toThrow('Gemini response is not a valid object')
+  })
+
+  it('uses item total minus paid total when Gemini duplicates discount lines', () => {
+    const result = validateAndNormalize({
+      merchant: 'ADENDA',
+      receiptDate: '12/06/2026',
+      total: 813.21,
+      subtotal: 841.21,
+      discounts: 56,
+      items: [
+        { name: 'CHOCO AVELLANA COFLER', totalPrice: 199, category: 'SNACKS_DULCES' },
+        { name: 'MUZARELLA CONAPROLE', totalPrice: 132.75, category: 'LACTEOS' },
+        { name: 'JAMON COCIDO SCHNECK', totalPrice: 168.1, category: 'CARNES_FIAMBRES' },
+        { name: 'BIZCOCHOS PAGNIFIQUE', totalPrice: 197.36, category: 'PANIFICADOS' },
+        { name: '3D MEGATUBE BARBACOA', totalPrice: 52, category: 'SNACKS_DULCES' },
+        { name: 'KNORR SSA FILETTO', totalPrice: 92, category: 'ALIMENTOS' },
+      ],
+      confidence: 0.9,
+      warnings: [],
+    })
+
+    expect(result.subtotal).toBe(841.21)
+    expect(result.discounts).toBe(28)
+    expect(result.warnings[0]).toContain('se ajustó a $28.00')
+  })
+})
+
+describe('ReceiptScanService', () => {
+  it('parses the first balanced JSON object from a Gemini response with extra explanation', async () => {
+    const service = new ReceiptScanService({
+      get: (key: string) => key === 'GEMINI_API_KEY' ? 'test-key' : undefined,
+    } as never)
+    const originalFetch = globalThis.fetch
+    globalThis.fetch = async () => new Response(JSON.stringify({
+      candidates: [{
+        content: {
+          parts: [{
+            text: [
+              '```json',
+              '{"merchant":"ADENDA","receiptDate":"12/06/2026","currency":"UYU","total":813.21,"subtotal":841.21,"discounts":28,"paymentMethod":"MASTER","items":[],"confidence":0.9,"warnings":[]}',
+              '```',
+              'The discount calculation is ambiguous. Extra note: {not JSON}.',
+            ].join('\n'),
+          }],
+        },
+      }],
+    }))
+
+    try {
+      const result = await service.scan(Buffer.from('fake-image'), 'image/jpeg')
+
+      expect(result.merchant).toBe('ADENDA')
+      expect(result.total).toBe(813.21)
+    } finally {
+      globalThis.fetch = originalFetch
+    }
+  })
+
+  it('throws a friendly error when Gemini returns no parseable JSON', async () => {
+    const service = new ReceiptScanService({
+      get: (key: string) => key === 'GEMINI_API_KEY' ? 'test-key' : undefined,
+    } as never)
+    const originalFetch = globalThis.fetch
+    globalThis.fetch = async () => new Response(JSON.stringify({
+      candidates: [{ content: { parts: [{ text: 'No JSON here.' }] } }],
+    }))
+
+    try {
+      await expect(service.scan(Buffer.from('fake-image'), 'image/jpeg')).rejects.toThrow(BadRequestException)
+    } finally {
+      globalThis.fetch = originalFetch
+    }
   })
 })

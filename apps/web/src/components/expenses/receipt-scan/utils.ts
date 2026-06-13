@@ -1,8 +1,41 @@
-import { makeItem } from '../constants'
+import { makeItem, toCents } from '../constants'
 import type { ExpenseItemForm } from '../types'
 import type { ScanReceiptResponse } from './types'
 
+const ROUNDING_TOLERANCE_CENTS = 5
+
+function adjustedTotals(response: ScanReceiptResponse): number[] {
+  const originalCents = response.items.map((item) => toCents(item.totalPrice))
+  const originalTotalCents = originalCents.reduce((sum, cents) => sum + cents, 0)
+  const paidTotalCents = response.total === null ? null : toCents(response.total)
+
+  if (
+    paidTotalCents === null
+    || originalTotalCents <= 0
+    || originalTotalCents <= paidTotalCents
+    || originalTotalCents - paidTotalCents <= ROUNDING_TOLERANCE_CENTS
+  ) {
+    return response.items.map((item) => item.totalPrice)
+  }
+
+  const exactShares = originalCents.map((cents) => cents * paidTotalCents / originalTotalCents)
+  const adjustedCents = exactShares.map(Math.floor)
+  const centsToDistribute = paidTotalCents - adjustedCents.reduce((sum, cents) => sum + cents, 0)
+  const byFraction = exactShares
+    .map((share, index) => ({ index, fraction: share - Math.floor(share) }))
+    .sort((a, b) => b.fraction - a.fraction)
+
+  for (let i = 0; i < centsToDistribute; i += 1) {
+    const target = byFraction[i % byFraction.length]
+    if (target) adjustedCents[target.index] = (adjustedCents[target.index] ?? 0) + 1
+  }
+
+  return adjustedCents.map((cents) => cents / 100)
+}
+
 export function scanResultToFormItems(response: ScanReceiptResponse): ExpenseItemForm[] {
+  const totals = adjustedTotals(response)
+
   return response.items.map((item, index) =>
     makeItem({
       localId: `scan-${index}-${Date.now()}`,
@@ -11,7 +44,7 @@ export function scanResultToFormItems(response: ScanReceiptResponse): ExpenseIte
       quantity: item.quantity?.toString() ?? '',
       unit: '',
       unitPrice: item.unitPrice?.toString() ?? '',
-      total: item.totalPrice.toFixed(2),
+      total: (totals[index] ?? item.totalPrice).toFixed(2),
     }),
   )
 }
