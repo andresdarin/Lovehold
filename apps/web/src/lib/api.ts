@@ -15,10 +15,14 @@ export async function apiFetch<T = unknown>(
   options: RequestInit = {},
   accessToken?: string,
 ): Promise<T> {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(options.headers as Record<string, string>),
+  const headers: Record<string, string> = {}
+  const isFormData = options.body instanceof FormData
+
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json'
   }
+
+  Object.assign(headers, options.headers as Record<string, string>)
 
   if (accessToken) {
     headers['Authorization'] = `Bearer ${accessToken}`
