@@ -47,7 +47,7 @@ export default function AppShell({ children, profile, onLogout }: AppShellProps)
       </main>
 
       {/* Bottom Nav (Mobile) */}
-      <MobileNav />
+      <MobileNav profile={profile} />
     </div>
   )
 }

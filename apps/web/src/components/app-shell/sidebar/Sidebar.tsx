@@ -39,4 +39,7 @@ export default function Sidebar({ profile, onLogout, collapsed, onToggle }: Side
         hoveredHref={hoveredHref}
         onHoverChange={setHoveredHref}
       />
-      <SidebarFooter collapsed={collapsed} profile={profile} onLogout={onLogo
+      <SidebarFooter collapsed={collapsed} profile={profile} onLogout={onLogout} />
+    </aside>
+  )
+}

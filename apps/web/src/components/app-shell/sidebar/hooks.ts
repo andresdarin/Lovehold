@@ -46,4 +46,7 @@ export function useAnimatedIndicator(collapsed: boolean, activeHref: string) {
       window.clearTimeout(timeout)
       window.removeEventListener('resize', updateIndicator)
     }
-  }, [collaps
+  }, [collapsed, updateIndicator])
+
+  return { navRef, itemRefs, indicator, hoveredHref, setHoveredHref }
+}

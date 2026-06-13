@@ -47,4 +47,15 @@ export default function SidebarFooter({ collapsed, profile, onLogout }: SidebarF
           {!collapsed && (
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-[#2D255F] dark:text-white">
-                {profile.
+                {profile.displayName ?? 'Sin nombre'}
+              </p>
+              <p className="truncate text-xs text-[#2D255F]/45 dark:text-white/45">
+                {profile.email}
+              </p>
+            </div>
+          )}
+        </Link>
+      )}
+    </div>
+  )
+}

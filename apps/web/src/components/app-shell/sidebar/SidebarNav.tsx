@@ -77,3 +77,12 @@ export default function SidebarNav({ collapsed, profile, navRef, itemRefs, indic
                 isActive || isTarget ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white/55 group-hover:bg-white/70 dark:bg-white/[0.06] dark:group-hover:bg-white/[0.12]'
               }`}
             >
+              <Icon className="h-[18px] w-[18px]" />
+            </span>
+            {!collapsed && <span className="truncate">{item.label}</span>}
+          </Link>
+        )
+      })}
+    </nav>
+  )
+}

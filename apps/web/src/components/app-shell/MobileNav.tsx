@@ -3,9 +3,14 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Wallet, Plus, TrendingUp, Settings } from 'lucide-react'
+import { Home, Wallet, Plus, TrendingUp, Settings, BadgeDollarSign } from 'lucide-react'
 
 interface MobileNavProps {
+  profile: {
+    displayName: string | null
+    email: string
+    color: string
+  } | null
   onAddClick?: () => void
 }
 
@@ -13,11 +18,12 @@ interface MobileNavProps {
  * MobileNav: Barra de navegación inferior persistente en mobile.
  * Cuenta con accesos directos y un botón de acción principal central para agregar gastos.
  */
-export default function MobileNav({ onAddClick }: MobileNavProps) {
+export default function MobileNav({ profile, onAddClick }: MobileNavProps) {
   const pathname = usePathname()
 
   const navItems = [
     { label: 'Inicio', href: '/dashboard', icon: Home },
+    ...(profile ? [{ label: 'Finanzas', href: '/finanzas', icon: BadgeDollarSign }] : []),
     { label: 'Movimientos', href: '/expenses', icon: Wallet },
     { label: 'Agregar', href: '#', icon: Plus, isAction: true },
     { label: 'Balance', href: '/balance', icon: TrendingUp },
