@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { BadgeDollarSign } from 'lucide-react'
+import PersonalFinancePageContent from '@/components/personal-finance/PersonalFinancePageContent'
 
 export default function FinanzasPage() {
   return (
@@ -16,17 +17,7 @@ export default function FinanzasPage() {
         </div>
       </header>
 
-      <section className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-surface p-12 text-center shadow-sm">
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-soft">
-          <BadgeDollarSign className="h-6 w-6 text-muted-foreground animate-pulse" />
-        </div>
-        <div>
-          <h3 className="text-lg font-bold text-foreground">Próximamente</h3>
-          <p className="mt-1 text-sm text-muted-foreground max-w-sm">
-            Acá vas a poder gestionar tus ingresos, egresos, ahorros y llevar un control mensual de tus finanzas.
-          </p>
-        </div>
-      </section>
+      <PersonalFinancePageContent />
     </div>
   )
 }

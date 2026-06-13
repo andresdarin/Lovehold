@@ -148,3 +148,41 @@ model Settlement {
   from      Profile   @relation("settlementSender", fields: [fromId], references: [id])
   to        Profile   @relation("settlementReceiver", fields: [toId], references: [id])
 }
+
+model PersonalExpense {
+  id            String   @id @default(cuid())
+  profileId     String
+  title         String
+  merchant      String?
+  amount        Decimal  @db.Decimal(10, 2)
+  date          DateTime
+  type          String   // fixed | variable | supermarket
+  category      String
+  notes         String?
+  isRecurring   Boolean  @default(false)
+  recurrenceDay Int?
+  monthKey      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  items PersonalExpenseItem[]
+
+  @@index([profileId, monthKey])
+}
+
+model PersonalExpenseItem {
+  id         String   @id @default(cuid())
+  expenseId  String
+  name       String
+  quantity   Decimal? @db.Decimal(10, 3)
+  unitPrice  Decimal? @db.Decimal(10, 2)
+  totalPrice Decimal  @db.Decimal(10, 2)
+  category   String
+  rawLine    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  expense PersonalExpense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+
+  @@index([expenseId])
+}
