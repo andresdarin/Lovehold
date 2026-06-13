@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import Sidebar from './Sidebar'
+import Sidebar from './sidebar/Sidebar'
 import Topbar from './Topbar'
 import MobileNav from './MobileNav'
 
