@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { apiFetch } from '@/lib/api'
+import { getCurrentMonth } from './constants'
 import type { Movement, MovementFilters, MonthSummary, PaginationInfo, ExpenseListResponse } from './types'
-import { getCurrentMonth } from './utils'
 
 export function useMovements() {
   const [filters, setFiltersState] = useState<MovementFilters>({

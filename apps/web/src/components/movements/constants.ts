@@ -50,3 +50,25 @@ export const SCOPE_OPTIONS = [
   { value: 'personal', label: 'Personal' },
   { value: 'household', label: 'Hogar' },
 ] as const
+
+export const MONTH_LABELS_ES = [
+  'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+  'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic',
+] as const
+
+const monthNames = [
+  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
+] as const
+
+export function getCurrentMonth(): string {
+  const now = new Date()
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+}
+
+export function formatMonthLabel(value: string): string {
+  const [year, month] = value.split('-')
+  const m = Number(month)
+  if (!year || !m || m < 1 || m > 12) return value
+  return `${monthNames[m - 1]} de ${year}`
+}

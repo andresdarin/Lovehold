@@ -1,6 +1,8 @@
 'use client'
 
 import { Search, X } from 'lucide-react'
+import MovementsMonthPicker from './MovementsMonthPicker'
+import CustomSelect from '../ui/CustomSelect'
 import type { MovementFilters } from './types'
 import { KIND_OPTIONS, SCOPE_OPTIONS } from './constants'
 
@@ -10,9 +12,7 @@ interface Props {
   onClear: () => void
 }
 
-const inputBase = 'h-11 rounded-xl border border-border bg-surface-soft text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'
-const inputSelect = `${inputBase} appearance-none px-4 font-medium`
-const inputText = `${inputBase} px-4`
+const inputText = 'h-11 rounded-xl border border-border bg-surface-soft text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 px-4'
 
 export default function MovementsFilters({ filters, onChange, onClear }: Props) {
   const hasActiveFilters = filters.q || filters.kind || filters.scope || filters.category || filters.paymentMethod
@@ -31,32 +31,26 @@ export default function MovementsFilters({ filters, onChange, onClear }: Props) 
       </div>
 
       <div className="flex gap-3 overflow-x-auto pb-1 sm:flex-none sm:pb-0">
-        <input
-          type="month"
+        <MovementsMonthPicker
           value={filters.month}
-          onChange={(e) => onChange('month', e.target.value)}
-          className={`${inputText} w-40 shrink-0`}
+          onChange={(v) => onChange('month', v)}
         />
 
-        <select
+        <CustomSelect
           value={filters.kind}
-          onChange={(e) => onChange('kind', e.target.value)}
-          className={`${inputSelect} w-36 shrink-0`}
-        >
-          {KIND_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
+          options={KIND_OPTIONS}
+          onChange={(v) => onChange('kind', v)}
+          placeholder="Todos"
+          className="w-36 shrink-0"
+        />
 
-        <select
+        <CustomSelect
           value={filters.scope}
-          onChange={(e) => onChange('scope', e.target.value)}
-          className={`${inputSelect} w-32 shrink-0`}
-        >
-          {SCOPE_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
+          options={SCOPE_OPTIONS}
+          onChange={(v) => onChange('scope', v)}
+          placeholder="Todos"
+          className="w-32 shrink-0"
+        />
 
         {hasActiveFilters && (
           <button

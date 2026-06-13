@@ -7,10 +7,6 @@ export function formatAmount(value: number): string {
   return currencyFormat.format(value)
 }
 
-export function formatCurrency(value: number): string {
-  return formatAmount(value)
-}
-
 const dateFormat = new Intl.DateTimeFormat('es-UY', { day: 'numeric', month: 'long' })
 const dateFormatShort = new Intl.DateTimeFormat('es-UY', { day: 'numeric', month: 'long', year: 'numeric' })
 
@@ -45,7 +41,7 @@ export function kindShortLabel(kind: string): string {
 }
 
 export function kindTone(kind: string): string {
-  return KIND_TONES[kind] ?? KIND_TONES.other ?? 'bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20'
+  return KIND_TONES[kind] ?? KIND_TONES.other ?? 'bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-900 dark:text-gray-400 dark:border-gray-700'
 }
 
 export function scopeLabel(scope: string): string {
@@ -90,11 +86,6 @@ export function getMovementSubtitleParts(movement: Movement): string[] {
   return parts
 }
 
-export function getMovementMetadata(movement: Movement): string {
-  const parts = getMovementSubtitleParts(movement)
-  return parts.length > 0 ? parts.join(' · ') : scopeLabel(movement.scope)
-}
-
 export function groupByDate(movements: Movement[]): Record<string, Movement[]> {
   const groups: Record<string, Movement[]> = {}
   for (const m of movements) {
@@ -103,9 +94,4 @@ export function groupByDate(movements: Movement[]): Record<string, Movement[]> {
     groups[key].push(m)
   }
   return groups
-}
-
-export function getCurrentMonth(): string {
-  const now = new Date()
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
 }
