@@ -18,7 +18,7 @@ export default function MovementsFilters({ filters, onChange, onClear }: Props) 
   const hasActiveFilters = filters.q || filters.kind || filters.scope || filters.category || filters.paymentMethod
 
   return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
       <div className="relative min-w-0 flex-1">
         <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
@@ -30,7 +30,7 @@ export default function MovementsFilters({ filters, onChange, onClear }: Props) 
         />
       </div>
 
-      <div className="flex gap-2 overflow-x-auto sm:flex-none">
+      <div className="flex gap-3 overflow-x-auto pb-1 sm:flex-none sm:pb-0">
         <input
           type="month"
           value={filters.month}

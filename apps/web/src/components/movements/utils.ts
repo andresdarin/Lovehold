@@ -52,12 +52,47 @@ export function scopeLabel(scope: string): string {
   return SCOPE_LABELS[scope] ?? scope
 }
 
-export function getMovementMetadata(movement: Movement): string {
+function normalize(str: string): string {
+  return str.toLowerCase().trim()
+}
+
+export function movementTitleIncludesMerchant(title: string, merchant: string): boolean {
+  return normalize(title).includes(normalize(merchant))
+}
+
+const GENERIC_TITLES = new Set(['compra', 'gasto', 'compra de supermercado', 'supermercado', ''])
+
+function isGenericTitle(title: string): boolean {
+  return GENERIC_TITLES.has(normalize(title))
+}
+
+export function getMovementDisplayTitle(movement: Movement): string {
+  const { title, merchant, kind } = movement
+  if (merchant && (!title || isGenericTitle(title) || title === merchant || movementTitleIncludesMerchant(title, merchant))) {
+    return merchant
+  }
+  if (kind === 'supermarket' && !merchant) {
+    return 'Compra de supermercado'
+  }
+  return title || merchant || 'Sin título'
+}
+
+export function getMovementSubtitleParts(movement: Movement): string[] {
+  const displayTitle = getMovementDisplayTitle(movement)
   const parts: string[] = []
-  if (movement.merchant) parts.push(movement.merchant)
-  if (movement.itemsCount > 0) parts.push(`${movement.itemsCount} producto${movement.itemsCount !== 1 ? 's' : ''}`)
+  if (movement.merchant && movement.merchant !== displayTitle && !movementTitleIncludesMerchant(displayTitle, movement.merchant)) {
+    parts.push(movement.merchant)
+  }
+  if (movement.itemsCount > 0) {
+    parts.push(`${movement.itemsCount} producto${movement.itemsCount !== 1 ? 's' : ''}`)
+  }
   parts.push(scopeLabel(movement.scope))
-  return parts.join(' · ')
+  return parts
+}
+
+export function getMovementMetadata(movement: Movement): string {
+  const parts = getMovementSubtitleParts(movement)
+  return parts.length > 0 ? parts.join(' · ') : scopeLabel(movement.scope)
 }
 
 export function groupByDate(movements: Movement[]): Record<string, Movement[]> {

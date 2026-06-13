@@ -17,12 +17,12 @@ export const KIND_SHORT_LABELS: Record<string, string> = {
 }
 
 export const KIND_TONES: Record<string, string> = {
-  fixed: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
-  variable: 'bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20',
-  supermarket: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
-  subscription: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20',
-  debt: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
-  other: 'bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20',
+  fixed: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800',
+  variable: 'bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-900 dark:text-gray-400 dark:border-gray-700',
+  supermarket: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800',
+  subscription: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950 dark:text-violet-300 dark:border-violet-800',
+  debt: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800',
+  other: 'bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-900 dark:text-gray-400 dark:border-gray-700',
 }
 
 export const SCOPE_LABELS: Record<string, string> = {

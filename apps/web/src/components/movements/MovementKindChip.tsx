@@ -2,9 +2,9 @@
 
 import { kindShortLabel, kindTone } from './utils'
 
-export default function MovementKindChip({ kind, compact }: { kind: string; compact?: boolean }) {
+export default function MovementKindChip({ kind }: { kind: string }) {
   return (
-    <span className={`inline-flex items-center rounded-full border px-2.5 font-medium ${kindTone(kind)} ${compact ? 'h-5 text-[11px]' : 'h-6 text-xs'}`}>
+    <span className={`inline-flex h-5 items-center rounded-full border px-2 text-[11px] font-medium leading-none ${kindTone(kind)}`}>
       {kindShortLabel(kind)}
     </span>
   )

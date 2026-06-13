@@ -32,10 +32,10 @@ export default function MovementsList({
   const groups = groupByDate(movements)
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {Object.entries(groups).map(([dateKey, items]) => (
         <div key={dateKey}>
-          <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <h3 className="mb-2.5 px-1 text-xs font-semibold text-muted-foreground">
             {formatDateGroup(items[0]!.date)}
           </h3>
           <div className="space-y-1">

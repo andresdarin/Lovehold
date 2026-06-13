@@ -1,7 +1,7 @@
 'use client'
 
-import { RotateCcw } from 'lucide-react'
-import { formatAmount, getMovementMetadata } from './utils'
+import { ChevronRight } from 'lucide-react'
+import { formatAmount, getMovementDisplayTitle, getMovementSubtitleParts } from './utils'
 import MovementKindChip from './MovementKindChip'
 import type { Movement } from './types'
 
@@ -11,35 +11,31 @@ interface Props {
 }
 
 export default function MovementCard({ movement, onClick }: Props) {
+  const title = getMovementDisplayTitle(movement)
+  const subtitleParts = getMovementSubtitleParts(movement)
+  const subtitle = subtitleParts.length > 0 ? subtitleParts.join(' · ') : null
+
   return (
     <button
       type="button"
       onClick={() => onClick(movement)}
-      className="flex w-full items-center gap-4 rounded-2xl border border-border bg-surface px-5 py-4 text-left shadow-sm transition hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+      className="group flex w-full items-center gap-2.5 rounded-2xl border border-border bg-surface px-4 py-3 text-left shadow-sm transition hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
     >
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-foreground">
-          {movement.title || movement.merchant || 'Sin título'}
-        </p>
-        <p className="mt-0.5 truncate text-xs text-muted-foreground">
-          {getMovementMetadata(movement)}
-        </p>
-        <div className="mt-2 flex items-center gap-2">
-          <MovementKindChip kind={movement.kind} compact />
-          {movement.isRecurring && (
-            <span className="flex items-center gap-1 text-[11px] text-amber-600 dark:text-amber-400">
-              <RotateCcw className="h-3 w-3" />
-              {movement.recurringLabel || 'Recurrente'}
-            </span>
-          )}
+        <p className="truncate text-sm font-semibold text-foreground">{title}</p>
+        {subtitle && (
+          <p className="mt-0.5 truncate text-xs text-muted-foreground">{subtitle}</p>
+        )}
+        <div className="mt-1.5 flex items-center gap-1.5">
+          <MovementKindChip kind={movement.kind} />
         </div>
       </div>
 
-      <div className="shrink-0 text-right">
-        <p className="text-base font-bold text-foreground">{formatAmount(movement.total)}</p>
-        {movement.paymentMethod && (
-          <p className="mt-0.5 text-[11px] text-muted-foreground">{movement.paymentMethod}</p>
-        )}
+      <div className="flex shrink-0 items-center gap-1.5">
+        <div className="text-right">
+          <p className="text-sm font-bold text-foreground tabular-nums">{formatAmount(movement.total)}</p>
+        </div>
+        <ChevronRight className="h-4 w-4 text-muted-foreground/40 transition group-hover:text-muted-foreground/70" />
       </div>
     </button>
   )
