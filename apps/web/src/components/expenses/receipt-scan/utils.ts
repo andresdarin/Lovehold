@@ -4,6 +4,14 @@ import type { ScanReceiptResponse } from './types'
 
 const ROUNDING_TOLERANCE_CENTS = 5
 
+function isWeightedQuantity(quantity: number | null): boolean {
+  return quantity !== null && !Number.isInteger(quantity)
+}
+
+function formatQuantity(value: number): string {
+  return value.toFixed(3).replace(/0+$/, '').replace(/\.$/, '')
+}
+
 function adjustedTotals(response: ScanReceiptResponse): number[] {
   const originalCents = response.items.map((item) => toCents(item.totalPrice))
   const originalTotalCents = originalCents.reduce((sum, cents) => sum + cents, 0)
@@ -36,17 +44,19 @@ function adjustedTotals(response: ScanReceiptResponse): number[] {
 export function scanResultToFormItems(response: ScanReceiptResponse): ExpenseItemForm[] {
   const totals = adjustedTotals(response)
 
-  return response.items.map((item, index) =>
-    makeItem({
+  return response.items.map((item, index) => {
+    const isWeighted = isWeightedQuantity(item.quantity)
+
+    return makeItem({
       localId: `scan-${index}-${Date.now()}`,
       name: item.name,
       itemCategory: item.category,
-      quantity: item.quantity?.toString() ?? '',
-      unit: '',
-      unitPrice: item.unitPrice?.toString() ?? '',
+      quantity: isWeighted ? '1' : item.quantity?.toString() ?? '',
+      unit: isWeighted && item.quantity !== null ? `${formatQuantity(item.quantity)} kg` : '',
+      unitPrice: isWeighted ? '' : item.unitPrice?.toString() ?? '',
       total: (totals[index] ?? item.totalPrice).toFixed(2),
-    }),
-  )
+    })
+  })
 }
 
 export function confidenceColor(confidence: number): string {

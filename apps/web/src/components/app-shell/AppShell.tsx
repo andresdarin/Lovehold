@@ -41,7 +41,7 @@ export default function AppShell({ children, profile, onLogout }: AppShellProps)
           sidebarCollapsed ? 'lg:pl-[124px]' : 'lg:pl-[292px]'
         }`}
       >
-        <div className="mx-auto max-w-5xl p-4 md:p-6 lg:p-8">
+        <div className="p-4 md:p-6 lg:p-8">
           {children}
         </div>
       </main>

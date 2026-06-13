@@ -13,9 +13,9 @@ export default function ReceiptScanUploader({
   onClear: () => void
 }) {
   return (
-    <section className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+    <section className="flex h-full flex-col rounded-2xl border border-border bg-surface p-6 shadow-sm">
+      <div className="flex items-center gap-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10" aria-hidden="true">
           <ScanLine className="h-5 w-5 text-primary" />
         </div>
         <div>
@@ -24,19 +24,19 @@ export default function ReceiptScanUploader({
         </div>
       </div>
 
-      <div className="mt-4 space-y-4">
+      <div className="mt-6 flex min-h-0 flex-1 flex-col gap-4">
         {preview ? (
-          <div className="relative">
+          <div className="relative min-h-80 flex-1 overflow-hidden rounded-xl bg-black/10">
             <img
               src={preview}
               alt="Vista previa del ticket"
-              className="max-h-64 w-full rounded-xl object-contain bg-black/5"
+              className="h-full w-full object-cover"
             />
             <button
               type="button"
               onClick={onClear}
               disabled={scanning}
-              className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white transition hover:bg-black/70 disabled:opacity-50"
+              className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white transition hover:bg-black/75 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
               aria-label="Quitar imagen"
             >
               <X className="h-4 w-4" />
@@ -75,7 +75,7 @@ export default function ReceiptScanUploader({
         )}
 
         {preview && !scanning && (
-          <LiquidGlass variant="button" intensity="medium" className="block w-full">
+          <LiquidGlass variant="button" intensity="medium" className="mt-auto block w-full">
             <button
               type="button"
               onClick={onScan}
@@ -88,7 +88,7 @@ export default function ReceiptScanUploader({
         )}
 
         {scanning && (
-          <div className="flex items-center justify-center gap-3 rounded-xl bg-surface-soft py-4">
+          <div className="mt-auto flex items-center justify-center gap-3 rounded-xl bg-surface-soft py-4">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
             <span className="text-sm font-medium text-muted-foreground">Analizando ticket con IA…</span>
           </div>

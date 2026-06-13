@@ -38,7 +38,9 @@ Reglas:
 - Detectá total final pagado.
 - Detectá descuentos/promociones si aparecen.
 - confidence debe ir de 0 a 1.
-- warnings debe explicar inconsistencias o datos dudosos.
+- warnings debe listar solo problemas de lectura/OCR o datos dudosos.
+- No valides aritmética de subtotal, descuentos, IVA o impuestos; el servidor lo recalcula.
+- Si aparecen "Descuento" y "Total Descuentos", no los sumes dos veces.
 - Los precios uruguayos pueden usar coma como separador decimal.
 - Las fechas pueden estar en formato DD/MM/YYYY.`
 

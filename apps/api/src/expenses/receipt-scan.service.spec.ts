@@ -157,6 +157,36 @@ describe('validateAndNormalize', () => {
     expect(result.discounts).toBe(28)
     expect(result.warnings[0]).toContain('se ajustó a $28.00')
   })
+
+  it('drops Gemini arithmetic warnings before backend reconciliation', () => {
+    const result = validateAndNormalize({
+      merchant: 'ADENDA',
+      receiptDate: '12/06/2026',
+      total: 813.21,
+      subtotal: 841.21,
+      discounts: 56,
+      items: [
+        { name: 'CHOCO AVELLANA COFLER', totalPrice: 199, category: 'SNACKS_DULCES' },
+        { name: 'MUZARELLA CONAPROLE', totalPrice: 132.75, category: 'LACTEOS' },
+        { name: 'JAMON COCIDO SCHNECK', totalPrice: 168.1, category: 'CARNES_FIAMBRES' },
+        { name: 'BIZCOCHOS PAGNIFIQUE', totalPrice: 197.36, category: 'PANIFICADOS' },
+        { name: '3D MEGATUBE BARBACOA', totalPrice: 52, category: 'SNACKS_DULCES' },
+        { name: 'KNORR SSA FILETTO', totalPrice: 92, category: 'ALIMENTOS' },
+      ],
+      confidence: 0.9,
+      warnings: [
+        'Calculated subtotal (sum of items: 841.21) minus discounts (56.00) equals 785.21, which does not match the final total (813.21).',
+        'The IVA breakdown is inconsistent with these figures.',
+        'Lectura dudosa en nombre de producto: BIZCOCHOS PAGNIFIQUE.',
+      ],
+    })
+
+    expect(result.discounts).toBe(28)
+    expect(result.warnings.join(' ')).not.toContain('Calculated subtotal')
+    expect(result.warnings.join(' ')).not.toContain('IVA breakdown')
+    expect(result.warnings).toContain('Lectura dudosa en nombre de producto: BIZCOCHOS PAGNIFIQUE.')
+    expect(result.warnings[result.warnings.length - 1]).toContain('se ajustó a $28.00')
+  })
 })
 
 describe('ReceiptScanService', () => {

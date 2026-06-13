@@ -2,7 +2,7 @@ import { BadRequestException } from '@nestjs/common'
 import { EXPENSE_ITEM_CATEGORIES } from './dto/create-expense.dto'
 import type { ScanReceiptResponse } from './receipt-scan.types'
 import { reconcileReceiptTotals } from './receipt-scan.totals'
-
+import { normalizeGeminiWarnings } from './receipt-scan.warnings'
 export function normalizeDate(raw: string | null): string | null {
   if (!raw) return null
   const trimmed = raw.trim()
@@ -74,7 +74,7 @@ export function validateAndNormalize(raw: unknown): ScanReceiptResponse {
 
   const total = parseUruguayanPrice(data.total as string | number | null)
   const itemsTotal = items.reduce((sum, item) => sum + item.totalPrice, 0)
-  const warnings: string[] = Array.isArray(data.warnings) ? data.warnings.filter((w): w is string => typeof w === 'string') : []
+  const warnings = normalizeGeminiWarnings(data.warnings)
 
   const { subtotal, discounts } = reconcileReceiptTotals({
     itemCount: items.length,

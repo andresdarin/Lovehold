@@ -188,6 +188,24 @@
     z-index: 1;
   }
 
+  .scrollbar-salmon {
+    scrollbar-color: var(--primary) transparent;
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-salmon::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .scrollbar-salmon::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-salmon::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 999px;
+  }
+
   .dark .liquid-glass {
     border-color: color-mix(in oklch, var(--border) 78%, var(--primary-foreground) 16%);
     background:
