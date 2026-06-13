@@ -9,6 +9,7 @@
     "moduleResolution": "bundler",
     "allowJs": true,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "incremental": true,
     "paths": {
       "@/*": ["./src/*"]

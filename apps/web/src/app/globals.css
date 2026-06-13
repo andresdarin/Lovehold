@@ -18,6 +18,11 @@
     --warning: #F59E0B;
     --danger: #FF6B6B;
     --gold: #FACC15;
+    --lh-navy: var(--foreground);
+    --lh-primary: var(--primary);
+    --lh-primary-rose: #E0546B;
+    --lh-border-light: var(--border);
+    --lh-surface: var(--surface);
   }
 
   .dark {
@@ -36,6 +41,11 @@
     --warning: #F59E0B;
     --danger: #FF6B6B;
     --gold: #FACC15;
+    --lh-navy: var(--foreground);
+    --lh-primary: var(--primary);
+    --lh-primary-rose: #C94D60;
+    --lh-border-light: var(--border);
+    --lh-surface: var(--surface);
   }
 
   * {
@@ -219,4 +229,10 @@
   --color-warning: var(--warning);
   --color-danger: var(--danger);
   --color-gold: var(--gold);
+
+  --color-lh-navy: var(--lh-navy);
+  --color-lh-primary: var(--lh-primary);
+  --color-lh-primary-rose: var(--lh-primary-rose);
+  --color-lh-border-light: var(--lh-border-light);
+  --color-lh-surface: var(--lh-surface);
 }

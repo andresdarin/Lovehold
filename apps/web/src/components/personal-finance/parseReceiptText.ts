@@ -1,44 +1,40 @@
 const IGNORE_PATTERNS = [
-  /^(rut|fecha|caja|cajero|ticket|factura|boleta|cliente|dirección|teléfono|total|subtotal|iva|descuento|vuelto|cambio|redondeo|forma de pago|efectivo|crédito|débito|tarjeta|gracias|vuelva pronto)/i,
-  /^\d{6,}/,
-  /^(iva|irpf|imesi)\b/i,
-  /^\s*$/,
+  /^(rut|fecha|caja|cajero|ticket|factura|boleta|cliente|dirección|teléfono|subtotal|iva|descuento|vuelto|cambio|redondeo|forma de pago|efectivo|crédito|débito|tarjeta|gracias|vuelva pronto|le atendi)/i,
+  /^\d{6,}$/, /^(iva|irpf|imesi)\b/i, /^\s*$/,
 ]
 
-const PRICE_PATTERNS = [
-  /(\d{1,3}(?:\.\d{3})*,\d{2})\s*$/,  // 1.234,56
-  /(\d+,\d{2})\s*$/,                    // 1234,56
-  /\$\s*([\d.,]+)\s*$/,                 // $ 1.234,56 or $1234
-  /(\d{1,3}(?:\.\d{3})*)\s*$/,         // 1.234 (no decimal)
-  /(\d+)\s*$/,                          // 1234 (no decimal)
-]
+const SEPARATORS = [' — ', ' - ']
+const PRICE_ONLY = /^\$?\s*\d[\d\s.,]*$/
 
-const PRICE_ONLY = /^\$?\s*[\d.,]+\s*$/
-
-function parsePrice(raw: string | undefined): number | null {
-  if (!raw) return null
-  const cleaned = raw.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.')
+function parseUruguayanPrice(raw: string): number | null {
+  const cleaned = raw.replace(/[$\s]/g, '').replace(/\./g, '').replace(',', '.')
   const n = parseFloat(cleaned)
-  return isNaN(n) ? null : n
+  return isNaN(n) || n <= 0 ? null : n
 }
 
-function extractPrice(line: string): number | null {
-  for (const pattern of PRICE_PATTERNS) {
-    const match = line.match(pattern)
-    if (match) {
-      const price = parsePrice(match[1])
-      if (price !== null && price > 0) return price
-    }
-  }
-  return null
+function extractPriceFromEnd(line: string): number | null {
+  const match = line.match(/(\d[\d\s.,]*)$/)
+  if (!match?.[1]) return null
+  return parseUruguayanPrice(match[1])
 }
 
-function extractName(line: string, _price: number): string {
-  return line
-    .replace(/\$\s*[\d.,]+\s*$/, '')
-    .replace(/[\d.,]+\s*$/, '')
-    .replace(/\s+/g, ' ')
-    .trim()
+const CATEGORY_MAP: Record<string, string> = {
+  alimentos: 'alimentos', verduras: 'alimentos', frutas: 'alimentos',
+  lacteos: 'alimentos', 'lácteos': 'alimentos', carnes: 'alimentos',
+  fiambres: 'alimentos', panificados: 'alimentos',
+  bebidas: 'bebidas', alcohol: 'bebidas', refrescos: 'bebidas',
+  limpieza: 'limpieza', hogar: 'limpieza',
+  higiene: 'higiene',
+  snacks: 'snacks', dulces: 'snacks', golosinas: 'snacks',
+  mascotas: 'mascotas',
+  farmacia: 'farmacia', salud: 'farmacia', medicamentos: 'farmacia',
+  otros: 'otros_super', varios: 'otros_super',
+}
+
+function normalizeCategory(raw: string): string {
+  const first = raw.replace(/\s*\/.*/, '').trim()
+  const key = first.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  return CATEGORY_MAP[key] ?? 'alimentos'
 }
 
 export interface DetectedItem {
@@ -53,59 +49,52 @@ export interface DetectedItem {
 export interface ParseResult {
   items: DetectedItem[]
   ignored: string[]
-  detectedTotal: number | null
+  detectedTotal: number
 }
 
 export function parseReceiptText(text: string): ParseResult {
   const lines = text.split('\n')
   const items: DetectedItem[] = []
   const ignored: string[] = []
-  let detectedTotal: number | null = null
 
   for (const raw of lines) {
     const line = raw.trim()
-    if (!line) continue
-
-    if (IGNORE_PATTERNS.some((p) => p.test(line))) {
-      ignored.push(line)
-      if (/^total\b/i.test(line)) {
-        const total = extractPrice(line)
-        if (total !== null) detectedTotal = total
-      }
+    if (!line || IGNORE_PATTERNS.some((p) => p.test(line)) || PRICE_ONLY.test(line)) {
+      if (line) ignored.push(line)
       continue
     }
 
-    if (PRICE_ONLY.test(line)) continue
+    let parsed = false
+    for (const sep of SEPARATORS) {
+      const parts = line.split(sep).map((s) => s.trim())
+      if (parts.length < 2) continue
 
-    const price = extractPrice(line)
-    if (price === null) {
-      ignored.push(line)
-      continue
+      const price = parseUruguayanPrice(parts[parts.length - 1]!)
+      if (price === null) continue
+      if (!parts[0]) { ignored.push(line); parsed = true; break }
+
+      const categoryRaw = parts.length >= 3 ? parts[1]! : ''
+      items.push({
+        name: parts[0]!, quantity: null, unitPrice: null,
+        totalPrice: price, category: categoryRaw ? normalizeCategory(categoryRaw) : 'alimentos', rawLine: line,
+      })
+      parsed = true
+      break
     }
+    if (parsed) continue
 
-    const name = extractName(line, price)
-    if (!name || name.length < 2) {
-      ignored.push(line)
-      continue
-    }
+    const price = extractPriceFromEnd(line)
+    if (price === null) { ignored.push(line); continue }
 
-    items.push({
-      name,
-      quantity: null,
-      unitPrice: null,
-      totalPrice: price,
-      category: 'alimentos',
-      rawLine: line,
-    })
+    const name = line.replace(/\$?\s*[\d\s.,]+$/, '').trim()
+    if (!name) { ignored.push(line); continue }
+
+    items.push({ name, quantity: null, unitPrice: null, totalPrice: price, category: 'alimentos', rawLine: line })
   }
 
-  if (items.length === 0 && ignored.length > 0) {
-    const lastTotal = ignored
-      .filter((l) => /^total\b/i.test(l))
-      .map((l) => extractPrice(l))
-      .find((p): p is number => p !== null)
-    detectedTotal = lastTotal ?? null
-  }
+  return { items, ignored, detectedTotal: items.reduce((s, i) => s + i.totalPrice, 0) }
+}
 
-  return { items, ignored, detectedTotal }
+export function normalizeProductName(name: string): string {
+  return name.toLowerCase().trim().replace(/\s+/g, ' ')
 }

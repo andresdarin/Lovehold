@@ -72,7 +72,7 @@ export default function LoginPage() {
         className="h-16 w-16 mx-auto focus:outline-none"
       />
 
-      <h1 className="mt-6 text-center text-4xl lg:text-5xl font-bold leading-tight text--lh-navy">
+      <h1 className="mt-6 text-center text-4xl lg:text-5xl font-bold leading-tight text-lh-navy">
         Welcome to
         <br />
         L<span
@@ -80,17 +80,17 @@ export default function LoginPage() {
           style={{ height: '1em' }}
         >
           <Heart
-            className="block h-[0.62em] w-[0.62em] text--lh-primary stroke-[3.5px] translate-y-[0.04em]"
+            className="block h-[0.62em] w-[0.62em] text-lh-primary stroke-[3.5px] translate-y-[0.04em]"
             style={{ display: 'block' }}
           />
         </span>vehold
       </h1>
 
-      <p className="mt-2 lg:mt-6 text-center text-lg text--lh-navy/60">
+      <p className="mt-2 lg:mt-6 text-center text-lg text-lh-navy/60">
         Compartan todo. Lleven cuentas de lo que importa.
       </p>
 
-      <h2 className="mt-6 text-center text-xl font-semibold text--lh-navy">
+      <h2 className="mt-6 text-center text-xl font-semibold text-lh-navy">
         Iniciar sesión
       </h2>
 
@@ -98,12 +98,12 @@ export default function LoginPage() {
         <div>
           <label
             htmlFor="email"
-            className="mb-2 block text-sm font-medium text--lh-navy/70"
+            className="mb-2 block text-sm font-medium text-lh-navy/70"
           >
             Email
           </label>
           <div className="relative">
-            <Mail className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text--lh-navy/40" />
+            <Mail className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-lh-navy/40" />
             <input
               id="email"
               type="email"
@@ -112,7 +112,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="tu@email.com"
-              className="w-full rounded-xl border border--lh-border-light bg-lh-surface py-3.5 pl-11 pr-4 text--lh-navy placeholder:text--lh-navy/40 outline-none transition-all focus:border--lh-primary focus:ring-2 focus:ring--lh-primary/40 focus-visible:ring-2 focus-visible:ring--lh-primary/40"
+              className="w-full rounded-xl border border-lh-border-light bg-lh-surface py-3.5 pl-11 pr-4 text-lh-navy placeholder:text-lh-navy/40 outline-none transition-all focus:border-lh-primary focus:ring-2 focus:ring-lh-primary/40 focus-visible:ring-2 focus-visible:ring-lh-primary/40"
             />
           </div>
         </div>
@@ -120,12 +120,12 @@ export default function LoginPage() {
         <div>
           <label
             htmlFor="password"
-            className="mb-2 block text-sm font-medium text--lh-navy/70"
+            className="mb-2 block text-sm font-medium text-lh-navy/70"
           >
             Contraseña
           </label>
           <div className="relative">
-            <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text--lh-navy/40" />
+            <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-lh-navy/40" />
             <input
               id="password"
               type="password"
@@ -134,37 +134,37 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full rounded-xl border border--lh-border-light bg-lh-surface py-3.5 pl-11 pr-4 text--lh-navy placeholder:text--lh-navy/40 outline-none transition-all focus:border--lh-primary focus:ring-2 focus:ring--lh-primary/40 focus-visible:ring-2 focus-visible:ring--lh-primary/40"
+              className="w-full rounded-xl border border-lh-border-light bg-lh-surface py-3.5 pl-11 pr-4 text-lh-navy placeholder:text-lh-navy/40 outline-none transition-all focus:border-lh-primary focus:ring-2 focus:ring-lh-primary/40 focus-visible:ring-2 focus-visible:ring-lh-primary/40"
             />
           </div>
         </div>
 
         {error && (
-          <p className="rounded-xl border border--lh-primary/20 bg--lh-primary/10 px-4 py-3 text-sm text--lh-primary">
+          <p className="rounded-xl border border-lh-primary/20 bg-lh-primary/10 px-4 py-3 text-sm text-lh-primary">
             {error}
           </p>
         )}
 
         <div className="flex items-center justify-center gap-3 py-3" aria-hidden="true">
-          <span className="h-px flex-1 bg--lh-navy/[0.06]" />
-          <Heart className="h-6 w-6 text--lh-primary/25" />
-          <span className="h-px flex-1 bg--lh-navy/[0.06]" />
+          <span className="h-px flex-1 bg-lh-navy/[0.06]" />
+          <Heart className="h-6 w-6 text-lh-primary/25" />
+          <span className="h-px flex-1 bg-lh-navy/[0.06]" />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-xl bg-gradient-to-r from--lh-primary to--lh-primary-rose py-[14px] font-semibold text-white shadow-lg shadow--lh-primary/25 transition-all hover:shadow-xl hover:shadow--lh-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring--lh-primary/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full rounded-xl bg-gradient-to-r from-lh-primary to-lh-primary-rose py-[14px] font-semibold text-white shadow-lg shadow-lh-primary/25 transition-all hover:shadow-xl hover:shadow-lh-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lh-primary/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Entrando…' : 'Entrar'}
         </button>
       </form>
 
-      <p className="mt-8 text-center text-sm text--lh-navy/50">
+      <p className="mt-8 text-center text-sm text-lh-navy/50">
         ¿No tenés cuenta?{' '}
         <Link
           href="/signup"
-          className="rounded font-medium text--lh-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring--lh-primary/50 focus-visible:ring-offset-2"
+          className="rounded font-medium text-lh-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lh-primary/50 focus-visible:ring-offset-2"
         >
           Registrate
         </Link>
