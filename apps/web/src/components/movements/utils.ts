@@ -1,8 +1,14 @@
-import { money } from '../expenses/constants'
+import { KIND_LABELS, KIND_SHORT_LABELS, KIND_TONES, SCOPE_LABELS } from './constants'
 import type { Movement } from './types'
 
+const currencyFormat = new Intl.NumberFormat('es-UY', { style: 'currency', currency: 'UYU', minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+export function formatAmount(value: number): string {
+  return currencyFormat.format(value)
+}
+
 export function formatCurrency(value: number): string {
-  return money(value)
+  return formatAmount(value)
 }
 
 const dateFormat = new Intl.DateTimeFormat('es-UY', { day: 'numeric', month: 'long' })
@@ -31,31 +37,27 @@ export function formatDateGroup(dateStr: string): string {
 }
 
 export function kindLabel(kind: string): string {
-  const map: Record<string, string> = {
-    fixed: 'Fijo',
-    variable: 'Variable',
-    supermarket: 'Supermercado',
-    subscription: 'Suscripción',
-    debt: 'Deuda',
-    other: 'Otro',
-  }
-  return map[kind] ?? kind
+  return KIND_LABELS[kind] ?? kind
+}
+
+export function kindShortLabel(kind: string): string {
+  return KIND_SHORT_LABELS[kind] ?? kind
+}
+
+export function kindTone(kind: string): string {
+  return KIND_TONES[kind] ?? KIND_TONES.other ?? 'bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20'
 }
 
 export function scopeLabel(scope: string): string {
-  return scope === 'household' ? 'Hogar' : scope === 'personal' ? 'Personal' : scope
+  return SCOPE_LABELS[scope] ?? scope
 }
 
-export function kindColor(kind: string): string {
-  const map: Record<string, string> = {
-    fixed: 'bg-blue-500/15 text-blue-600 dark:text-blue-400',
-    variable: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
-    supermarket: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
-    subscription: 'bg-violet-500/15 text-violet-600 dark:text-violet-400',
-    debt: 'bg-rose-500/15 text-rose-600 dark:text-rose-400',
-    other: 'bg-gray-500/15 text-gray-600 dark:text-gray-400',
-  }
-  return map[kind] ?? 'bg-gray-500/15 text-gray-600 dark:text-gray-400'
+export function getMovementMetadata(movement: Movement): string {
+  const parts: string[] = []
+  if (movement.merchant) parts.push(movement.merchant)
+  if (movement.itemsCount > 0) parts.push(`${movement.itemsCount} producto${movement.itemsCount !== 1 ? 's' : ''}`)
+  parts.push(scopeLabel(movement.scope))
+  return parts.join(' · ')
 }
 
 export function groupByDate(movements: Movement[]): Record<string, Movement[]> {

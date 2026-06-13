@@ -1,6 +1,6 @@
 'use client'
 
-import { money } from '../expenses/constants'
+import { formatAmount } from './utils'
 import type { MovementItem } from './types'
 
 interface Props {
@@ -32,9 +32,9 @@ export default function MovementItemsTable({ items }: Props) {
                 {item.quantity != null ? `${item.quantity}${item.unit ? ` ${item.unit}` : ''}` : '-'}
               </td>
               <td className="px-2 py-2.5 text-muted-foreground">
-                {item.unitPrice != null ? money(item.unitPrice) : '-'}
+                {item.unitPrice != null ? formatAmount(item.unitPrice) : '-'}
               </td>
-              <td className="px-2 py-2.5 text-right font-semibold">{money(item.totalPrice)}</td>
+              <td className="px-2 py-2.5 text-right font-semibold tabular-nums">{formatAmount(item.totalPrice)}</td>
             </tr>
           ))}
         </tbody>

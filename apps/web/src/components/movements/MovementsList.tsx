@@ -32,11 +32,13 @@ export default function MovementsList({
   const groups = groupByDate(movements)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {Object.entries(groups).map(([dateKey, items]) => (
         <div key={dateKey}>
-          <h3 className="mb-3 text-sm font-bold text-muted-foreground">{formatDateGroup(items[0]!.date)}</h3>
-          <div className="space-y-2">
+          <h3 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            {formatDateGroup(items[0]!.date)}
+          </h3>
+          <div className="space-y-1">
             {items.map((m) => (
               <MovementCard key={m.id} movement={m} onClick={onMovementClick} />
             ))}

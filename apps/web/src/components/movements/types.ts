@@ -65,19 +65,3 @@ export interface ExpenseListResponse {
   summary: MonthSummary
   pagination: PaginationInfo
 }
-
-export const KIND_OPTIONS = [
-  { value: '', label: 'Todos' },
-  { value: 'fixed', label: 'Fijo' },
-  { value: 'variable', label: 'Variable' },
-  { value: 'supermarket', label: 'Supermercado' },
-  { value: 'subscription', label: 'Suscripción' },
-  { value: 'debt', label: 'Deuda' },
-  { value: 'other', label: 'Otro' },
-] as const
-
-export const SCOPE_OPTIONS = [
-  { value: '', label: 'Todos' },
-  { value: 'personal', label: 'Personal' },
-  { value: 'household', label: 'Hogar' },
-] as const

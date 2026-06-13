@@ -1,8 +1,7 @@
 'use client'
 
 import { X, Trash2, RotateCcw } from 'lucide-react'
-import { money } from '../expenses/constants'
-import { formatDate, kindLabel, kindColor, scopeLabel } from './utils'
+import { formatAmount, formatDate, kindLabel, kindTone, scopeLabel } from './utils'
 import MovementItemsTable from './MovementItemsTable'
 import type { Movement } from './types'
 
@@ -26,7 +25,7 @@ export default function MovementDetailDrawer({ movement, onClose }: Props) {
         role="dialog"
         aria-modal="true"
         aria-label="Detalle del movimiento"
-        className="scrollbar-salmon fixed inset-x-0 bottom-0 max-h-[88vh] overflow-y-auto rounded-t-2xl border border-border bg-surface p-5 shadow-2xl lg:inset-y-0 lg:left-auto lg:right-0 lg:max-h-none lg:w-[420px] lg:rounded-l-2xl lg:rounded-tr-none"
+        className="fixed inset-x-0 bottom-0 max-h-[88vh] overflow-y-auto rounded-t-2xl border border-border bg-surface p-5 shadow-2xl lg:inset-y-0 lg:left-auto lg:right-0 lg:max-h-none lg:w-[420px] lg:rounded-l-2xl lg:rounded-tr-none"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4">
@@ -45,9 +44,10 @@ export default function MovementDetailDrawer({ movement, onClose }: Props) {
           <p className="mt-3 text-sm text-foreground">{movement.merchant}</p>
         )}
 
-        <div className="mt-4 flex flex-wrap gap-1.5">
-          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">{movement.category}</span>
-          <span className={`rounded-full px-3 py-1 text-xs font-medium ${kindColor(movement.kind)}`}>{kindLabel(movement.kind)}</span>
+        <div className="mt-4 flex flex-wrap items-center gap-1.5">
+          <span className={`rounded-full px-3 py-1 text-xs font-medium ${kindTone(movement.kind)}`}>
+            {kindLabel(movement.kind)}
+          </span>
           <span className="rounded-full bg-surface-soft px-3 py-1 text-xs font-medium text-muted-foreground">{scopeLabel(movement.scope)}</span>
           {movement.isRecurring && (
             <span className="flex items-center gap-1 rounded-full bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-600 dark:text-amber-400">
@@ -58,7 +58,7 @@ export default function MovementDetailDrawer({ movement, onClose }: Props) {
         </div>
 
         <div className="mt-5">
-          <p className="text-3xl font-bold text-foreground">{money(movement.total)}</p>
+          <p className="text-3xl font-bold text-foreground tabular-nums">{formatAmount(movement.total)}</p>
           {movement.paymentMethod && (
             <p className="mt-1 text-sm text-muted-foreground">{movement.paymentMethod}</p>
           )}
@@ -73,18 +73,18 @@ export default function MovementDetailDrawer({ movement, onClose }: Props) {
             <div className="divide-y divide-border/50 text-sm">
               <div className="flex justify-between py-1.5">
                 <span className="text-muted-foreground">Suma de ítems</span>
-                <span className="font-medium text-foreground">{money(movement.itemsTotal)}</span>
+                <span className="font-medium text-foreground tabular-nums">{formatAmount(movement.itemsTotal)}</span>
               </div>
               {movement.discounts != null && movement.discounts > 0 && (
                 <div className="flex justify-between py-1.5">
                   <span className="text-muted-foreground">Descuentos</span>
-                  <span className="font-medium text-success">-{money(movement.discounts)}</span>
+                  <span className="font-medium text-success tabular-nums">-{formatAmount(movement.discounts)}</span>
                 </div>
               )}
               {movement.discounts != null && movement.discounts > 0 && (
                 <div className="flex justify-between py-1.5">
                   <span className="text-muted-foreground">Diferencia</span>
-                  <span className="font-medium text-foreground">{money(movement.total - movement.itemsTotal + movement.discounts)}</span>
+                  <span className="font-medium text-foreground tabular-nums">{formatAmount(movement.total - movement.itemsTotal + movement.discounts)}</span>
                 </div>
               )}
             </div>
