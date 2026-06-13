@@ -4,6 +4,7 @@ import { PrismaModule } from './prisma/prisma.module'
 import { ExpensesModule } from './expenses/expenses.module'
 import { ProfilesModule } from './profiles/profiles.module'
 import { PersonalFinanceModule } from './personal-finance/personal-finance.module'
+import { GamificationModule } from './gamification/gamification.module'
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { PersonalFinanceModule } from './personal-finance/personal-finance.modul
     ExpensesModule,
     ProfilesModule,
     PersonalFinanceModule,
+    GamificationModule,
   ],
 })
 export class AppModule {}

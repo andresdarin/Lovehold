@@ -328,11 +328,48 @@ export class ExpensesService {
     this.validateItemsTotal(dto.amount, dto.items)
 
     const isPersonal = dto.scope === 'personal'
-    if (isPersonal) {
-      return this.createPersonalExpense(profile.id, dto)
+    const expense = isPersonal
+      ? await this.createPersonalExpense(profile.id, dto)
+      : await this.createHouseholdExpense(profile, dto)
+
+    const earnedXp = this.calculateExpenseXp(dto)
+
+    if (earnedXp > 0) {
+      await this.prisma.profile.update({
+        where: { id: profile.id },
+        data: { gamificationXp: { increment: earnedXp } },
+      })
     }
 
-    return this.createHouseholdExpense(profile, dto)
+    return { ...expense, xpEarned: earnedXp }
+  }
+
+  private calculateExpenseXp(dto: CreateExpenseDto): number {
+    let xp = 0
+    const categoryLower = (dto.category || '').toLowerCase()
+    const hasItems = (dto.items?.length ?? 0) > 0
+    const isSupermarket = categoryLower.includes('súper') || categoryLower.includes('super')
+
+    if (isSupermarket && hasItems) {
+      xp += 10
+    } else {
+      xp += 5
+    }
+
+    if (hasItems) {
+      xp += 5
+    }
+
+    const hasCompleteData =
+      dto.category?.trim() &&
+      dto.scope?.trim() &&
+      dto.paymentMethod?.trim()
+
+    if (hasCompleteData) {
+      xp += 5
+    }
+
+    return xp
   }
 
   private async createPersonalExpense(profileId: string, dto: CreateExpenseDto) {

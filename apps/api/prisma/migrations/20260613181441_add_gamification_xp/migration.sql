@@ -1,0 +1,1 @@
+ALTER TABLE "Profile" ADD COLUMN "gamificationXp" INTEGER NOT NULL DEFAULT 0;

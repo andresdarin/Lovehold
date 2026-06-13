@@ -7,14 +7,15 @@ datasource db {
 }
 
 model Profile {
-  id         String   @id @default(cuid())
-  authUserId String   @unique
-  email      String   @unique
-  displayName String?
-  avatarUrl  String?
-  color      String   @default("#6366f1")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id           String   @id @default(cuid())
+  authUserId   String   @unique
+  email        String   @unique
+  displayName  String?
+  avatarUrl    String?
+  color        String   @default("#6366f1")
+  gamificationXp Int    @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   createdHouseholds  Household[]        @relation("householdCreator")
   paidExpenses       Expense[]          @relation("paidBy")
