@@ -8,21 +8,12 @@ import ReceiptScanSection from '@/components/expenses/receipt-scan/ReceiptScanSe
 import { useExpenseForm } from '@/components/expenses/hooks'
 import { useReceiptScan } from '@/components/expenses/receipt-scan/hooks'
 import { scanResultToFormItems } from '@/components/expenses/receipt-scan/utils'
-import { makeItem, SAMPLE_ITEMS } from '@/components/expenses/constants'
 
 export default function NewExpensePage() {
   const { profile } = useProfile()
   const profileName = profile?.displayName || profile?.email || 'Tu perfil'
   const form = useExpenseForm(profileName)
   const scan = useReceiptScan()
-
-  function loadTataExample() {
-    const items = SAMPLE_ITEMS.map((item, i) => makeItem({ ...item, localId: `tata-${i}`, quantity: '', unit: '', unitPrice: '' }))
-    form.loadExample({
-      form: { title: 'Compra Tata', merchant: 'Tata', category: 'Compras de súper', amount: '1042.01', date: '2026-06-09', paymentMethod: 'Débito VISA', notes: '' },
-      items,
-    })
-  }
 
   function applyScan() {
     if (!scan.result) return
@@ -61,7 +52,6 @@ export default function NewExpensePage() {
           onClearItems={form.clearItems}
           onUpdateItem={form.updateItem}
           onUseItemsTotal={form.useItemsTotalAsAmount}
-          onLoadExample={loadTataExample}
         />
       </NewExpenseFormGrid>
     </form>

@@ -49,17 +49,3 @@ export function money(value: number): string {
 export function sumItems(items: ExpenseItemForm[]): number {
   return items.reduce((sum, item) => sum + parseAmount(item.total), 0)
 }
-
-export const SAMPLE_ITEMS: Omit<ExpenseItemForm, 'localId' | 'quantity' | 'unit' | 'unitPrice'>[] = [
-  { name: 'Huevos San Agustín 15 un', itemCategory: 'ALIMENTOS', total: '199.00' },
-  { name: 'Papel higiénico SAK 30 mt x 16 ro', itemCategory: 'HIGIENE', total: '319.00' },
-  { name: 'Cebolla colorada', itemCategory: 'VERDURAS', total: '10.01' },
-  { name: 'Queso cheddar Conaprole', itemCategory: 'LACTEOS', total: '106.80' },
-  { name: 'Goma en tubo Gomets', itemCategory: 'OTROS', total: '10.00' },
-  { name: 'Panceta ahumada Doña Coca', itemCategory: 'CARNES_FIAMBRES', total: '146.20' },
-  { name: 'Pan Bimbo artesano papa x4u', itemCategory: 'PANIFICADOS', total: '114.00' },
-  { name: 'Cerveza Colina 473 ml', itemCategory: 'ALCOHOL', total: '49.00' },
-  { name: 'Alfajor triple nieve Punta', itemCategory: 'SNACKS_DULCES', total: '39.00' },
-  { name: 'Alfajor Portezuelo triple', itemCategory: 'SNACKS_DULCES', total: '39.00' },
-  { name: 'Bolsa compostable 50x60', itemCategory: 'LIMPIEZA_HOGAR', total: '10.00' },
-]

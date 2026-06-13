@@ -1,7 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { Calculator, Plus, Sparkles, Trash2 } from 'lucide-react'
+import { Calculator, Plus, Trash2 } from 'lucide-react'
 import { money } from '../constants'
 
 function ToolbarButton({
@@ -23,7 +23,7 @@ function ToolbarButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl px-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 sm:w-auto ${color}`}
+      className={`inline-flex h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${color}`}
     >
       {children}
     </button>
@@ -31,32 +31,22 @@ function ToolbarButton({
 }
 
 export default function ExpenseItemsToolbar({
-  itemsCount, itemsTotal, onAddItem, onUseItemsTotal, onClearItems, onLoadExample,
+  itemsCount, itemsTotal, onAddItem, onUseItemsTotal, onClearItems,
 }: {
   itemsCount: number
   itemsTotal: number
   onAddItem: () => void
   onUseItemsTotal: () => void
   onClearItems: () => void
-  onLoadExample: () => void
 }) {
   return (
-    <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-      <div>
-        <div className="flex items-center gap-3">
-          <h2 className="text-base font-bold text-foreground">Productos del ticket</h2>
-          <span className="text-xs font-medium text-muted-foreground">{itemsCount} total</span>
-        </div>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Revisá ítems en formato compacto. Podés guardar el gasto general sin productos.
-        </p>
+    <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center gap-3">
+        <h2 className="text-base font-bold text-foreground">Productos del ticket</h2>
+        <span className="text-xs font-medium text-muted-foreground">{itemsCount} total</span>
       </div>
 
-      <div className="grid gap-2 sm:flex sm:flex-wrap md:justify-end">
-        <ToolbarButton onClick={onLoadExample}>
-          <Sparkles className="h-4 w-4 text-primary" />
-          Ejemplo
-        </ToolbarButton>
+      <div className="flex items-center gap-2">
         <ToolbarButton onClick={onUseItemsTotal} disabled={itemsCount === 0}>
           <Calculator className="h-4 w-4 text-primary" />
           Usar {money(itemsTotal)}

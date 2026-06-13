@@ -16,11 +16,7 @@ export default function NewExpenseFormGrid({
   children: ReactNode
 }) {
   return (
-    <section className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-      <div className="space-y-6">
-        <ExpenseFormFields form={form.form} profileName={profileName} onUpdate={form.updateForm} />
-        {children}
-      </div>
+    <section className="grid items-start gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
       <ExpenseSummary
         itemsTotal={form.itemsTotal}
         declaredTotal={form.declaredTotal}
@@ -35,6 +31,10 @@ export default function NewExpenseFormGrid({
         success={form.success}
         onSubmit={form.handleSubmit}
       />
+      <div className="space-y-6">
+        <ExpenseFormFields form={form.form} profileName={profileName} onUpdate={form.updateForm} />
+        {children}
+      </div>
     </section>
   )
 }

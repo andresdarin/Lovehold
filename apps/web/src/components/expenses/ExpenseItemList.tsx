@@ -9,7 +9,7 @@ import ExpenseItemsToolbar from './expense-items/ExpenseItemsToolbar'
 import type { ExpenseItemForm } from './types'
 
 export default function ExpenseItemList({
-  items, onAddItem, onRemoveItem, onClearItems, onUpdateItem, onUseItemsTotal, onLoadExample,
+  items, onAddItem, onRemoveItem, onClearItems, onUpdateItem, onUseItemsTotal,
 }: {
   items: ExpenseItemForm[]
   onAddItem: () => void
@@ -17,7 +17,6 @@ export default function ExpenseItemList({
   onClearItems: () => void
   onUpdateItem: (id: string, field: keyof ExpenseItemForm, value: string) => void
   onUseItemsTotal: () => void
-  onLoadExample: () => void
 }) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const editingItem = items.find((item) => item.localId === editingId) ?? null
@@ -41,7 +40,6 @@ export default function ExpenseItemList({
         onAddItem={onAddItem}
         onUseItemsTotal={onUseItemsTotal}
         onClearItems={clearItems}
-        onLoadExample={onLoadExample}
       />
 
       <div className="mt-5">
