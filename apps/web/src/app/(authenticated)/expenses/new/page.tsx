@@ -53,15 +53,17 @@ export default function NewExpensePage() {
         onApply={applyScan}
       />
 
-      <NewExpenseFormGrid form={form} profileName={profileName} />
-
-      <ExpenseItemList
-        items={form.items}
-        onAddItem={form.addItem}
-        onRemoveItem={form.removeItem}
-        onUpdateItem={form.updateItem}
-        onLoadExample={loadTataExample}
-      />
+      <NewExpenseFormGrid form={form} profileName={profileName} discounts={scan.result?.discounts ?? 0}>
+        <ExpenseItemList
+          items={form.items}
+          onAddItem={form.addItem}
+          onRemoveItem={form.removeItem}
+          onClearItems={form.clearItems}
+          onUpdateItem={form.updateItem}
+          onUseItemsTotal={form.useItemsTotalAsAmount}
+          onLoadExample={loadTataExample}
+        />
+      </NewExpenseFormGrid>
     </form>
   )
 }

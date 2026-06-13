@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import ExpenseFormFields from './ExpenseFormFields'
 import ExpenseSummary from './ExpenseSummary'
 import type { useExpenseForm } from './hooks'
@@ -7,17 +8,23 @@ import type { useExpenseForm } from './hooks'
 type ExpenseFormState = ReturnType<typeof useExpenseForm>
 
 export default function NewExpenseFormGrid({
-  form, profileName,
+  form, profileName, discounts, children,
 }: {
   form: ExpenseFormState
   profileName: string
+  discounts: number
+  children: ReactNode
 }) {
   return (
-    <section className="grid gap-6 xl:grid-cols-[1fr_400px]">
-      <ExpenseFormFields form={form.form} profileName={profileName} onUpdate={form.updateForm} />
+    <section className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="space-y-6">
+        <ExpenseFormFields form={form.form} profileName={profileName} onUpdate={form.updateForm} />
+        {children}
+      </div>
       <ExpenseSummary
         itemsTotal={form.itemsTotal}
         declaredTotal={form.declaredTotal}
+        discounts={discounts}
         difference={form.difference}
         hasBlockingDifference={form.hasBlockingDifference}
         isSupermarketExpense={form.isSupermarketExpense}
@@ -26,7 +33,6 @@ export default function NewExpenseFormGrid({
         isSubmitting={form.isSubmitting}
         error={form.error}
         success={form.success}
-        onUseItemsTotal={form.useItemsTotalAsAmount}
         onSubmit={form.handleSubmit}
       />
     </section>
