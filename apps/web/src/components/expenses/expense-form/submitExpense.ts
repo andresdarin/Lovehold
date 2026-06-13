@@ -10,16 +10,19 @@ export async function submitExpense({
   items: ExpenseItemForm[]
   declaredTotal: number
 }) {
+  const isPersonal = form.scope === 'personal'
+
   await apiFetch('/api/expenses', {
     method: 'POST',
     body: JSON.stringify({
+      scope: form.scope,
       title: form.title.trim(),
       merchant: form.merchant.trim() || undefined,
       category: form.category.trim(),
       amount: declaredTotal,
       date: form.date,
       paymentMethod: form.paymentMethod.trim() || undefined,
-      splitType: 'EQUAL',
+      splitType: isPersonal ? undefined : 'EQUAL',
       notes: form.notes.trim() || undefined,
       items: items.length
         ? items.map((item) => ({

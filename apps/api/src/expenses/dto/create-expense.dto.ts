@@ -69,6 +69,10 @@ export class CreateExpenseItemDto {
 }
 
 export class CreateExpenseDto {
+  @IsOptional()
+  @IsIn(['personal', 'household'])
+  scope?: 'personal' | 'household'
+
   @IsString()
   @IsNotEmpty()
   @MaxLength(120)

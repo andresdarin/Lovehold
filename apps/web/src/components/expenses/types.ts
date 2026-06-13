@@ -9,6 +9,7 @@ export interface ExpenseItemForm {
 }
 
 export interface ExpenseForm {
+  scope: 'personal' | 'household'
   title: string
   merchant: string
   category: string

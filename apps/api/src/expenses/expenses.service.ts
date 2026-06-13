@@ -30,16 +30,8 @@ export class ExpensesService {
       where: { authUserId: user.authUserId },
       include: {
         householdMembers: {
-          include: {
-            household: {
-              include: {
-                members: true,
-              },
-            },
-          },
-          orderBy: {
-            joinedAt: 'asc',
-          },
+          include: { household: { include: { members: true } } },
+          orderBy: { joinedAt: 'asc' },
         },
       },
     })
@@ -48,14 +40,73 @@ export class ExpensesService {
       throw new NotFoundException('Profile not found. Use POST /profiles/ensure to create one.')
     }
 
+    this.validateItemsTotal(dto.amount, dto.items)
+
+    const isPersonal = dto.scope === 'personal'
+    if (isPersonal) {
+      return this.createPersonalExpense(profile.id, dto)
+    }
+
+    return this.createHouseholdExpense(profile, dto)
+  }
+
+  private async createPersonalExpense(profileId: string, dto: CreateExpenseDto) {
+    const expenseDate = new Date(dto.date)
+    const monthKey = `${expenseDate.getFullYear()}-${String(expenseDate.getMonth() + 1).padStart(2, '0')}`
+    const category = dto.category.trim().toLowerCase()
+    const type = category.includes('súper') || category.includes('super') ? 'supermarket' : 'variable'
+
+    const expense = await this.prisma.personalExpense.create({
+      data: {
+        profileId,
+        title: dto.title.trim(),
+        merchant: dto.merchant?.trim() || null,
+        amount: moneyValue(dto.amount),
+        date: expenseDate,
+        type,
+        category: dto.category.trim(),
+        notes: dto.notes?.trim() || null,
+        isRecurring: false,
+        monthKey,
+        items: dto.items?.length
+          ? {
+              create: dto.items.map((item) => ({
+                name: item.name.trim(),
+                quantity: quantityValue(item.quantity),
+                unitPrice: item.unitPrice === undefined ? undefined : moneyValue(item.unitPrice),
+                totalPrice: moneyValue(item.total),
+                category: item.itemCategory,
+                rawLine: item.rawText?.trim() || null,
+              })),
+            }
+          : undefined,
+      },
+      include: { items: true },
+    })
+
+    return {
+      ...expense,
+      amount: Number(expense.amount),
+      items: expense.items.map((item) => ({
+        ...item,
+        quantity: item.quantity === null ? null : Number(item.quantity),
+        unitPrice: item.unitPrice === null ? null : Number(item.unitPrice),
+        totalPrice: Number(item.totalPrice),
+      })),
+      scope: 'personal',
+    }
+  }
+
+  private async createHouseholdExpense(
+    profile: { id: string; householdMembers: { householdId: string; household: { members: { profileId: string }[] } }[] },
+    dto: CreateExpenseDto,
+  ) {
     const membership = profile.householdMembers[0]
     if (!membership) {
       throw new BadRequestException(
-        'Todavía no tenés un Lovehold vinculado. TODO: crear o unirse a un household antes de cargar gastos.',
+        'Todavía no tenés un Lovehold vinculado. Crea o unite a uno antes de cargar gastos compartidos.',
       )
     }
-
-    this.validateItemsTotal(dto.amount, dto.items)
 
     const householdId = membership.householdId
     const categoryName = dto.category.trim()
@@ -64,7 +115,7 @@ export class ExpensesService {
     const amountCents = toCents(dto.amount)
     const splitProfileIds = this.getSplitProfileIds(
       profile.id,
-      membership.household.members.map((member) => member.profileId),
+      membership.household.members.map((member: { profileId: string }) => member.profileId),
     )
 
     const expense = await this.prisma.$transaction(async (tx) => {

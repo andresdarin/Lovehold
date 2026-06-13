@@ -8,6 +8,7 @@ import { useExpenseSubmit } from './useExpenseSubmit'
 
 const ROUNDING_TOLERANCE = 5
 const INITIAL_FORM: ExpenseForm = {
+  scope: 'personal',
   title: '',
   merchant: '',
   category: 'Compras de súper',
