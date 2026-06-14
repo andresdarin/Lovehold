@@ -1,6 +1,7 @@
-import { Edit3, Camera } from 'lucide-react'
+import { Edit3 } from 'lucide-react'
 import LiquidGlass from '@/components/ui/LiquidGlass'
 import { ProfileAvatar } from './ProfileAvatar'
+import { AvatarUploadButton } from './AvatarUploadButton'
 import { formatMemberSince } from './utils'
 
 interface ProfileHeroCardProps {
@@ -10,6 +11,7 @@ interface ProfileHeroCardProps {
   color: string | undefined
   createdAt: string | undefined
   onEdit: () => void
+  onAvatarUpdate: (avatarUrl: string | null) => void
 }
 
 export function ProfileHeroCard({
@@ -19,6 +21,7 @@ export function ProfileHeroCard({
   color,
   createdAt,
   onEdit,
+  onAvatarUpdate,
 }: ProfileHeroCardProps) {
   return (
     <LiquidGlass variant="card" intensity="medium" className="p-6">
@@ -31,13 +34,12 @@ export function ProfileHeroCard({
             color={color}
             size={96}
           />
-          <button
-            disabled
-            title="Cambiar foto (próximamente)"
-            className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-surface text-muted-foreground opacity-60 cursor-not-allowed"
-          >
-            <Camera className="h-4 w-4" />
-          </button>
+          <div className="absolute -bottom-1 -right-1">
+            <AvatarUploadButton
+              hasAvatar={!!avatarUrl}
+              onUploadComplete={onAvatarUpdate}
+            />
+          </div>
         </div>
 
         <div className="text-center sm:text-left">

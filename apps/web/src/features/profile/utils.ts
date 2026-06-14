@@ -19,3 +19,29 @@ export function formatDate(iso: string): string {
     day: 'numeric',
   })
 }
+
+const ALLOWED_AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+const MAX_AVATAR_SIZE = 2 * 1024 * 1024
+
+export function validateAvatarFile(file: File): string | null {
+  if (!ALLOWED_AVATAR_TYPES.includes(file.type)) {
+    return 'Solo se permiten imágenes JPG, PNG o WebP'
+  }
+  if (file.size > MAX_AVATAR_SIZE) {
+    return 'La imagen no puede superar los 2MB'
+  }
+  return null
+}
+
+export function getAvatarFileExtension(file: File): string {
+  const map: Record<string, string> = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+  }
+  return map[file.type] ?? 'jpg'
+}
+
+export function buildAvatarPath(userId: string, file: File): string {
+  return `${userId}/avatar.${getAvatarFileExtension(file)}`
+}

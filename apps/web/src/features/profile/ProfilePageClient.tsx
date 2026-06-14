@@ -32,6 +32,7 @@ export default function ProfilePageClient() {
           color={profile?.color}
           createdAt={profile?.createdAt}
           onEdit={() => setEditOpen(true)}
+          onAvatarUpdate={refreshProfile}
         />
         <ProfileRankCard
           data={gamification}

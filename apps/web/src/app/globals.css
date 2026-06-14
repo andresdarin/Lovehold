@@ -96,43 +96,41 @@
   }
 
   .liquid-glass {
-    --lg-blur: 12px;
-    --lg-saturation: 150%;
-    --lg-shadow-alpha: 18%;
-    --lg-shine-opacity: 0.34;
-    --lg-highlight-opacity: 0.24;
+    --lg-blur: 20px;
+    --lg-saturation: 140%;
+    --lg-shadow-alpha: 12%;
+    --lg-shine-opacity: 0.25;
+    --lg-highlight-opacity: 0.12;
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    border: 1px solid color-mix(in oklch, var(--border) 72%, var(--primary) 16%);
+    border: 1px solid color-mix(in oklch, var(--border) 80%, var(--primary) 12%);
     background:
       linear-gradient(135deg,
-        color-mix(in oklch, var(--surface) 84%, transparent),
-        color-mix(in oklch, var(--surface) 42%, transparent) 48%,
-        color-mix(in oklch, var(--surface-soft) 68%, transparent)),
-      color-mix(in oklch, var(--surface) 72%, transparent);
+        color-mix(in oklch, var(--surface) 80%, transparent),
+        color-mix(in oklch, var(--surface-soft) 40%, transparent));
     box-shadow:
-      inset 0 1px 0 color-mix(in oklch, var(--primary-foreground) 52%, transparent),
-      inset 0 -18px 32px color-mix(in oklch, var(--primary) 8%, transparent),
-      0 18px 44px color-mix(in oklch, var(--primary) var(--lg-shadow-alpha), transparent);
-    backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturation)) contrast(1.04);
-    -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturation)) contrast(1.04);
+      inset 0 1px 0 color-mix(in oklch, var(--primary-foreground) 40%, transparent),
+      inset 0 -12px 24px color-mix(in oklch, var(--primary) 4%, transparent),
+      0 12px 36px color-mix(in oklch, var(--primary) var(--lg-shadow-alpha), transparent);
+    backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturation)) contrast(1.02);
+    -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-saturation)) contrast(1.02);
   }
 
   .liquid-glass[data-intensity="medium"] {
-    --lg-blur: 16px;
-    --lg-saturation: 170%;
-    --lg-shadow-alpha: 24%;
-    --lg-shine-opacity: 0.42;
-    --lg-highlight-opacity: 0.34;
+    --lg-blur: 24px;
+    --lg-saturation: 150%;
+    --lg-shadow-alpha: 16%;
+    --lg-shine-opacity: 0.30;
+    --lg-highlight-opacity: 0.16;
   }
 
   .liquid-glass[data-intensity="strong"] {
-    --lg-blur: 22px;
-    --lg-saturation: 190%;
-    --lg-shadow-alpha: 30%;
-    --lg-shine-opacity: 0.52;
-    --lg-highlight-opacity: 0.44;
+    --lg-blur: 32px;
+    --lg-saturation: 160%;
+    --lg-shadow-alpha: 20%;
+    --lg-shine-opacity: 0.38;
+    --lg-highlight-opacity: 0.20;
   }
 
   .liquid-glass[data-variant="card"] {
@@ -165,36 +163,36 @@
   .liquid-glass::before {
     opacity: var(--lg-shine-opacity);
     background:
-      radial-gradient(circle at 22% 16%, color-mix(in oklch, var(--primary-foreground) 62%, transparent), transparent 24%),
-      radial-gradient(circle at 78% 84%, color-mix(in oklch, var(--primary) 18%, transparent), transparent 32%),
-      radial-gradient(circle at 92% 18%, color-mix(in oklch, var(--accent) 16%, transparent), transparent 28%);
+      radial-gradient(circle at 15% 15%, color-mix(in oklch, var(--primary-foreground) 40%, transparent), transparent 35%),
+      radial-gradient(circle at 85% 85%, color-mix(in oklch, var(--primary) 10%, transparent), transparent 40%),
+      radial-gradient(circle at 90% 10%, color-mix(in oklch, var(--accent) 8%, transparent), transparent 35%);
     transform: translate3d(0, 0, 0);
-    transition: opacity 220ms ease, transform 420ms ease;
+    transition: opacity 300ms ease, transform 600ms ease;
   }
 
   .liquid-glass::after {
     opacity: var(--lg-highlight-opacity);
     background:
-      linear-gradient(115deg,
-        transparent 8%,
-        color-mix(in oklch, var(--primary-foreground) 42%, transparent) 34%,
-        transparent 58%),
-      linear-gradient(180deg,
-        color-mix(in oklch, var(--primary-foreground) 28%, transparent),
-        transparent 44%);
-    transform: translateX(-18%) skewX(-8deg);
-    transition: opacity 220ms ease, transform 520ms ease;
+      linear-gradient(105deg,
+        transparent 35%,
+        color-mix(in oklch, var(--primary-foreground) 15%, transparent) 48%,
+        color-mix(in oklch, var(--primary-foreground) 30%, transparent) 50%,
+        color-mix(in oklch, var(--primary-foreground) 15%, transparent) 52%,
+        transparent 65%);
+    filter: blur(12px);
+    transform: translateX(-40%) skewX(-15deg);
+    transition: opacity 300ms ease, transform 800ms ease;
   }
 
   .liquid-glass:hover::before,
   .liquid-glass:focus-within::before {
-    opacity: calc(var(--lg-shine-opacity) + 0.12);
-    transform: scale(1.04);
+    opacity: calc(var(--lg-shine-opacity) + 0.08);
+    transform: scale(1.02);
   }
 
   .liquid-glass:hover::after,
   .liquid-glass:focus-within::after {
-    transform: translateX(10%) skewX(-8deg);
+    transform: translateX(30%) skewX(-15deg);
   }
 
   .liquid-glass__content {
@@ -221,17 +219,15 @@
   }
 
   .dark .liquid-glass {
-    border-color: color-mix(in oklch, var(--border) 78%, var(--primary-foreground) 16%);
+    border-color: color-mix(in oklch, var(--border) 85%, var(--primary-foreground) 10%);
     background:
       linear-gradient(135deg,
-        color-mix(in oklch, var(--surface) 88%, transparent),
-        color-mix(in oklch, var(--surface) 46%, transparent) 48%,
-        color-mix(in oklch, var(--surface-soft) 58%, transparent)),
-      color-mix(in oklch, var(--surface) 74%, transparent);
+        color-mix(in oklch, var(--surface) 70%, transparent),
+        color-mix(in oklch, var(--surface-soft) 30%, transparent));
     box-shadow:
-      inset 0 1px 0 color-mix(in oklch, var(--primary-foreground) 20%, transparent),
-      inset 0 -18px 32px color-mix(in oklch, var(--primary) 10%, transparent),
-      0 18px 44px color-mix(in oklch, var(--background) 58%, transparent);
+      inset 0 1px 0 color-mix(in oklch, var(--primary-foreground) 12%, transparent),
+      inset 0 -12px 24px color-mix(in oklch, var(--primary) 6%, transparent),
+      0 12px 36px color-mix(in oklch, var(--background) 70%, transparent);
   }
 
   @media (prefers-reduced-motion: reduce) {
