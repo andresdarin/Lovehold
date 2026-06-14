@@ -4,6 +4,7 @@ import {
 } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
 import type { EnsureProfileDto } from './dto/ensure-profile.dto'
+import type { UpdateProfileDto } from './dto/update-profile.dto'
 
 @Injectable()
 export class ProfilesService {
@@ -39,5 +40,23 @@ export class ProfilesService {
     }
 
     return profile
+  }
+
+  async update(authUserId: string, dto: UpdateProfileDto) {
+    const profile = await this.prisma.profile.findUnique({
+      where: { authUserId },
+    })
+
+    if (!profile) {
+      throw new NotFoundException('Profile not found.')
+    }
+
+    return this.prisma.profile.update({
+      where: { id: profile.id },
+      data: {
+        ...(dto.displayName !== undefined && { displayName: dto.displayName }),
+        ...(dto.avatarUrl !== undefined && { avatarUrl: dto.avatarUrl }),
+      },
+    })
   }
 }

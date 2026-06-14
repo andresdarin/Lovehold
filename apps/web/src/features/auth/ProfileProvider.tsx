@@ -21,6 +21,7 @@ interface ProfileContextType {
   loading: boolean
   error: string | null
   logout: () => Promise<void>
+  refreshProfile: () => Promise<void>
 }
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined)
@@ -37,6 +38,11 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
+  async function fetchProfile(token: string) {
+    const me = await apiFetch<Profile>('/api/me', {}, token)
+    setProfile(me)
+  }
+
   useEffect(() => {
     async function load() {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession()
@@ -47,8 +53,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       }
 
       try {
-        const me = await apiFetch<Profile>('/api/me', {}, session.access_token)
-        setProfile(me)
+        await fetchProfile(session.access_token)
       } catch (err) {
         if (err instanceof ApiError && err.status === 404) {
           setError('Perfil no encontrado. Por favor, volvé a iniciar sesión.')
@@ -62,6 +67,16 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
 
     load()
   }, [router, supabase])
+
+  async function refreshProfile() {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return
+    try {
+      await fetchProfile(session.access_token)
+    } catch {
+      // Silently fail on refresh — data stays stale
+    }
+  }
 
   async function logout() {
     await supabase.auth.signOut()
@@ -95,7 +110,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ProfileContext.Provider value={{ profile, loading, error, logout }}>
+    <ProfileContext.Provider value={{ profile, loading, error, logout, refreshProfile }}>
       <AppShell profile={profile} onLogout={logout}>
         {children}
       </AppShell>
