@@ -9,7 +9,14 @@ export function computeSummary(expenses: PersonalExpense[]): MonthlySummary {
 
   for (const e of expenses) {
     total += e.amount
-    byCategory[e.category] = (byCategory[e.category] ?? 0) + e.amount
+    
+    // Normalizar y unificar categorías equivalentes de supermercado
+    let categoryKey = e.category.toLowerCase().trim()
+    if (categoryKey === 'compras de súper' || categoryKey === 'compras de super' || categoryKey === 'supermercado') {
+      categoryKey = 'supermercado'
+    }
+
+    byCategory[categoryKey] = (byCategory[categoryKey] ?? 0) + e.amount
     if (e.type === 'fixed') fixed += e.amount
     else if (e.type === 'supermarket') supermarket += e.amount
     else variable += e.amount

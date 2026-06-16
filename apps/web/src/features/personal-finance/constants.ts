@@ -57,6 +57,7 @@ export const CATEGORY_LABELS: Record<string, string> = {
   snacks: 'Snacks',
   farmacia: 'Farmacia',
   otros_super: 'Otros',
+  supermercado: 'Supermercado',
 }
 
 export const MONTH_NAMES = [
