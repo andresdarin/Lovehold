@@ -1,6 +1,7 @@
 'use client'
 
 import { ShoppingBasket, Heart, User } from 'lucide-react'
+import CustomDatePicker from '@/components/ui/CustomDatePicker'
 import type { ExpenseForm } from './types'
 
 export default function ExpenseFormFields({
@@ -55,7 +56,15 @@ export default function ExpenseFormFields({
         <TextField label="Título" value={form.title} onChange={(v) => onUpdate('title', v)} placeholder="Compra Tata" required />
         <TextField label="Comercio" value={form.merchant} onChange={(v) => onUpdate('merchant', v)} placeholder="Tata" />
         <TextField label="Categoría general" value={form.category} onChange={(v) => onUpdate('category', v)} placeholder="Compras de súper" required />
-        <TextField label="Fecha" type="date" value={form.date} onChange={(v) => onUpdate('date', v)} required />
+        <div className="block">
+          <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Fecha</span>
+          <CustomDatePicker
+            className="mt-2 w-full"
+            value={form.date}
+            onChange={(v) => onUpdate('date', v)}
+            required
+          />
+        </div>
         <TextField label="Método de pago" value={form.paymentMethod} onChange={(v) => onUpdate('paymentMethod', v)} placeholder="Débito VISA" />
         <TextField label="Total declarado" type="number" min="0" step="0.01" value={form.amount} onChange={(v) => onUpdate('amount', v)} placeholder="0.00" required />
         {isPersonal ? (

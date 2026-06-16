@@ -3,6 +3,8 @@
 import React, { useState } from 'react'
 import { EXPENSE_TYPES, FIXED_CATEGORIES, VARIABLE_CATEGORIES } from './constants'
 import ReceiptItemsEditor from './ReceiptItemsEditor'
+import CustomDatePicker from '@/components/ui/CustomDatePicker'
+import CustomSelect from '@/components/ui/CustomSelect'
 import type { DetectedReceiptItem } from './types'
 
 interface ExpenseFormProps {
@@ -84,7 +86,7 @@ export default function ExpenseForm({ onSubmit, onCancel, submitting, initialIte
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-foreground">Fecha</label>
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required className={inputCls} />
+            <CustomDatePicker value={date} onChange={setDate} required className="mt-1 w-full" />
           </div>
         </div>
       ) : (
@@ -94,17 +96,21 @@ export default function ExpenseForm({ onSubmit, onCancel, submitting, initialIte
           <p className="mt-2 text-right text-sm font-semibold text-foreground">Total: ${itemsTotal.toFixed(2)}</p>
           <div className="mt-3">
             <label className="mb-1 block text-sm font-medium text-foreground">Fecha</label>
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required className={inputCls} />
+            <CustomDatePicker value={date} onChange={setDate} required className="mt-1 w-full" />
           </div>
         </div>
       )}
 
       {type !== 'supermarket' && (
-        <div>
-          <label className="mb-1 block text-sm font-medium text-foreground">Categoría</label>
-          <select value={category} onChange={(e) => setCategory(e.target.value)} className={inputCls}>
-            {categories.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
-          </select>
+        <div className="block">
+          <span className="mb-1 block text-sm font-medium text-foreground">Categoría</span>
+          <CustomSelect
+            className="w-full"
+            value={category}
+            options={categories}
+            onChange={setCategory}
+            placeholder="Seleccionar categoría"
+          />
         </div>
       )}
 

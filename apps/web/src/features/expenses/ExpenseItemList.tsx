@@ -33,7 +33,7 @@ export default function ExpenseItemList({
   }
 
   return (
-    <section className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+    <section className="rounded-2xl border border-border bg-surface/85 backdrop-blur-md p-6 shadow-md transition-all duration-300">
       <ExpenseItemsToolbar
         itemsCount={items.length}
         itemsTotal={sumItems(items)}

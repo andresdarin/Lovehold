@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { Plus, Trash2, ClipboardPaste } from 'lucide-react'
+import CustomSelect from '@/components/ui/CustomSelect'
 import { SUPERMARKET_ITEM_CATEGORIES } from './constants'
 import type { DetectedReceiptItem } from './types'
 import { parseReceiptText } from './parseReceiptText'
@@ -107,10 +108,13 @@ export default function ReceiptItemsEditor({ items, onChange }: ReceiptItemsEdit
             className="w-20 rounded-lg border border-border bg-surface-soft px-2 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/45"
             placeholder="P.Unit" />
           <span className="w-20 text-right text-sm font-semibold text-foreground">${item.totalPrice.toFixed(2)}</span>
-          <select value={item.category} onChange={(e) => updateItem(item.id, 'category', e.target.value)}
-            className="rounded-lg border border-border bg-surface-soft px-2 py-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/45">
-            {SUPERMARKET_ITEM_CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
-          </select>
+          <CustomSelect
+            className="h-8 text-xs min-w-[120px]"
+            value={item.category}
+            options={SUPERMARKET_ITEM_CATEGORIES}
+            onChange={(val) => updateItem(item.id, 'category', val)}
+            placeholder="Categoría"
+          />
           <button type="button" onClick={() => removeItem(item.id)}
             className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-danger/10 hover:text-danger focus:outline-none focus:ring-2 focus:ring-primary/45">
             <Trash2 className="h-4 w-4" />

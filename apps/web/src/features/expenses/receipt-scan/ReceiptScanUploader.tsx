@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Camera, ImageUp, ScanLine, X, Loader2 } from 'lucide-react'
 import LiquidGlass from '@/components/ui/LiquidGlass'
 
@@ -12,8 +13,64 @@ export default function ReceiptScanUploader({
   onScan: () => void
   onClear: () => void
 }) {
+  const [isDragging, setIsDragging] = useState(false)
+
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      if (preview || scanning) return
+      const items = e.clipboardData?.items
+      if (!items) return
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i]
+        if (item && item.type.startsWith('image/')) {
+          const file = item.getAsFile()
+          if (file) {
+            onFileSelect(file)
+            break
+          }
+        }
+      }
+    }
+    document.addEventListener('paste', handlePaste)
+    return () => {
+      document.removeEventListener('paste', handlePaste)
+    }
+  }, [preview, scanning, onFileSelect])
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    if (!preview && !scanning) {
+      setIsDragging(true)
+    }
+  }
+
+  const handleDragLeave = () => {
+    setIsDragging(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    if (preview || scanning) return
+    const file = e.dataTransfer.files?.[0]
+    if (file && file.type.startsWith('image/')) {
+      onFileSelect(file)
+    }
+  }
+
   return (
-    <section className="flex h-full flex-col rounded-2xl border border-border bg-surface p-6 shadow-sm">
+    <section
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      className="relative flex h-full flex-col rounded-2xl border border-border bg-surface p-6 shadow-sm transition-all duration-200"
+    >
+      {isDragging && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-primary bg-background/85 backdrop-blur-md transition-all duration-200">
+          <ScanLine className="h-10 w-10 animate-pulse text-primary mb-2" />
+          <p className="text-sm font-bold text-foreground">Soltá la imagen del ticket acá</p>
+        </div>
+      )}
       <div className="flex items-center gap-4">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10" aria-hidden="true">
           <ScanLine className="h-5 w-5 text-primary" />

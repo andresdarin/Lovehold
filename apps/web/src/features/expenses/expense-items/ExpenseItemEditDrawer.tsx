@@ -1,6 +1,7 @@
 'use client'
 
 import { Trash2, X } from 'lucide-react'
+import CustomSelect from '@/components/ui/CustomSelect'
 import { ITEM_CATEGORIES } from '../constants'
 import type { ExpenseItemForm } from '../types'
 
@@ -42,15 +43,16 @@ export default function ExpenseItemEditDrawer({
 
         <div className="mt-6 grid gap-4">
           <DrawerField label="Producto" value={currentItem.name} onChange={(value) => update('name', value)} placeholder="Producto" required />
-          <label className="block">
+          <div className="block">
             <span className="text-sm font-medium text-muted-foreground">Categoría</span>
-            <select value={currentItem.itemCategory} onChange={(event) => update('itemCategory', event.target.value)}
-              className="mt-2 h-11 w-full rounded-xl border border-border bg-surface px-4 text-sm font-medium text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
-              {ITEM_CATEGORIES.map((category) => (
-                <option key={category.value} value={category.value}>{category.label}</option>
-              ))}
-            </select>
-          </label>
+            <CustomSelect
+              className="mt-2 w-full"
+              value={currentItem.itemCategory}
+              options={ITEM_CATEGORIES}
+              onChange={(value) => update('itemCategory', value)}
+              placeholder="Categoría"
+            />
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <DrawerField label="Cantidad" type="number" min="0" step="0.001" value={currentItem.quantity} onChange={(value) => update('quantity', value)} placeholder="1" />
             <DrawerField label="Unidad" value={currentItem.unit} onChange={(value) => update('unit', value)} placeholder="un" />
