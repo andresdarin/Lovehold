@@ -5,6 +5,7 @@ import { ExpensesModule } from './expenses/expenses.module'
 import { ProfilesModule } from './profiles/profiles.module'
 import { PersonalFinanceModule } from './personal-finance/personal-finance.module'
 import { GamificationModule } from './gamification/gamification.module'
+import { HealthModule } from './health/health.module'
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { GamificationModule } from './gamification/gamification.module'
     ProfilesModule,
     PersonalFinanceModule,
     GamificationModule,
+    HealthModule,
   ],
 })
 export class AppModule {}
