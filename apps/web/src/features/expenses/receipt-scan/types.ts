@@ -9,7 +9,7 @@ export interface ScannedItem {
 export interface ScanReceiptResponse {
   merchant: string | null
   receiptDate: string | null
-  currency: 'UYU'
+  currency: 'UYU' | 'USD'
   total: number | null
   subtotal: number | null
   discounts: number | null

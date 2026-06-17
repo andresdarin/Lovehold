@@ -13,7 +13,7 @@ Estructura:
 {
   "merchant": string | null,
   "receiptDate": string | null,
-  "currency": "UYU",
+  "currency": "UYU" | "USD",
   "total": number | null,
   "subtotal": number | null,
   "discounts": number | null,
@@ -36,6 +36,7 @@ Reglas:
 - Si no podés leer algo con confianza, usá null.
 - Conservá el significado del nombre del producto pero normalizalo un poco.
 - Detectá total final pagado.
+- Detectá la moneda del ticket ("UYU" o "USD"). Si es en dólares, usá "USD". Si no se indica explícitamente o es en pesos, usá "UYU".
 - Detectá descuentos/promociones si aparecen.
 - confidence debe ir de 0 a 1.
 - warnings debe listar solo problemas de lectura/OCR o datos dudosos.

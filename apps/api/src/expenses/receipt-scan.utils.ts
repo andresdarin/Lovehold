@@ -70,9 +70,25 @@ export function validateAndNormalize(raw: unknown): ScanReceiptResponse {
 
   const data = raw as Record<string, unknown>
 
-  const items = Array.isArray(data.items) ? data.items.map(normalizeItem) : []
+  let items = Array.isArray(data.items) ? data.items.map(normalizeItem) : []
 
   const total = parseUruguayanPrice(data.total as string | number | null)
+
+  // Fallback for non-supermarket bills/services (like Abitab):
+  // if no items were extracted but we have a valid total, create a single fallback item
+  if (items.length === 0 && total !== null && total > 0) {
+    const merchantName = typeof data.merchant === 'string' && data.merchant.trim()
+      ? data.merchant.trim()
+      : 'Servicio'
+    items = [{
+      name: `Pago ${merchantName}`,
+      quantity: 1,
+      unitPrice: total,
+      totalPrice: total,
+      category: 'OTROS',
+    }]
+  }
+
   const itemsTotal = items.reduce((sum, item) => sum + item.totalPrice, 0)
   const warnings = normalizeGeminiWarnings(data.warnings)
 
@@ -88,7 +104,7 @@ export function validateAndNormalize(raw: unknown): ScanReceiptResponse {
   return {
     merchant: typeof data.merchant === 'string' ? data.merchant.trim() || null : null,
     receiptDate: normalizeDate(typeof data.receiptDate === 'string' ? data.receiptDate : null),
-    currency: 'UYU',
+    currency: (typeof data.currency === 'string' && (data.currency.toUpperCase() === 'USD' || data.currency.toUpperCase() === 'U$S')) ? 'USD' : 'UYU',
     total,
     subtotal,
     discounts,

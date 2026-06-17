@@ -42,7 +42,10 @@ export function toCents(value: number): number {
   return Math.round(value * 100)
 }
 
-export function money(value: number): string {
+export function money(value: number, currency: string = 'UYU'): string {
+  if (currency === 'USD') {
+    return `U$S ${value.toFixed(2)}`
+  }
   return `$${value.toFixed(2)}`
 }
 

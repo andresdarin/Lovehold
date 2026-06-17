@@ -10,8 +10,8 @@ function textValue(value: string | null): string {
   return value?.trim() || 'No detectado'
 }
 
-function moneyValue(value: number | null): string {
-  return value === null ? 'No detectado' : money(value)
+function moneyValue(value: number | null, currency: string = 'UYU'): string {
+  return value === null ? 'No detectado' : money(value, currency)
 }
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
@@ -68,9 +68,9 @@ export default function ReceiptScanReviewPanel({
           <div className="mt-5 border-y border-border/70">
             <SummaryRow label="Comercio" value={textValue(result.merchant)} />
             <SummaryRow label="Fecha" value={textValue(result.receiptDate)} />
-            <SummaryRow label="Total pagado" value={moneyValue(result.total)} />
-            <SummaryRow label="Suma de ítems" value={money(itemsTotal)} />
-            <SummaryRow label="Descuentos" value={result.discounts === null ? 'No detectado' : `-${money(result.discounts)}`} />
+            <SummaryRow label="Total pagado" value={moneyValue(result.total, result.currency)} />
+            <SummaryRow label="Suma de ítems" value={money(itemsTotal, result.currency)} />
+            <SummaryRow label="Descuentos" value={result.discounts === null ? 'No detectado' : `-${money(result.discounts, result.currency)}`} />
             <SummaryRow label="Medio de pago" value={textValue(result.paymentMethod)} />
             <SummaryRow label="Productos" value={String(result.items.length)} />
           </div>
