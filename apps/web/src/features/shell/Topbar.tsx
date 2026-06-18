@@ -9,6 +9,7 @@ interface TopbarProps {
     displayName: string | null
     email: string
     color: string
+    avatarUrl?: string | null
   } | null
   onLogout: () => void
 }
@@ -34,23 +35,31 @@ export default function Topbar({ profile, onLogout }: TopbarProps) {
       {/* Controles / Perfil */}
       <div className="flex items-center gap-3">
         <ThemeToggle />
-        
+
         {profile && (
           <div
-            className="flex h-10 w-10 items-center justify-center rounded-xl font-bold text-white text-xs shadow-sm"
+            className="flex h-10 w-10 items-center justify-center rounded-xl font-bold text-white text-xs shadow-sm overflow-hidden"
             style={{ backgroundColor: profile.color ?? '#FF6B6B' }}
             title={profile.displayName ?? profile.email}
           >
-            {userInitial}
+            {profile.avatarUrl ? (
+              <img
+                src={profile.avatarUrl}
+                alt={profile.displayName ?? 'Foto de perfil'}
+                className="h-full w-full rounded-xl object-cover"
+              />
+            ) : (
+              userInitial
+            )}
           </div>
         )}
 
         <button
           onClick={onLogout}
-          className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface hover:bg-danger/10 hover:text-danger text-muted-foreground transition-colors focus:outline-none"
+          className="flex h-8 w-8 items-center justify-center rounded-xl border border-border bg-surface hover:bg-danger/10 hover:text-danger text-muted-foreground transition-colors focus:outline-none"
           title="Cerrar sesión"
         >
-          <LogOut className="h-[18px] w-[18px]" />
+          <LogOut className="h-4 w-4" />
         </button>
       </div>
     </header>

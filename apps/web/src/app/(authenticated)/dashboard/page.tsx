@@ -20,18 +20,18 @@ export default function DashboardPage() {
     : '—'
 
   return (
-    <div className="flex flex-col gap-5 md:gap-6">
+    <div className="space-y-6">
       {/* ═══ HEADER ═══ */}
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
             <Heart className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+            <h1 className="text-xl font-bold text-foreground">
               {firstName ? `${greetingTime}, ${firstName}` : greetingTime}
             </h1>
-            <p className="text-sm font-medium text-muted-foreground/90">Todavía no creaste tu Lovehold con Ale.</p>
+            <p className="text-sm text-muted-foreground">Todavía no creaste tu Lovehold con Ale.</p>
           </div>
         </div>
 
@@ -39,7 +39,7 @@ export default function DashboardPage() {
           <LiquidGlass variant="button" intensity="medium" className="inline-flex">
             <Link
               href="/expenses/new"
-              className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-foreground transition-all duration-180 hover:bg-white/[0.04] active:scale-98"
+              className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-foreground disabled:cursor-not-allowed"
             >
               <Plus className="h-4 w-4 text-primary" />
               Agregar gasto
@@ -52,17 +52,25 @@ export default function DashboardPage() {
       <section className="rounded-[20px] border border-white/[0.08] bg-surface p-5 shadow-sm">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div
-            className="flex h-12 w-12 items-center justify-center rounded-xl text-lg font-bold text-white shadow-inner"
+            className="flex h-12 w-12 items-center justify-center rounded-xl text-lg font-bold text-white shadow-inner overflow-hidden"
             style={{ backgroundColor: profile?.color ?? 'var(--primary)' }}
           >
-            {(profile?.displayName?.[0] ?? profile?.email[0] ?? '?').toUpperCase()}
+            {profile?.avatarUrl ? (
+              <img
+                src={profile.avatarUrl}
+                alt={profile.displayName ?? 'Foto de perfil'}
+                className="h-full w-full rounded-xl object-cover"
+              />
+            ) : (
+              (profile?.displayName?.[0] ?? profile?.email[0] ?? '?').toUpperCase()
+            )}
           </div>
           <div className="flex-1">
             <p className="font-semibold text-foreground">
               {profile?.displayName ?? 'Completá tu perfil'}
             </p>
             <p className="text-sm text-muted-foreground">{profile?.email}</p>
-            <p className="mt-2 inline-flex rounded-full border border-white/[0.08] bg-surface-soft px-3 py-1 text-xs font-semibold text-muted-foreground">
+            <p className="mt-2 inline-flex rounded-full border border-border bg-surface-soft px-3 py-1 text-xs font-semibold text-muted-foreground">
               Pendiente de vincular con Ale
             </p>
           </div>
@@ -78,10 +86,10 @@ export default function DashboardPage() {
       {/* ═══ EMPTY LOVEHOLD STATE ═══ */}
       <LiquidGlass variant="card" intensity="subtle" className="p-6 text-center">
         <div className="mx-auto flex max-w-2xl flex-col items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
             <Heart className="h-7 w-7 text-primary" />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">Creá tu Lovehold</h2>
+          <h2 className="text-xl font-bold text-foreground">Creá tu Lovehold</h2>
           <p className="max-w-xl text-sm font-medium leading-6 text-muted-foreground">
             Invitá a Ale y empiecen a llevar sus gastos compartidos, balances y metas del mes en un solo lugar.
           </p>
@@ -89,7 +97,7 @@ export default function DashboardPage() {
             {['Gastos compartidos', 'Balance automático', 'Métricas mensuales'].map((benefit) => (
               <span
                 key={benefit}
-                className="rounded-full border border-white/[0.08] bg-surface px-3 py-1.5 text-xs font-semibold text-foreground/80"
+                className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-foreground/80"
               >
                 {benefit}
               </span>
@@ -107,7 +115,7 @@ export default function DashboardPage() {
             </LiquidGlass>
             <button
               disabled
-              className="flex items-center gap-2 rounded-2xl border border-white/[0.08] bg-surface px-6 py-3 text-sm font-semibold text-muted-foreground transition hover:bg-surface-soft hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed cursor-not-allowed"
+              className="flex items-center gap-2 rounded-2xl border border-border bg-surface px-6 py-3 text-sm font-semibold text-muted-foreground transition hover:bg-surface-soft hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed cursor-not-allowed"
             >
               <QrCode className="h-4 w-4" />
               Unirme con código
@@ -169,7 +177,7 @@ function MetricCard({
   glassBadge?: boolean
 }) {
   return (
-    <div className="flex flex-col gap-3 rounded-[20px] border border-white/[0.08] bg-surface p-5 shadow-sm">
+    <div className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4 shadow-sm">
       <div className="flex items-center justify-between">
         {glassBadge ? (
           <LiquidGlass variant="badge" intensity="medium" className={`flex h-9 w-9 items-center justify-center ${colorClass}`}>
@@ -199,7 +207,7 @@ function SupermarketCategoriesCard() {
   ]
 
   return (
-    <section className="rounded-[20px] border border-white/[0.08] bg-surface p-5 shadow-sm">
+    <section className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
@@ -212,14 +220,14 @@ function SupermarketCategoriesCard() {
             </p>
           </div>
         </div>
-        <span className="rounded-full border border-white/[0.08] bg-surface-soft px-3 py-1 text-xs font-semibold text-muted-foreground">
+        <span className="rounded-full border border-border bg-surface-soft px-3 py-1 text-xs font-semibold text-muted-foreground">
           Próximamente
         </span>
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
         {categories.map((category) => (
-          <div key={category.label} className="rounded-[20px] border border-white/[0.08] bg-surface-soft p-4">
+          <div key={category.label} className="rounded-2xl border border-border bg-surface-soft p-4">
             <p className="text-sm font-semibold text-foreground">{category.label}</p>
             <p className="mt-2 text-2xl font-bold text-foreground">{category.value}</p>
             <p className="mt-1 text-xs text-muted-foreground">Aparecerá con ítems registrados.</p>
@@ -239,13 +247,13 @@ function FirstStepsCard() {
   ]
 
   return (
-    <section className="rounded-[20px] border border-white/[0.08] bg-surface p-5 shadow-sm">
+    <section className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-base font-bold text-foreground">Primeros pasos</h2>
           <p className="mt-1 text-sm text-muted-foreground">1 de 4 completado</p>
         </div>
-        <span className="rounded-full border border-white/[0.08] bg-surface-soft px-3 py-1 text-xs font-semibold text-muted-foreground">
+        <span className="rounded-full border border-border bg-surface-soft px-3 py-1 text-xs font-semibold text-muted-foreground">
           25%
         </span>
       </div>
@@ -255,11 +263,10 @@ function FirstStepsCard() {
       <div className="mt-5 space-y-3">
         {steps.map((step) => (
           <div key={step.label} className="flex items-center gap-3">
-            <span className={`flex h-7 w-7 items-center justify-center rounded-full border ${
-              step.done
+            <span className={`flex h-7 w-7 items-center justify-center rounded-full border ${step.done
                 ? 'border-primary bg-primary text-primary-foreground'
-                : 'border-white/[0.08] bg-surface-soft text-muted-foreground'
-            }`}>
+                : 'border-border bg-surface-soft text-muted-foreground'
+              }`}>
               {step.done ? <Check className="h-4 w-4" /> : <Circle className="h-3 w-3" />}
             </span>
             <span className={`text-sm font-semibold ${step.done ? 'text-foreground' : 'text-muted-foreground'}`}>
@@ -274,12 +281,12 @@ function FirstStepsCard() {
 
 function HowItWorksCard() {
   return (
-    <section className="rounded-[20px] border border-white/[0.08] bg-surface p-5 shadow-sm">
+    <section className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
       <h2 className="text-base font-bold text-foreground">Cómo funciona</h2>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">
         Cuando uno paga algo compartido, Lovehold calcula automáticamente cuánto corresponde a cada uno y mantiene el balance actualizado.
       </p>
-      <div className="mt-5 rounded-[20px] border border-white/[0.08] bg-surface-soft p-4">
+      <div className="mt-5 rounded-2xl border border-border bg-surface-soft p-4">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-sm font-bold text-foreground">Delivery $900</p>
@@ -304,7 +311,7 @@ function EmptyStateCard({
   description: string
 }) {
   return (
-    <div className="flex flex-col items-center gap-4 rounded-[20px] border border-white/[0.08] bg-surface p-8 text-center shadow-sm">
+    <div className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-surface p-8 text-center shadow-sm">
       <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-surface-soft">
         <Icon className="h-5 w-5 text-muted-foreground" />
       </div>

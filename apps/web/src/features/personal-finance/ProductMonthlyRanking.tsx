@@ -3,7 +3,16 @@
 import React, { useMemo, useState } from 'react'
 import { PackageOpen, ChevronLeft, ChevronRight } from 'lucide-react'
 import { formatCurrency } from './constants'
-import type { PersonalExpenseItem, ProductRankingItem } from './types'
+import type { PersonalExpenseItem } from './types'
+
+interface ProductRankingItemExtended {
+  name: string
+  normalizedName: string
+  count: number
+  totalQuantity: number
+  totalSpent: number
+  isWeight: boolean
+}
 
 interface ProductMonthlyRankingProps {
   items: PersonalExpenseItem[]
@@ -13,22 +22,81 @@ type SortBy = 'totalSpent' | 'count'
 
 const PAGE_SIZES = [5, 10, 25, 50]
 
-function computeRanking(items: PersonalExpenseItem[], sortBy: SortBy): ProductRankingItem[] {
+function computeRanking(items: PersonalExpenseItem[], sortBy: SortBy): ProductRankingItemExtended[] {
   if (!items?.length) return []
 
-  const grouped: Record<string, ProductRankingItem> = {}
-
-  for (const item of items) {
-    const key = item.name.toLowerCase().trim().replace(/\s+/g, ' ')
-    if (!grouped[key]) {
-      grouped[key] = { name: item.name, normalizedName: key, count: 0, totalQuantity: 0, totalSpent: 0 }
-    }
-    grouped[key].count += 1
-    grouped[key].totalQuantity += item.quantity ?? 1
-    grouped[key].totalSpent += item.totalPrice
+  const normalizeString = (str: string): string => {
+    return str
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s]/g, '')
+      .replace(/\b\d+(?:g|gr|grs|kg|kgs|ml|l|cc|u|un|und|unid)\b/g, '')
+      .trim()
+      .replace(/\s+/g, ' ')
   }
 
-  return Object.values(grouped)
+  // Step 1: Initial exact grouping of normalized names
+  type RawAcc = Record<string, { originalName: string; count: number; totalQuantity: number; totalSpent: number; isWeight: boolean }>
+  const rawGrouped = items.reduce<RawAcc>((acc, item) => {
+    const clean = normalizeString(item.name)
+    if (!clean) return acc
+    if (!acc[clean]) {
+      acc[clean] = { originalName: item.name, count: 0, totalQuantity: 0, totalSpent: 0, isWeight: false }
+    }
+    acc[clean].count += 1
+    const qty = item.quantity ?? 1
+    acc[clean].totalQuantity += qty
+    acc[clean].totalSpent += item.totalPrice
+    
+    // If quantity is decimal or less than 1, it's sold by weight
+    if (item.quantity !== null && (item.quantity % 1 !== 0 || item.quantity < 0.999)) {
+      acc[clean].isWeight = true
+    }
+    return acc
+  }, {})
+
+  // Step 2: Merge subsets (e.g. "jamon dona coca et negra" into "jamon dona coca")
+  const sortedKeys = Object.keys(rawGrouped).sort((a, b) => a.length - b.length)
+  const finalGrouped: Record<string, ProductRankingItemExtended> = {}
+
+  for (const key of sortedKeys) {
+    const data = rawGrouped[key]
+    if (!data) continue
+    let merged = false
+
+    for (const existingKey of Object.keys(finalGrouped)) {
+      const existingWords = existingKey.split(' ')
+      const currentWords = key.split(' ')
+      
+      const allWordsMatch = existingWords.every((word) => currentWords.includes(word))
+
+      if (allWordsMatch && existingWords.length > 1) {
+        const existing = finalGrouped[existingKey]
+        if (existing) {
+          existing.count += data.count
+          existing.totalQuantity += data.totalQuantity
+          existing.totalSpent += data.totalSpent
+          if (data.isWeight) existing.isWeight = true
+          merged = true
+          break
+        }
+      }
+    }
+
+    if (!merged) {
+      finalGrouped[key] = {
+        name: data.originalName.toLowerCase().trim(), // Normalize completely to lowercase
+        normalizedName: key,
+        count: data.count,
+        totalQuantity: data.totalQuantity,
+        totalSpent: data.totalSpent,
+        isWeight: data.isWeight
+      }
+    }
+  }
+
+  return Object.values(finalGrouped)
     .map((g) => ({ ...g, totalSpent: Math.round(g.totalSpent * 100) / 100 }))
     .sort((a, b) => (sortBy === 'count' ? b.count - a.count : b.totalSpent - a.totalSpent))
 }
@@ -89,10 +157,9 @@ export default function ProductMonthlyRanking({ items }: ProductMonthlyRankingPr
                 {rank}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-foreground">{item.name}</p>
+                <p className="truncate text-sm font-semibold text-foreground lowercase">{item.name}</p>
                 <p className="text-xs text-muted-foreground">
-                  {item.count} compra{item.count !== 1 ? 's' : ''}
-                  {item.totalQuantity > 0 ? ` · ${item.totalQuantity} unidad${item.totalQuantity !== 1 ? 'es' : ''}` : ''}
+                  {item.count} {item.count === 1 ? 'compra' : 'compras'} · {item.isWeight ? `${item.totalQuantity.toFixed(3)} kg` : `${item.totalQuantity} u`}
                 </p>
               </div>
               <p className="shrink-0 text-sm font-bold text-foreground">{formatCurrency(item.totalSpent)}</p>

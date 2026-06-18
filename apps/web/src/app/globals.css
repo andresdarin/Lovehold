@@ -60,9 +60,10 @@
   html {
     scrollbar-gutter: stable;
   }
+
   input:-webkit-autofill,
-  input:-webkit-autofill:hover, 
-  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
   input:-webkit-autofill:active {
     -webkit-background-clip: text;
     -webkit-text-fill-color: var(--foreground) !important;
@@ -134,7 +135,7 @@
   }
 
   .liquid-glass[data-variant="card"] {
-    border-radius: 1.25rem;
+    border-radius: 1rem;
   }
 
   .liquid-glass[data-variant="button"],
@@ -231,6 +232,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+
     .liquid-glass,
     .liquid-glass::before,
     .liquid-glass::after {
