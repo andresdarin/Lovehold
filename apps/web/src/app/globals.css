@@ -134,7 +134,7 @@
   }
 
   .liquid-glass[data-variant="card"] {
-    border-radius: 1rem;
+    border-radius: 1.25rem;
   }
 
   .liquid-glass[data-variant="button"],
