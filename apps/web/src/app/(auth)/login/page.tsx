@@ -7,6 +7,7 @@ import { Mail, Lock, Heart, Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { apiFetch } from '@/lib/api'
+import { APP_VERSION } from '@/lib/version'
 
 /**
  * Vista de Login.
@@ -176,6 +177,9 @@ export default function LoginPage() {
         >
           Registrate
         </Link>
+      </p>
+      <p className="mt-6 text-center text-xs text-lh-navy/30">
+        v{APP_VERSION}
       </p>
     </motion.div>
   )
