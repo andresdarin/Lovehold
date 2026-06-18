@@ -3,7 +3,7 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Mail, Lock, User, Phone, Heart } from 'lucide-react'
+import { Mail, Lock, User, Phone, Heart, Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { apiFetch } from '@/lib/api'
@@ -20,6 +20,8 @@ export default function SignUpPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [phone, setPhone] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -170,15 +172,22 @@ export default function SignUpPage() {
             <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-lh-navy/40" />
             <input
               id="password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               required
               autoComplete="new-password"
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Mín. 6 caracteres"
-              className="w-full rounded-xl border border-lh-border-light bg-lh-surface py-3.5 pl-11 pr-4 text-lh-navy placeholder:text-lh-navy/40 outline-none transition-all focus:border-lh-primary focus:ring-2 focus:ring-lh-primary/40 focus-visible:ring-2 focus-visible:ring-lh-primary/40"
+              className="w-full rounded-xl border border-lh-border-light bg-lh-surface py-3.5 pl-11 pr-12 text-lh-navy placeholder:text-lh-navy/40 outline-none transition-all focus:border-lh-primary focus:ring-2 focus:ring-lh-primary/40 focus-visible:ring-2 focus-visible:ring-lh-primary/40"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-lh-navy/40 hover:text-lh-navy/70 transition-colors focus:outline-none"
+            >
+              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            </button>
           </div>
         </div>
 
@@ -193,14 +202,21 @@ export default function SignUpPage() {
             <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-lh-navy/40" />
             <input
               id="confirmPassword"
-              type="password"
+              type={showConfirmPassword ? 'text' : 'password'}
               required
               autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Repetí tu contraseña"
-              className="w-full rounded-xl border border-lh-border-light bg-lh-surface py-3.5 pl-11 pr-4 text-lh-navy placeholder:text-lh-navy/40 outline-none transition-all focus:border-lh-primary focus:ring-2 focus:ring-lh-primary/40 focus-visible:ring-2 focus-visible:ring-lh-primary/40"
+              className="w-full rounded-xl border border-lh-border-light bg-lh-surface py-3.5 pl-11 pr-12 text-lh-navy placeholder:text-lh-navy/40 outline-none transition-all focus:border-lh-primary focus:ring-2 focus:ring-lh-primary/40 focus-visible:ring-2 focus-visible:ring-lh-primary/40"
             />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-lh-navy/40 hover:text-lh-navy/70 transition-colors focus:outline-none"
+            >
+              {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            </button>
           </div>
         </div>
 

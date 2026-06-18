@@ -46,7 +46,7 @@ export default function ExpenseForm({ onSubmit, onCancel, submitting, initialIte
       notes: notes || undefined,
       isRecurring: type === 'fixed' ? isRecurring : undefined,
       recurrenceDay: type === 'fixed' && isRecurring ? recurrenceDay : undefined,
-      items: type === 'supermarket' ? items.map(({ id, ...rest }) => rest) : undefined,
+      items: type === 'supermarket' ? items.map(({ id: _id, ...rest }) => rest) : undefined,
     })
   }
 
