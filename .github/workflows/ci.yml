@@ -34,6 +34,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @lovehold/api exec prisma generate
       - run: pnpm --filter @lovehold/api exec tsc --noEmit
       - run: pnpm --filter @lovehold/web exec tsc --noEmit
 
@@ -48,4 +49,5 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @lovehold/api exec prisma generate
       - run: pnpm build
