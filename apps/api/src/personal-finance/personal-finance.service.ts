@@ -124,19 +124,76 @@ export class PersonalFinanceService {
       select: { name: true, quantity: true, totalPrice: true },
     })
 
-    type Acc = Record<string, { name: string; count: number; totalQuantity: number; totalSpent: number }>
-    const grouped = items.reduce<Acc>((acc, item) => {
-      const key = item.name.toLowerCase().trim().replace(/\s+/g, ' ')
-      if (!acc[key]) {
-        acc[key] = { name: item.name, count: 0, totalQuantity: 0, totalSpent: 0 }
+    // Helper to normalize strings for comparison (remove accents, punctuation, weights, units)
+    const normalizeString = (str: string): string => {
+      return str
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // remove accents
+        .replace(/[^a-z0-9\s]/g, '') // remove punctuation
+        .replace(/\b\d+(?:g|gr|grs|kg|kgs|ml|l|cc|u|un|und|unid)\b/g, '') // remove weights/units
+        .trim()
+        .replace(/\s+/g, ' ')
+    }
+
+    // Step 1: Initial exact grouping of normalized names
+    type RawAcc = Record<string, { originalName: string; count: number; totalQuantity: number; totalSpent: number }>
+    const rawGrouped = items.reduce<RawAcc>((acc, item) => {
+      const clean = normalizeString(item.name)
+      if (!clean) return acc
+      if (!acc[clean]) {
+        acc[clean] = { originalName: item.name, count: 0, totalQuantity: 0, totalSpent: 0 }
       }
-      acc[key].count += 1
-      acc[key].totalQuantity += item.quantity === null ? 1 : Number(item.quantity)
-      acc[key].totalSpent += Number(item.totalPrice)
+      acc[clean].count += 1
+      acc[clean].totalQuantity += item.quantity === null ? 1 : Number(item.quantity)
+      acc[clean].totalSpent += Number(item.totalPrice)
       return acc
     }, {})
 
-    return Object.values(grouped)
+    // Step 2: Merge subsets (e.g. "jamon dona coca et negra" into "jamon dona coca")
+    const sortedKeys = Object.keys(rawGrouped).sort((a, b) => a.length - b.length)
+    const finalGrouped: Record<string, { name: string; count: number; totalQuantity: number; totalSpent: number }> = {}
+
+    for (const key of sortedKeys) {
+      const data = rawGrouped[key]
+      if (!data) continue
+      let merged = false
+
+      for (const existingKey of Object.keys(finalGrouped)) {
+        const existingWords = existingKey.split(' ')
+        const currentWords = key.split(' ')
+        
+        // If all words of the shorter name exist in the current longer name
+        const allWordsMatch = existingWords.every((word) => currentWords.includes(word))
+
+        if (allWordsMatch && existingWords.length > 1) {
+          const existing = finalGrouped[existingKey]
+          if (existing) {
+            existing.count += data.count
+            existing.totalQuantity += data.totalQuantity
+            existing.totalSpent += data.totalSpent
+            merged = true
+            break
+          }
+        }
+      }
+
+      if (!merged) {
+        // Format name beautifully: capitalize first letter of each word
+        const formattedName = data.originalName
+          .toLowerCase()
+          .replace(/\b\w/g, (c) => c.toUpperCase())
+
+        finalGrouped[key] = {
+          name: formattedName,
+          count: data.count,
+          totalQuantity: data.totalQuantity,
+          totalSpent: data.totalSpent,
+        }
+      }
+    }
+
+    return Object.values(finalGrouped)
       .map((g) => ({ ...g, totalSpent: Math.round(g.totalSpent * 100) / 100 }))
       .sort((a, b) => b.totalSpent - a.totalSpent)
   }

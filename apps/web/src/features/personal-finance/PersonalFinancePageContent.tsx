@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Plus, ClipboardPaste } from 'lucide-react'
 import { usePersonalFinance, useCreateExpense } from './hooks'
 import { monthLabel, currentMonthKey } from './constants'
-import { computeSummary, computeProductRanking } from './utils'
+import { computeSummary } from './utils'
 import MonthlySummaryCards from './MonthlySummaryCards'
 import ExpenseForm from './ExpenseForm'
 import ReceiptPasteForm from './ReceiptPasteForm'
@@ -22,7 +22,6 @@ export default function PersonalFinancePageContent() {
 
   const allItems = useMemo(() => expenses.flatMap((e) => e.items ?? []), [expenses])
   const summary = useMemo(() => computeSummary(expenses), [expenses])
-  const ranking = useMemo(() => computeProductRanking(allItems), [allItems])
 
   function shiftMonth(delta: number) {
     const parts = monthKey.split('-')
@@ -105,13 +104,10 @@ export default function PersonalFinancePageContent() {
             </section>
           </div>
 
-          {ranking.length > 0 && (
+          {allItems.length > 0 && (
             <section className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
               <h3 className="mb-3 text-sm font-bold text-foreground">Productos más comprados</h3>
-              <p className="mb-3 text-xs text-muted-foreground">
-                Promedio mensual general: ${(summary.total / Math.max(summary.count, 1)).toFixed(2)} por gasto
-              </p>
-              <ProductMonthlyRanking ranking={ranking} />
+              <ProductMonthlyRanking items={allItems} />
             </section>
           )}
         </>
