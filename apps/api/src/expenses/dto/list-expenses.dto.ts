@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer'
-import { IsDateString, IsIn, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
+import { IsIn, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
 
 export class ListExpensesDto {
   @IsOptional()
