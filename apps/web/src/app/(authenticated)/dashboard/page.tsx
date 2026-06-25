@@ -52,17 +52,19 @@ export default function DashboardPage() {
       <section className="rounded-[20px] border border-white/[0.08] bg-surface p-5 shadow-sm">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div
-            className="flex h-12 w-12 items-center justify-center rounded-xl text-lg font-bold text-white shadow-inner overflow-hidden"
-            style={{ backgroundColor: profile?.color ?? 'var(--primary)' }}
+            className="flex h-12 w-12 items-center justify-center rounded-xl text-lg font-bold text-white shadow-inner overflow-hidden ring-1 ring-white/10 shrink-0"
+            style={{ 
+              background: `linear-gradient(135deg, ${profile?.color ?? '#FF6B6B'}ee, ${profile?.color ?? '#FF6B6B'})` 
+            }}
           >
             {profile?.avatarUrl ? (
               <img
                 src={profile.avatarUrl}
                 alt={profile.displayName ?? 'Foto de perfil'}
-                className="h-full w-full rounded-xl object-cover"
+                className="h-full w-full rounded-xl object-cover block shrink-0"
               />
             ) : (
-              (profile?.displayName?.[0] ?? profile?.email[0] ?? '?').toUpperCase()
+              <span className="drop-shadow-sm text-lg font-bold">{(profile?.displayName?.[0] ?? profile?.email[0] ?? '?').toUpperCase()}</span>
             )}
           </div>
           <div className="flex-1">

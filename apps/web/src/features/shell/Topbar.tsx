@@ -38,18 +38,20 @@ export default function Topbar({ profile, onLogout }: TopbarProps) {
 
         {profile && (
           <div
-            className="flex h-10 w-10 items-center justify-center rounded-xl font-bold text-white text-xs shadow-sm overflow-hidden"
-            style={{ backgroundColor: profile.color ?? '#FF6B6B' }}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-bold text-white text-xs shadow-sm overflow-hidden ring-1 ring-white/10"
+            style={{ 
+              background: `linear-gradient(135deg, ${profile.color ?? '#FF6B6B'}ee, ${profile.color ?? '#FF6B6B'})` 
+            }}
             title={profile.displayName ?? profile.email}
           >
             {profile.avatarUrl ? (
               <img
                 src={profile.avatarUrl}
                 alt={profile.displayName ?? 'Foto de perfil'}
-                className="h-full w-full rounded-xl object-cover"
+                className="h-full w-full rounded-xl object-cover block shrink-0"
               />
             ) : (
-              userInitial
+              <span className="drop-shadow-sm text-sm">{userInitial}</span>
             )}
           </div>
         )}
