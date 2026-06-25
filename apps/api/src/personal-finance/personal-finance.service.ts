@@ -5,7 +5,7 @@ import type { CreatePersonalExpenseDto } from './dto/create-personal-expense.dto
 
 @Injectable()
 export class PersonalFinanceService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   private async getProfileId(authUserId: string): Promise<string> {
     const profile = await this.prisma.profile.findUnique({
@@ -59,17 +59,17 @@ export class PersonalFinanceService {
         monthKey,
         ...(dto.items?.length
           ? {
-              items: {
-                create: dto.items.map((item) => ({
-                  name: item.name.trim(),
-                  category: item.category,
-                  quantity: (item.quantity === undefined || item.quantity === null) ? null : item.quantity.toFixed(3),
-                  unitPrice: (item.unitPrice === undefined || item.unitPrice === null) ? null : item.unitPrice.toFixed(2),
-                  totalPrice: item.totalPrice.toFixed(2),
-                  rawLine: item.rawLine?.trim() || null,
-                })),
-              },
-            }
+            items: {
+              create: dto.items.map((item) => ({
+                name: item.name.trim(),
+                category: item.category,
+                quantity: (item.quantity === undefined || item.quantity === null) ? null : item.quantity.toFixed(3),
+                unitPrice: (item.unitPrice === undefined || item.unitPrice === null) ? null : item.unitPrice.toFixed(2),
+                totalPrice: item.totalPrice.toFixed(2),
+                rawLine: item.rawLine?.trim() || null,
+              })),
+            },
+          }
           : {}),
       },
       include: { items: true },

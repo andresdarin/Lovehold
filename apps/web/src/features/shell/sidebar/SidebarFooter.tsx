@@ -11,6 +11,7 @@ interface SidebarFooterProps {
     displayName: string | null
     email: string
     color: string
+    avatarUrl?: string | null
   } | null
   onLogout: () => void
 }
@@ -38,11 +39,21 @@ export default function SidebarFooter({ collapsed, profile, onLogout }: SidebarF
           aria-label="Ir al perfil"
         >
           <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-            style={{ backgroundColor: profile.color ?? '#FF6B6B' }}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white overflow-hidden ring-1 ring-white/10"
+            style={{ 
+              background: `linear-gradient(135deg, ${profile.color ?? '#FF6B6B'}ee, ${profile.color ?? '#FF6B6B'})` 
+            }}
             title={collapsed ? (profile.displayName ?? profile.email) : undefined}
           >
-            {userInitial}
+            {profile.avatarUrl ? (
+              <img
+                src={profile.avatarUrl}
+                alt={profile.displayName ?? 'Foto de perfil'}
+                className="h-full w-full rounded-full object-cover block shrink-0"
+              />
+            ) : (
+              <span className="drop-shadow-sm text-sm">{userInitial}</span>
+            )}
           </div>
           {!collapsed && (
             <div className="min-w-0 flex-1">

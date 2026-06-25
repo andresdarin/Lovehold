@@ -49,13 +49,23 @@ export default function DashboardPage() {
       </header>
 
       {/* ═══ PROFILE CARD ═══ */}
-      <section className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+      <section className="rounded-[20px] border border-white/[0.08] bg-surface p-5 shadow-sm">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div
-            className="flex h-12 w-12 items-center justify-center rounded-xl text-lg font-bold text-white shadow-inner"
-            style={{ backgroundColor: profile?.color ?? 'var(--primary)' }}
+            className="flex h-12 w-12 items-center justify-center rounded-xl text-lg font-bold text-white shadow-inner overflow-hidden ring-1 ring-white/10 shrink-0"
+            style={{ 
+              background: `linear-gradient(135deg, ${profile?.color ?? '#FF6B6B'}ee, ${profile?.color ?? '#FF6B6B'})` 
+            }}
           >
-            {(profile?.displayName?.[0] ?? profile?.email[0] ?? '?').toUpperCase()}
+            {profile?.avatarUrl ? (
+              <img
+                src={profile.avatarUrl}
+                alt={profile.displayName ?? 'Foto de perfil'}
+                className="h-full w-full rounded-xl object-cover block shrink-0"
+              />
+            ) : (
+              <span className="drop-shadow-sm text-lg font-bold">{(profile?.displayName?.[0] ?? profile?.email[0] ?? '?').toUpperCase()}</span>
+            )}
           </div>
           <div className="flex-1">
             <p className="font-semibold text-foreground">
@@ -255,11 +265,10 @@ function FirstStepsCard() {
       <div className="mt-5 space-y-3">
         {steps.map((step) => (
           <div key={step.label} className="flex items-center gap-3">
-            <span className={`flex h-7 w-7 items-center justify-center rounded-full border ${
-              step.done
+            <span className={`flex h-7 w-7 items-center justify-center rounded-full border ${step.done
                 ? 'border-primary bg-primary text-primary-foreground'
                 : 'border-border bg-surface-soft text-muted-foreground'
-            }`}>
+              }`}>
               {step.done ? <Check className="h-4 w-4" /> : <Circle className="h-3 w-3" />}
             </span>
             <span className={`text-sm font-semibold ${step.done ? 'text-foreground' : 'text-muted-foreground'}`}>

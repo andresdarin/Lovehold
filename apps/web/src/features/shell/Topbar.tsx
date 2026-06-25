@@ -9,6 +9,7 @@ interface TopbarProps {
     displayName: string | null
     email: string
     color: string
+    avatarUrl?: string | null
   } | null
   onLogout: () => void
 }
@@ -22,7 +23,7 @@ export default function Topbar({ profile, onLogout }: TopbarProps) {
   const userInitial = (profile?.displayName?.[0] ?? profile?.email[0] ?? '?').toUpperCase()
 
   return (
-    <header className="sticky top-0 left-0 right-0 flex h-16 items-center justify-between border-b border-border bg-surface px-6 lg:hidden z-20">
+    <header className="sticky top-0 left-0 right-0 flex h-[calc(4rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] items-center justify-between border-b border-border bg-surface px-6 lg:hidden z-20">
       {/* Identidad de Marca */}
       <div className="flex items-center gap-2">
         <Heart className="h-5 w-5 text-primary fill-primary" />
@@ -34,14 +35,24 @@ export default function Topbar({ profile, onLogout }: TopbarProps) {
       {/* Controles / Perfil */}
       <div className="flex items-center gap-3">
         <ThemeToggle />
-        
+
         {profile && (
           <div
-            className="flex h-8 w-8 items-center justify-center rounded-xl font-bold text-white text-xs"
-            style={{ backgroundColor: profile.color ?? '#FF6B6B' }}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-bold text-white text-xs shadow-sm overflow-hidden ring-1 ring-white/10"
+            style={{ 
+              background: `linear-gradient(135deg, ${profile.color ?? '#FF6B6B'}ee, ${profile.color ?? '#FF6B6B'})` 
+            }}
             title={profile.displayName ?? profile.email}
           >
-            {userInitial}
+            {profile.avatarUrl ? (
+              <img
+                src={profile.avatarUrl}
+                alt={profile.displayName ?? 'Foto de perfil'}
+                className="h-full w-full rounded-xl object-cover block shrink-0"
+              />
+            ) : (
+              <span className="drop-shadow-sm text-sm">{userInitial}</span>
+            )}
           </div>
         )}
 

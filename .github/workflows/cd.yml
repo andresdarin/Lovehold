@@ -24,6 +24,18 @@ jobs:
           node-version: '22'
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
+
+      - name: Compute version
+        id: version
+        run: |
+          COUNT=$(git rev-list --count HEAD)
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+          echo "version=0.$COUNT.${{ github.run_number }}" >> $GITHUB_OUTPUT
+
+      - name: Inject version into source
+        run: |
+          echo "export const APP_VERSION = '${{ steps.version.outputs.version }}'" > apps/web/src/lib/version.ts
+
       - name: Deploy to Vercel
         run: |
           npx vercel --token=${{ secrets.VERCEL_TOKEN }} --prod --yes

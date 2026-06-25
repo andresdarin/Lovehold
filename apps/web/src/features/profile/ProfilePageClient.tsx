@@ -11,6 +11,7 @@ import { EditProfileModal } from './EditProfileModal'
 import { RankProgressCompact } from './RankProgressCompact'
 import { ProfileMiniStats } from './ProfileMiniStats'
 import LiquidGlass from '@/components/ui/LiquidGlass'
+import { APP_VERSION } from '@/lib/version'
 
 /**
  * Editorial profile page orchestrator.
@@ -84,6 +85,10 @@ export default function ProfilePageClient() {
         onClose={() => setEditOpen(false)}
         onSaved={refreshProfile}
       />
+
+      <p className="text-center text-xs text-muted-foreground/40 pt-4">
+        v{APP_VERSION}
+      </p>
     </div>
   )
 }

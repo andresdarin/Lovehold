@@ -37,7 +37,7 @@ export default function AppShell({ children, profile, onLogout }: AppShellProps)
 
       {/* Contenido Principal */}
       <main
-        className={`min-h-[calc(100vh-4rem)] lg:min-h-screen pb-20 lg:pb-0 transition-all duration-300 ease-in-out ${
+        className={`min-h-[calc(100dvh-4rem)] lg:min-h-screen pb-[calc(104px+env(safe-area-inset-bottom))] lg:pb-0 transition-all duration-300 ease-in-out ${
           sidebarCollapsed ? 'lg:pl-[124px]' : 'lg:pl-[292px]'
         }`}
       >
