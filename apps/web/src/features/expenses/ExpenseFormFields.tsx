@@ -14,14 +14,14 @@ export default function ExpenseFormFields({
   const isPersonal = form.scope === 'personal'
 
   return (
-    <div className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+    <div className="rounded-[20px] border border-white/[0.08] bg-gradient-to-b from-white/[0.055] to-white/[0.025] p-4 shadow-sm">
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-          <ShoppingBasket className="h-5 w-5 text-primary" />
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
+          <ShoppingBasket className="h-4 w-4 text-primary" />
         </div>
         <div>
-          <h2 className="text-base font-bold text-foreground">Datos generales</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="text-sm font-bold text-foreground">Datos generales</h2>
+          <p className="text-xs text-muted-foreground">
             {isPersonal
               ? 'Gasto personal, no se divide con nadie.'
               : 'El ticket se guarda como gasto compartido 50/50.'}
@@ -29,37 +29,37 @@ export default function ExpenseFormFields({
         </div>
       </div>
 
-      <div className="mt-5 flex gap-2 rounded-xl border border-border bg-surface-soft p-1">
+      <div className="mt-4 flex h-10 gap-1 rounded-xl border border-white/[0.08] bg-white/[0.04] p-1">
         <button
           type="button"
           onClick={() => onUpdate('scope', 'personal')}
-          className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition ${
-            isPersonal ? 'bg-surface text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+          className={`flex flex-1 items-center justify-center gap-2 rounded-lg text-xs font-semibold transition ${
+            isPersonal ? 'bg-white/[0.08] text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.2)] border border-white/[0.04]' : 'text-muted-foreground hover:text-foreground'
           }`}
         >
-          <User className="h-4 w-4" />
+          <User className="h-3.5 w-3.5" />
           Personal
         </button>
         <button
           type="button"
           onClick={() => onUpdate('scope', 'household')}
-          className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition ${
-            !isPersonal ? 'bg-surface text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+          className={`flex flex-1 items-center justify-center gap-2 rounded-lg text-xs font-semibold transition ${
+            !isPersonal ? 'bg-white/[0.08] text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.2)] border border-white/[0.04]' : 'text-muted-foreground hover:text-foreground'
           }`}
         >
-          <Heart className="h-4 w-4" />
+          <Heart className="h-3.5 w-3.5" />
           Lovehold
         </button>
       </div>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
         <TextField label="Título" value={form.title} onChange={(v) => onUpdate('title', v)} placeholder="Compra Tata" required />
         <TextField label="Comercio" value={form.merchant} onChange={(v) => onUpdate('merchant', v)} placeholder="Tata" />
         <TextField label="Categoría general" value={form.category} onChange={(v) => onUpdate('category', v)} placeholder="Compras de súper" required />
         <div className="block">
-          <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Fecha</span>
+          <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Fecha</span>
           <CustomDatePicker
-            className="mt-2 w-full"
+            className="mt-1.5 w-full text-xs font-semibold"
             value={form.date}
             onChange={(v) => onUpdate('date', v)}
             required
@@ -80,12 +80,12 @@ export default function ExpenseFormFields({
         />
       </div>
 
-      <label className="mt-4 block">
-        <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Notas</span>
+      <label className="mt-3 block">
+        <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Notas</span>
         <textarea
           value={form.notes} onChange={(e) => onUpdate('notes', e.target.value)}
-          rows={3} placeholder="Algo útil para recordar esta compra"
-          className="mt-2 w-full resize-none rounded-2xl border border-border bg-surface-soft px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+          placeholder="Algo útil para recordar esta compra"
+          className="mt-1.5 min-h-[72px] max-h-[88px] w-full resize-none rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs font-semibold text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
       </label>
     </div>
@@ -98,12 +98,12 @@ function TextField({ label, value, onChange, placeholder, type = 'text', disable
 }) {
   return (
     <label className="block">
-      <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">{label}</span>
+      <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{label}</span>
       <input
         type={type} value={value} min={min} step={step} required={required} disabled={disabled}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-2 h-11 w-full rounded-2xl border border-border bg-surface px-4 text-sm font-medium text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:bg-surface-soft disabled:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+        className="mt-1.5 h-11 w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 text-xs font-semibold text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:bg-white/[0.02] disabled:text-muted-foreground/60 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
       />
     </label>
   )

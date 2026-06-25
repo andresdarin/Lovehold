@@ -33,7 +33,7 @@ export default function ExpenseItemList({
   }
 
   return (
-    <section className="rounded-2xl border border-border bg-surface/85 backdrop-blur-md p-6 shadow-md transition-all duration-300">
+    <section className="rounded-[20px] border border-white/[0.08] bg-gradient-to-b from-white/[0.055] to-white/[0.025] p-4 shadow-md transition-all duration-300">
       <ExpenseItemsToolbar
         itemsCount={items.length}
         itemsTotal={sumItems(items)}
@@ -42,11 +42,11 @@ export default function ExpenseItemList({
         onClearItems={clearItems}
       />
 
-      <div className="mt-5">
+      <div className="mt-4">
         {items.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border bg-surface-soft p-6 text-center">
-            <p className="font-semibold text-foreground">No se detectaron productos.</p>
-            <p className="mt-1 text-sm text-muted-foreground">Podés guardar el gasto general o agregar ítems manualmente.</p>
+          <div className="rounded-xl border border-dashed border-white/[0.08] bg-white/[0.02] p-5 text-center">
+            <p className="text-xs font-bold text-foreground">No se detectaron productos.</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">Podés guardar el gasto general o agregar ítems manualmente.</p>
           </div>
         ) : (
           <>

@@ -63,27 +63,27 @@ export default function ReceiptScanUploader({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className="relative flex h-full flex-col rounded-2xl border border-border bg-surface p-6 shadow-sm transition-all duration-200"
+      className="relative flex h-full flex-col rounded-[20px] border border-white/[0.08] bg-gradient-to-b from-white/[0.055] to-white/[0.025] p-4 shadow-[0_14px_40px_rgba(0,0,0,0.28)] transition-all duration-200 mb-4"
     >
       {isDragging && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-primary bg-background/85 backdrop-blur-md transition-all duration-200">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-[20px] border-2 border-dashed border-primary bg-background/85 backdrop-blur-md transition-all duration-200">
           <ScanLine className="h-10 w-10 animate-pulse text-primary mb-2" />
-          <p className="text-sm font-bold text-foreground">Soltá la imagen del ticket acá</p>
+          <p className="text-xs font-bold text-foreground">Soltá la imagen del ticket acá</p>
         </div>
       )}
-      <div className="flex items-center gap-4">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10" aria-hidden="true">
-          <ScanLine className="h-5 w-5 text-primary" />
+      <div className="flex items-center gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10" aria-hidden="true">
+          <ScanLine className="h-4 w-4 text-primary" />
         </div>
         <div>
-          <h2 className="text-base font-bold text-foreground">Escanear ticket</h2>
-          <p className="text-sm text-muted-foreground">Sacá una foto o subí una imagen del ticket.</p>
+          <h2 className="text-sm font-bold text-foreground">Escanear ticket</h2>
+          <p className="text-xs text-muted-foreground">Sacá una foto o subí una imagen del ticket.</p>
         </div>
       </div>
 
-      <div className="mt-6 flex min-h-0 flex-1 flex-col gap-4">
+      <div className="mt-4 flex min-h-0 flex-1 flex-col gap-3">
         {preview ? (
-          <div className="relative min-h-80 flex-1 overflow-hidden rounded-xl bg-black/10">
+          <div className="relative min-h-64 flex-1 overflow-hidden rounded-xl bg-black/10">
             <img
               src={preview}
               alt="Vista previa del ticket"
@@ -93,17 +93,17 @@ export default function ReceiptScanUploader({
               type="button"
               onClick={onClear}
               disabled={scanning}
-              className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white transition hover:bg-black/75 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white transition hover:bg-black/75 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
               aria-label="Quitar imagen"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
         ) : (
-          <div className="flex gap-3">
-            <label className="flex flex-1 cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-border bg-surface-soft px-4 py-6 text-center transition hover:border-primary/40 hover:bg-surface-soft/80">
-              <ImageUp className="h-8 w-8 text-muted-foreground" />
-              <span className="text-sm font-medium text-muted-foreground">Subir imagen</span>
+          <div className="flex gap-2">
+            <label className="flex h-24 flex-1 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-white/[0.08] bg-white/[0.02] px-2 py-4 text-center transition hover:border-primary/40 hover:bg-white/[0.04]">
+              <ImageUp className="h-[22px] w-[22px] text-muted-foreground" />
+              <span className="text-xs font-medium text-muted-foreground">Subir imagen</span>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
@@ -114,9 +114,9 @@ export default function ReceiptScanUploader({
                 }}
               />
             </label>
-            <label className="flex flex-1 cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-border bg-surface-soft px-4 py-6 text-center transition hover:border-primary/40 hover:bg-surface-soft/80">
-              <Camera className="h-8 w-8 text-muted-foreground" />
-              <span className="text-sm font-medium text-muted-foreground">Sacar foto</span>
+            <label className="flex h-24 flex-1 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-white/[0.08] bg-white/[0.02] px-2 py-4 text-center transition hover:border-primary/40 hover:bg-white/[0.04]">
+              <Camera className="h-[22px] w-[22px] text-muted-foreground" />
+              <span className="text-xs font-medium text-muted-foreground">Sacar foto</span>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
@@ -136,7 +136,7 @@ export default function ReceiptScanUploader({
             <button
               type="button"
               onClick={onScan}
-              className="flex w-full items-center justify-center gap-2 px-5 py-3 text-sm font-bold text-foreground focus-visible:outline-none"
+              className="flex w-full items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold text-foreground focus-visible:outline-none"
             >
               <ScanLine className="h-4 w-4 text-primary" />
               Analizar ticket
@@ -145,9 +145,9 @@ export default function ReceiptScanUploader({
         )}
 
         {scanning && (
-          <div className="mt-auto flex items-center justify-center gap-3 rounded-xl bg-surface-soft py-4">
-            <Loader2 className="h-5 w-5 animate-spin text-primary" />
-            <span className="text-sm font-medium text-muted-foreground">Analizando ticket con IA…</span>
+          <div className="mt-auto flex items-center justify-center gap-2.5 rounded-xl bg-white/[0.04] py-3">
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            <span className="text-xs font-medium text-muted-foreground">Analizando ticket con IA…</span>
           </div>
         )}
       </div>
