@@ -6,8 +6,8 @@ import { motion } from 'framer-motion'
 
 /**
  * Layout persistente de autenticación.
- * Maneja la transición conceptual tipo shared-element y morphing
- * de la ilustración de fondo entre Login y Registro.
+ * Mantiene la experiencia de escritorio original con transiciones de ilustración,
+ * y aplica una versión optimizada responsiva para mobile/PWA.
  */
 export default function AuthLayout({
   children,
@@ -69,7 +69,7 @@ export default function AuthLayout({
   }
 
   return (
-    <div className="min-h-screen bg-lh-cream overflow-hidden">
+    <div className="min-h-screen bg-lh-cream overflow-x-hidden overflow-y-auto lg:overflow-hidden">
       {/* ═══════════ DESKTOP LAYOUT (lg) ═══════════ */}
       <div className="hidden min-h-screen lg:relative lg:flex lg:items-center">
         {/* Contenedor flotante de los formularios */}
@@ -92,22 +92,27 @@ export default function AuthLayout({
       </div>
 
       {/* ═══════════ MOBILE LAYOUT (< lg) ═══════════ */}
-      <div className="flex min-h-screen flex-col lg:hidden">
-        {/* Cabecera con ilustración animada sutilmente */}
-        <div className="h-[200px] shrink-0 overflow-hidden relative">
+      <div className="flex min-h-[100dvh] flex-col lg:hidden bg-black text-white pb-[calc(16px+env(safe-area-inset-bottom,0px))]">
+        {/* Cabecera con ilustración fina y degradado inferior lineal simple */}
+        <div className="w-full h-[clamp(110px,15dvh,140px)] shrink-0 overflow-hidden relative">
           <motion.img
-            initial={{ scale: 1.1, opacity: 0 }}
+            initial={{ scale: 1.05, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
             src="/brand/lovehold-bg.png"
-            alt=""
+            alt="Lovehold Background"
             className="h-full w-full object-cover"
           />
+          {/* Overlay oscuro general */}
+          <div className="absolute inset-0 bg-black/25" />
+          
+          {/* Degradado inferior recto para fundir con el fondo negro */}
+          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black to-transparent" />
         </div>
 
-        {/* Formulario */}
-        <div className="relative -mt-8 flex flex-1 flex-col rounded-t-[32px] bg-lh-cream px-6 py-8">
-          <div className="mx-auto w-full max-w-sm">
+        {/* Contenedor del Formulario en Mobile */}
+        <div className="flex-1 flex flex-col bg-black px-6">
+          <div className="mx-auto w-full max-w-[390px] flex-1 flex flex-col justify-between">
             {children}
           </div>
         </div>
