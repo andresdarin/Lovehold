@@ -33,7 +33,7 @@ export default function AppShell({ children, profile, onLogout }: AppShellProps)
       />
 
       {/* Topbar (Mobile) */}
-      <Topbar profile={profile} onLogout={onLogout} />
+      <Topbar profile={profile} />
 
       {/* Contenido Principal */}
       <main
