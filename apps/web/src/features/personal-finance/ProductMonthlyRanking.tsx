@@ -148,21 +148,31 @@ export default function ProductMonthlyRanking({ items }: ProductMonthlyRankingPr
         </div>
       </div>
 
-      <div className="space-y-1.5">
+      <div className="flex flex-col gap-3">
         {paginated.map((item, i) => {
           const rank = (safePage - 1) * pageSize + i + 1
           return (
-            <div key={item.normalizedName} className="flex items-center gap-3 rounded-xl border border-border bg-surface px-3 py-2.5 shadow-sm">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-surface-soft text-xs font-bold text-muted-foreground">
+            <div 
+              key={item.normalizedName} 
+              className="flex items-center gap-3 bg-transparent pb-3 border-b-[0.5px] border-border/50 last:border-b-0 last:pb-0"
+            >
+              {/* Número de posición */}
+              <span className="w-6 shrink-0 text-sm font-medium text-muted-foreground">
                 {rank}
               </span>
+
+              {/* Nombre del producto y cantidad de compras */}
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-foreground lowercase">{item.name}</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="truncate text-sm font-medium text-foreground lowercase">{item.name}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
                   {item.count} {item.count === 1 ? 'compra' : 'compras'} · {item.isWeight ? `${item.totalQuantity.toFixed(3)} kg` : `${item.totalQuantity} u`}
                 </p>
               </div>
-              <p className="shrink-0 text-sm font-bold text-foreground">{formatCurrency(item.totalSpent)}</p>
+
+              {/* Monto a la derecha */}
+              <p className="shrink-0 text-sm font-medium text-foreground">
+                {formatCurrency(item.totalSpent)}
+              </p>
             </div>
           )
         })}

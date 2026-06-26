@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Wallet, TrendingUp, BadgeDollarSign, Plus } from 'lucide-react'
+import { Home, Wallet, TrendingUp, BadgeDollarSign } from 'lucide-react'
 
 interface MobileNavProps {
   profile: {
@@ -56,12 +56,20 @@ export default function MobileNav({ profile, onAddClick }: MobileNavProps) {
   const renderCentralButton = () => {
     const buttonContent = (
       <span 
-        style={{
-          background: 'linear-gradient(180deg, #ff5f7d, #f72585)',
-        }}
-        className="flex h-[54px] w-[54px] items-center justify-center rounded-full text-white shadow-[0_10px_28px_rgba(247,37,133,0.30)] transition-all duration-180 hover:scale-105 active:scale-95 outline-none cursor-pointer"
+        className="flex h-[54px] w-[54px] items-center justify-center rounded-full transition-all duration-180 hover:scale-105 active:scale-95 outline-none cursor-pointer overflow-hidden shadow-[0_10px_28px_rgba(0,0,0,0.30)]"
       >
-        <Plus className="h-[22px] w-[22px] text-white" />
+        {/* Imagen para tema claro */}
+        <img 
+          src="/icons/central_light.png" 
+          alt="Agregar gasto" 
+          className="h-full w-full object-cover block dark:hidden"
+        />
+        {/* Imagen para tema oscuro */}
+        <img 
+          src="/icons/central_dark.png" 
+          alt="Agregar gasto" 
+          className="h-full w-full object-cover hidden dark:block"
+        />
       </span>
     )
 
