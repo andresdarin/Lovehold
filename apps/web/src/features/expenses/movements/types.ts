@@ -1,6 +1,7 @@
 export type ExpenseKind = 'fixed' | 'variable' | 'supermarket' | 'subscription' | 'debt' | 'other'
 export type ExpenseScope = 'personal' | 'household'
 export type SplitStatus = 'none' | 'pending' | 'split'
+export type FinancialMovementType = 'EXPENSE' | 'INCOME' | 'TRANSFER' | 'FX' | 'CARD_PAYMENT'
 
 export interface MovementItem {
   id: string
@@ -32,6 +33,15 @@ export interface Movement {
   recurringLabel: string | null
   items: MovementItem[]
   createdAt: string
+  /** Present on finance records. Expense records remain supported while the API is unified. */
+  financialType?: FinancialMovementType
+  accountName?: string | null
+  destinationAccountName?: string | null
+  sourceAmount?: number | null
+  destinationAmount?: number | null
+  exchangeRate?: number | null
+  ticketId?: string | null
+  metadata?: Record<string, unknown> | null
 }
 
 export interface MonthSummary {
@@ -58,6 +68,10 @@ export interface MovementFilters {
   scope: string
   category: string
   paymentMethod: string
+  financialType: string
+  account: string
+  currency: string
+  period: string
 }
 
 export interface ExpenseListResponse {

@@ -29,6 +29,13 @@ export const createTransferSchema = z.object({
   destinationAccountId: z.string().min(1),
   amount: decimal,
   currency: z.enum(['UYU', 'USD']).default('UYU'),
+  destinationAmount: decimal.optional(),
+  destinationCurrency: z.enum(['UYU', 'USD']).optional(),
+  exchangeRate: decimal.optional(),
+  baseCurrency: z.enum(['UYU', 'USD']).optional(),
+  quoteCurrency: z.enum(['UYU', 'USD']).optional(),
+  feeAmount: decimal.optional(),
+  feeAccountId: z.string().optional(),
   date: z.string().datetime(),
   description: z.string().max(200).optional(),
 })

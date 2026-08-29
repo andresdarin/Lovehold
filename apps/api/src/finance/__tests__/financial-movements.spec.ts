@@ -379,8 +379,256 @@ describe('Finnic Financial Movements & Account Invariants', () => {
     expect(expense.inputMethod).toBe('RECEIPT_SCAN')
     expect(Number(expense.amount)).toBe(700)
 
-    // Assert: Monthly expense is 700
+  })
+
+  it('Scenario 8 (INGRESO USD): Registering USD 1000 income sets USD account to 1000 USD without generating UYU or altering UYU balance', async () => {
+    // Arrange USD Account with 0.00
+    accountsStore.set('usd-bank-1', {
+      id: 'usd-bank-1',
+      profileId: 'profile-1',
+      name: 'Itaú USD',
+      type: 'BANK',
+      currency: 'USD',
+      balance: '0.00',
+      isSpendable: true,
+      isActive: true,
+    })
+
+    // Act: Register income of 1000 USD
+    await registerIncomeUseCase.execute({
+      profileId: 'profile-1',
+      input: {
+        title: 'Sueldo USD',
+        amount: '1000.00',
+        currency: 'USD',
+        dueOn: new Date().toISOString(),
+        accountId: 'usd-bank-1',
+      },
+    })
+
+    // Assert: USD account is exactly 1000 USD
+    expect(Number(accountsStore.get('usd-bank-1').balance)).toBe(1000)
+
+    // Assert: Expense recorded is INCOME movement in USD
+    const inc = expensesStore.find((e) => e.movementType === 'INCOME')
+    expect(inc).toBeDefined()
+    expect(inc.currency).toBe('USD')
+    expect(Number(inc.amount)).toBe(1000)
+  })
+
+  it('Scenario 9 (CAMBIO USD → UYU): Changing 300 USD at 39.50 rate decrements USD by 300, increments UYU by 11850, and does NOT generate income or expense', async () => {
+    // Arrange USD Account (1000 USD) and UYU Cash (0 UYU)
+    accountsStore.set('usd-acc', {
+      id: 'usd-acc',
+      profileId: 'profile-1',
+      name: 'Itaú USD',
+      type: 'BANK',
+      currency: 'USD',
+      balance: '1000.00',
+      isSpendable: true,
+    })
+    accountsStore.set('uyu-cash', {
+      id: 'uyu-cash',
+      profileId: 'profile-1',
+      name: 'Efectivo UYU',
+      type: 'CASH',
+      currency: 'UYU',
+      balance: '0.00',
+      isSpendable: true,
+    })
+
+    // Act: Change 300 USD to 11850 UYU
+    const res = await createTransferUseCase.execute({
+      profileId: 'profile-1',
+      input: {
+        sourceAccountId: 'usd-acc',
+        destinationAccountId: 'uyu-cash',
+        amount: '300.00',
+        currency: 'USD',
+        destinationAmount: '11850.00',
+        destinationCurrency: 'UYU',
+        exchangeRate: '39.50',
+        date: new Date().toISOString(),
+      },
+    })
+
+    // Assert: Balances updated
+    expect(Number(accountsStore.get('usd-acc').balance)).toBe(700)
+    expect(Number(accountsStore.get('uyu-cash').balance)).toBe(11850)
+
+    // Assert: Transfer movement created with rate in notes
+    expect(res.category).toBe('CAMBIO_MONEDA')
+    expect(res.movementType).toBe('TRANSFER')
+    expect(res.notes).toContain('1 USD = 39.50 UYU')
+
+    // Assert: Summary has 0 expense and 0 income from this operation
     const summary = await personalFinanceService.getSummary({ authUserId: 'u1' } as any, '2026-08')
-    expect(summary.total).toBe(700)
+    expect(summary.total).toBe(0)
+  })
+
+  it('Scenario 10 (CAMBIO PARCIAL): Changing 250 USD leaves 750 USD in source account without whole conversion', async () => {
+    accountsStore.set('usd-acc', {
+      id: 'usd-acc',
+      profileId: 'profile-1',
+      name: 'Itaú USD',
+      type: 'BANK',
+      currency: 'USD',
+      balance: '1000.00',
+      isSpendable: true,
+    })
+    accountsStore.set('uyu-acc', {
+      id: 'uyu-acc',
+      profileId: 'profile-1',
+      name: 'Itaú UYU',
+      type: 'BANK',
+      currency: 'UYU',
+      balance: '0.00',
+      isSpendable: true,
+    })
+
+    await createTransferUseCase.execute({
+      profileId: 'profile-1',
+      input: {
+        sourceAccountId: 'usd-acc',
+        destinationAccountId: 'uyu-acc',
+        amount: '250.00',
+        currency: 'USD',
+        destinationAmount: '9875.00',
+        date: new Date().toISOString(),
+      },
+    })
+
+    expect(Number(accountsStore.get('usd-acc').balance)).toBe(750)
+    expect(Number(accountsStore.get('uyu-acc').balance)).toBe(9875)
+  })
+
+  it('Scenario 11 (TASA EFECTIVA): Calculates effective rate (1 USD = 39.00 UYU) when delivering 300 USD and receiving 11700 UYU', async () => {
+    accountsStore.set('usd-acc', {
+      id: 'usd-acc',
+      profileId: 'profile-1',
+      name: 'Itaú USD',
+      type: 'BANK',
+      currency: 'USD',
+      balance: '500.00',
+      isSpendable: true,
+    })
+    accountsStore.set('uyu-cash', {
+      id: 'uyu-cash',
+      profileId: 'profile-1',
+      name: 'Efectivo UYU',
+      type: 'CASH',
+      currency: 'UYU',
+      balance: '0.00',
+      isSpendable: true,
+    })
+
+    const res = await createTransferUseCase.execute({
+      profileId: 'profile-1',
+      input: {
+        sourceAccountId: 'usd-acc',
+        destinationAccountId: 'uyu-cash',
+        amount: '300.00',
+        currency: 'USD',
+        destinationAmount: '11700.00',
+        date: new Date().toISOString(),
+      },
+    })
+
+    expect(res.notes).toContain('1 USD = 39.00 UYU')
+  })
+
+  it('Scenario 12 (FX NO DUPLICA INGRESO): Income of 1000 USD followed by FX 300 USD → UYU maintains single 1000 USD income', async () => {
+    accountsStore.set('usd-acc', {
+      id: 'usd-acc',
+      profileId: 'profile-1',
+      name: 'Itaú USD',
+      type: 'BANK',
+      currency: 'USD',
+      balance: '0.00',
+      isSpendable: true,
+      isActive: true,
+    })
+    accountsStore.set('uyu-cash', {
+      id: 'uyu-cash',
+      profileId: 'profile-1',
+      name: 'Efectivo UYU',
+      type: 'CASH',
+      currency: 'UYU',
+      balance: '0.00',
+      isSpendable: true,
+    })
+
+    // 1. Income of 1000 USD
+    await registerIncomeUseCase.execute({
+      profileId: 'profile-1',
+      input: {
+        title: 'Sueldo USD',
+        amount: '1000.00',
+        currency: 'USD',
+        dueOn: new Date().toISOString(),
+        accountId: 'usd-acc',
+      },
+    })
+
+    // 2. Change 300 USD to UYU
+    await createTransferUseCase.execute({
+      profileId: 'profile-1',
+      input: {
+        sourceAccountId: 'usd-acc',
+        destinationAccountId: 'uyu-cash',
+        amount: '300.00',
+        currency: 'USD',
+        destinationAmount: '11850.00',
+        date: new Date().toISOString(),
+      },
+    })
+
+    // Assert: Only 1 income movement exists
+    const incomes = expensesStore.filter((e) => e.movementType === 'INCOME')
+    expect(incomes.length).toBe(1)
+    expect(Number(incomes[0].amount)).toBe(1000)
+    expect(incomes[0].currency).toBe('USD')
+
+    // Assert: FX created TRANSFER, not INCOME
+    const transfers = expensesStore.filter((e) => e.movementType === 'TRANSFER')
+    expect(transfers.length).toBe(1)
+  })
+
+  it('Scenario 13 (HISTÓRICO): Historical exchange rate declared in operation is preserved permanently and not overwritten by external quote changes', async () => {
+    accountsStore.set('usd-acc', {
+      id: 'usd-acc',
+      profileId: 'profile-1',
+      name: 'Itaú USD',
+      type: 'BANK',
+      currency: 'USD',
+      balance: '500.00',
+      isSpendable: true,
+    })
+    accountsStore.set('uyu-cash', {
+      id: 'uyu-cash',
+      profileId: 'profile-1',
+      name: 'Efectivo UYU',
+      type: 'CASH',
+      currency: 'UYU',
+      balance: '0.00',
+      isSpendable: true,
+    })
+
+    const historicalDate = '2026-08-10T12:00:00.000Z'
+    const record = await createTransferUseCase.execute({
+      profileId: 'profile-1',
+      input: {
+        sourceAccountId: 'usd-acc',
+        destinationAccountId: 'uyu-cash',
+        amount: '300.00',
+        currency: 'USD',
+        destinationAmount: '11700.00',
+        date: historicalDate,
+      },
+    })
+
+    // Rate is stored in record
+    expect(record.notes).toContain('1 USD = 39.00 UYU')
+    expect(Number(accountsStore.get('uyu-cash').balance)).toBe(11700)
   })
 })

@@ -160,10 +160,16 @@ export default function FinanzasHero({
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#C0D5D6]/70">
               Balance neto del mes
             </span>
-            <div className="mt-1 flex items-baseline justify-center gap-2">
-              <span className="text-4xl font-extrabold tracking-tight text-[#F5F2EE] sm:text-5xl tabular-nums">
-                {formatCurrency(summary.netBalance)}
+            <div className="mt-1 flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1">
+              <span className="text-3xl font-extrabold tracking-tight text-[#F5F2EE] sm:text-4xl tabular-nums">
+                {formatCurrency(summary.netByCurrency.UYU)}
               </span>
+              {summary.netByCurrency.USD !== 0 && (
+                <span className="text-xl font-bold tracking-tight text-[#C0D5D6] sm:text-2xl tabular-nums">
+                  <span className="text-xs text-[#C0D5D6]/60 mr-1">|</span>
+                  US$ {summary.netByCurrency.USD.toLocaleString('es-UY', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                </span>
+              )}
             </div>
             <div className="mt-1.5 inline-flex items-center gap-1.5 rounded-full border border-white/[0.1] bg-white/[0.05] px-2.5 py-0.5 text-[10px] font-semibold">
               <span
@@ -184,13 +190,21 @@ export default function FinanzasHero({
         <div className="grid grid-cols-3 gap-2 border-t border-white/[0.08] pt-3.5 sm:gap-3">
           <StatMetric
             label="Ingresos"
-            value={formatCurrency(summary.totalIncome)}
+            value={
+              summary.incomeByCurrency.USD > 0
+                ? `${formatCurrency(summary.incomeByCurrency.UYU)} + US$${summary.incomeByCurrency.USD.toFixed(0)}`
+                : formatCurrency(summary.incomeByCurrency.UYU)
+            }
             dotColor="bg-[#4BE3B5] shadow-[0_0_6px_rgba(75,227,181,0.6)]"
-            highlighted={summary.totalIncome > 0}
+            highlighted={summary.incomeByCurrency.UYU > 0 || summary.incomeByCurrency.USD > 0}
           />
           <StatMetric
             label="Egresos"
-            value={formatCurrency(summary.totalExpense)}
+            value={
+              summary.expenseByCurrency.USD > 0
+                ? `${formatCurrency(summary.expenseByCurrency.UYU)} + US$${summary.expenseByCurrency.USD.toFixed(0)}`
+                : formatCurrency(summary.expenseByCurrency.UYU)
+            }
             dotColor="bg-[#72B1BE] shadow-[0_0_6px_rgba(114,177,190,0.6)]"
           />
           <StatMetric

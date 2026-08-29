@@ -56,6 +56,11 @@ export interface PersonalExpenseItem {
   updatedAt: string
 }
 
+export interface CurrencyTotals {
+  UYU: number
+  USD: number
+}
+
 export interface MonthlySummary {
   total: number
   totalExpense: number
@@ -67,6 +72,9 @@ export interface MonthlySummary {
   creditCommitted: number
   count: number
   byCategory: Record<string, number>
+  incomeByCurrency: CurrencyTotals
+  expenseByCurrency: CurrencyTotals
+  netByCurrency: CurrencyTotals
 }
 
 export interface ProductRankingItem {
@@ -92,6 +100,11 @@ export interface CreateTransferData {
   destinationAccountId: string
   amount: string | number
   currency?: 'UYU' | 'USD'
+  destinationAmount?: string | number
+  destinationCurrency?: 'UYU' | 'USD'
+  exchangeRate?: string | number
+  feeAmount?: string | number
+  feeAccountId?: string
   date: string
   description?: string
 }

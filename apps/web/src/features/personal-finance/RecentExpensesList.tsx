@@ -105,19 +105,31 @@ export default function RecentExpensesList({ expenses }: RecentExpensesListProps
               <p className="truncate text-xs text-muted-foreground mt-0.5">
                 {CATEGORY_LABELS[exp.category] ?? exp.category} · {formatDate(exp.date)}
               </p>
+              {exp.category === 'CAMBIO_MONEDA' && exp.notes && (
+                <p className="text-[10px] text-[#A58D66] font-medium truncate mt-0.5">
+                  {exp.notes}
+                </p>
+              )}
             </div>
 
             {/* Monto a la derecha */}
             <p
-              className={`shrink-0 text-sm font-bold ${
+              className={`shrink-0 text-sm font-bold tabular-nums ${
                 isIncome
-                  ? 'text-emerald-400'
+                  ? 'text-[#2E7D6A] dark:text-[#4BE3B5]'
                   : isTransfer
                   ? 'text-foreground'
                   : 'text-primary'
               }`}
             >
-              {isIncome ? `+${formatCurrency(exp.amount)}` : isTransfer ? formatCurrency(exp.amount) : `-${formatCurrency(exp.amount)}`}
+              {(() => {
+                const isUSD = exp.currency === 'USD'
+                const formatted = isUSD
+                  ? `US$ ${exp.amount.toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                  : formatCurrency(exp.amount)
+
+                return isIncome ? `+${formatted}` : isTransfer ? formatted : `-${formatted}`
+              })()}
             </p>
           </div>
         )

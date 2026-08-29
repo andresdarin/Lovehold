@@ -141,9 +141,13 @@ export default function PersonalFinancePageContent() {
             {/* 3. Tarjeta de Resumen del mes */}
             <MonthlySummaryCards summary={summary} />
 
-            {/* 4. Cuentas y Liquidez (si existen cuentas configuradas) */}
+            {/* 4. Cuentas y Liquidez con estilo Navy y Ahorro */}
             {accounts.length > 0 && (
-              <FinanzasAccountsCard accounts={accounts} loading={loadingAccounts} />
+              <FinanzasAccountsCard
+                accounts={accounts}
+                savings={summary.netBalance}
+                loading={loadingAccounts}
+              />
             )}
 
             {/* 5. Categorías & Movimientos en Grid responsivo */}

@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { AlertTriangle, RefreshCw } from 'lucide-react'
 import { useMovements } from './hooks'
 import MovementsHeader from './MovementsHeader'
-import MovementsSummaryCards from './MovementsSummaryCards'
 import MovementsFilters from './MovementsFilters'
 import MovementsList from './MovementsList'
 import MovementDetailDrawer from './MovementDetailDrawer'
@@ -14,14 +13,11 @@ export default function MovementsPageClient() {
   const { movements, summary, pagination, loading, error, filters, setFilter, clearFilters, refresh, loadMore } = useMovements()
   const [selectedMovement, setSelectedMovement] = useState<Movement | null>(null)
 
-  const hasFilters = !!(
-    filters.q || filters.kind || filters.scope || filters.category || filters.paymentMethod
-  )
+  const hasFilters = !!(filters.q || filters.kind || filters.scope || filters.category || filters.paymentMethod || filters.financialType || filters.account || filters.currency)
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-full space-y-6 bg-[#F5F2EE] dark:bg-[#071D27]">
       <MovementsHeader />
-      <MovementsSummaryCards summary={summary} loading={loading} />
       <MovementsFilters filters={filters} onChange={setFilter} onClear={clearFilters} />
 
       {error && (

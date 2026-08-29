@@ -9,10 +9,17 @@ export function computeSummary(expenses: PersonalExpense[]): MonthlySummary {
   let creditCommitted = 0
   const byCategory: Record<string, number> = {}
 
+  const incomeByCurrency = { UYU: 0, USD: 0 }
+  const expenseByCurrency = { UYU: 0, USD: 0 }
+
   for (const e of expenses) {
+    const cur = (e.currency === 'USD' ? 'USD' : 'UYU') as 'UYU' | 'USD'
+
     if (e.movementType === 'INCOME') {
+      incomeByCurrency[cur] += e.amount
       totalIncome += e.amount
     } else if (!e.movementType || e.movementType === 'EXPENSE') {
+      expenseByCurrency[cur] += e.amount
       totalExpense += e.amount
 
       // Normalizar y unificar categorías equivalentes de supermercado
@@ -32,6 +39,11 @@ export function computeSummary(expenses: PersonalExpense[]): MonthlySummary {
     }
   }
 
+  const netByCurrency = {
+    UYU: incomeByCurrency.UYU - expenseByCurrency.UYU,
+    USD: incomeByCurrency.USD - expenseByCurrency.USD,
+  }
+
   const netBalance = totalIncome - totalExpense
 
   return {
@@ -45,6 +57,9 @@ export function computeSummary(expenses: PersonalExpense[]): MonthlySummary {
     creditCommitted,
     count: expenses.length,
     byCategory,
+    incomeByCurrency,
+    expenseByCurrency,
+    netByCurrency,
   }
 }
 

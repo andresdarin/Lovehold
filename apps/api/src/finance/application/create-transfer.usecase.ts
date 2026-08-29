@@ -31,45 +31,116 @@ export class CreateTransferUseCase {
       if (!sourceAccount) throw new NotFoundException('Cuenta de origen no encontrada.')
       if (!destAccount) throw new NotFoundException('Cuenta de destino no encontrada.')
 
-      // 1. Descontar de la cuenta de origen (ej. Banco)
+      const sourceCurrency = sourceAccount.currency
+      const destCurrency = destAccount.currency
+      const isFx = sourceCurrency !== destCurrency || Boolean(input.destinationAmount)
+
+      // 1. Determinar los montos exactos para cada cuenta
+      const sourceAmount = input.amount
+      let destinationAmount = input.destinationAmount ?? input.amount
+
+      if (isFx && !input.destinationAmount && input.exchangeRate) {
+        destinationAmount = (Number(sourceAmount) * Number(input.exchangeRate)).toFixed(2)
+      }
+
+      // 2. Descontar de la cuenta de origen
       await tx.financeAccount.update({
         where: { id: sourceAccount.id },
-        data: { balance: { decrement: input.amount } },
+        data: { balance: { decrement: sourceAmount } },
       })
 
-      // 2. Si la cuenta destino es Tarjeta de Crédito, el pago reduce la deuda
+      // 3. Aumentar o pagar en la cuenta de destino
       if (destAccount.type === 'CREDIT') {
         await tx.financeAccount.update({
           where: { id: destAccount.id },
-          data: { balance: { decrement: input.amount } },
+          data: { balance: { decrement: destinationAmount } },
         })
       } else {
-        // Si es cuenta bancaria o efectivo, aumenta los fondos disponibles
         await tx.financeAccount.update({
           where: { id: destAccount.id },
-          data: { balance: { increment: input.amount } },
+          data: { balance: { increment: destinationAmount } },
         })
       }
 
-      // 3. Registrar el movimiento de transferencia (neutral frente a gastos e ingresos)
-      const transferTitle =
-        input.description?.trim() ||
-        (destAccount.type === 'CREDIT'
-          ? `Pago de tarjeta ${destAccount.name}`
-          : `Transferencia a ${destAccount.name}`)
+      // 4. Si hubo comisión explícita, registrarla como egreso separado trazable
+      if (input.feeAmount && Number(input.feeAmount) > 0) {
+        const feeAccount = input.feeAccountId
+          ? await tx.financeAccount.findFirst({
+              where: { id: input.feeAccountId, profileId: command.profileId },
+            })
+          : sourceAccount
+
+        if (feeAccount) {
+          await tx.financeAccount.update({
+            where: { id: feeAccount.id },
+            data: { balance: { decrement: input.feeAmount } },
+          })
+
+          await tx.personalExpense.create({
+            data: {
+              profileId: command.profileId,
+              title: `Comisión por cambio de moneda`,
+              amount: input.feeAmount,
+              currency: feeAccount.currency,
+              date,
+              type: 'variable',
+              movementType: 'EXPENSE',
+              inputMethod: 'MANUAL',
+              category: 'COMISION_CAMBIO',
+              notes: `Comisión en operación ${sourceCurrency} → ${destCurrency}`,
+              monthKey,
+              financeAccountId: feeAccount.id,
+            },
+          })
+        }
+      }
+
+      // 5. Calcular tasa de cambio efectiva y notas históricas
+      let fxNotes: string | null = null
+      let title = input.description?.trim()
+
+      if (isFx) {
+        const numSource = Number(sourceAmount)
+        const numDest = Number(destinationAmount)
+        let effectiveRate = 1
+
+        if (numSource > 0) {
+          if (sourceCurrency === 'USD' && destCurrency === 'UYU') {
+            effectiveRate = numDest / numSource
+            fxNotes = `Tipo de cambio: 1 USD = ${effectiveRate.toFixed(2)} UYU (Origen: ${numSource} USD → Destino: ${numDest} UYU)`
+          } else if (sourceCurrency === 'UYU' && destCurrency === 'USD') {
+            effectiveRate = numSource / numDest
+            fxNotes = `Tipo de cambio: 1 USD = ${effectiveRate.toFixed(2)} UYU (Origen: ${numSource} UYU → Destino: ${numDest} USD)`
+          } else {
+            effectiveRate = numDest / numSource
+            fxNotes = `Tipo de cambio: 1 ${sourceCurrency} = ${effectiveRate.toFixed(4)} ${destCurrency}`
+          }
+        }
+
+        if (!title) {
+          title = `Cambio de moneda ${sourceCurrency} → ${destCurrency}`
+        }
+      } else {
+        if (!title) {
+          title =
+            destAccount.type === 'CREDIT'
+              ? `Pago de tarjeta ${destAccount.name}`
+              : `Transferencia a ${destAccount.name}`
+        }
+      }
 
       const transfer = await tx.personalExpense.create({
         data: {
           profileId: command.profileId,
-          title: transferTitle,
-          amount: input.amount,
-          currency: input.currency,
+          title,
+          amount: sourceAmount,
+          currency: sourceCurrency,
           date,
           type: 'variable',
           movementType: 'TRANSFER',
           inputMethod: 'MANUAL',
-          category: 'TRANSFERENCIA',
-          notes: input.description?.trim() || null,
+          category: isFx ? 'CAMBIO_MONEDA' : 'TRANSFERENCIA',
+          notes: input.description?.trim() ? `${input.description.trim()}${fxNotes ? ` | ${fxNotes}` : ''}` : fxNotes,
           monthKey,
           financeAccountId: sourceAccount.id,
           destinationAccountId: destAccount.id,
@@ -79,8 +150,12 @@ export class CreateTransferUseCase {
       return {
         ...transfer,
         amount: Number(transfer.amount),
-        sourceAccount: { id: sourceAccount.id, name: sourceAccount.name, type: sourceAccount.type },
-        destinationAccount: { id: destAccount.id, name: destAccount.name, type: destAccount.type },
+        sourceAmount: Number(sourceAmount),
+        destinationAmount: Number(destinationAmount),
+        sourceCurrency,
+        destCurrency,
+        sourceAccount: { id: sourceAccount.id, name: sourceAccount.name, type: sourceAccount.type, currency: sourceAccount.currency },
+        destinationAccount: { id: destAccount.id, name: destAccount.name, type: destAccount.type, currency: destAccount.currency },
       }
     })
   }

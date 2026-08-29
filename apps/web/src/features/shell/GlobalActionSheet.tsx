@@ -3,9 +3,10 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowDown, ScanLine, ArrowUp, ArrowLeftRight, X } from 'lucide-react'
+import { ArrowDown, ScanLine, ArrowUp, ArrowLeftRight, RefreshCw, X } from 'lucide-react'
 import IncomeFormModal from '../personal-finance/IncomeFormModal'
 import TransferFormModal from '../personal-finance/TransferFormModal'
+import CurrencyExchangeModal from '../personal-finance/CurrencyExchangeModal'
 
 interface GlobalActionSheetProps {
   isOpen: boolean
@@ -16,8 +17,9 @@ export default function GlobalActionSheet({ isOpen, onClose }: GlobalActionSheet
   const router = useRouter()
   const [isIncomeModalOpen, setIsIncomeModalOpen] = useState(false)
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
+  const [isExchangeModalOpen, setIsExchangeModalOpen] = useState(false)
 
-  const handleAction = (type: 'expense' | 'scan' | 'income' | 'transfer') => {
+  const handleAction = (type: 'expense' | 'scan' | 'income' | 'transfer' | 'exchange') => {
     onClose()
     if (type === 'expense') {
       router.push('/expenses/new')
@@ -27,6 +29,8 @@ export default function GlobalActionSheet({ isOpen, onClose }: GlobalActionSheet
       setIsIncomeModalOpen(true)
     } else if (type === 'transfer') {
       setIsTransferModalOpen(true)
+    } else if (type === 'exchange') {
+      setIsExchangeModalOpen(true)
     }
   }
 
@@ -127,7 +131,24 @@ export default function GlobalActionSheet({ isOpen, onClose }: GlobalActionSheet
                   </div>
                 </button>
 
-                {/* 4. Transferencia */}
+                {/* 4. Cambiar Moneda (FX) */}
+                <button
+                  onClick={() => handleAction('exchange')}
+                  className="group flex items-center gap-3.5 rounded-2xl border border-[#A58D66]/25 bg-[#A58D66]/5 p-3 text-left transition-all hover:border-[#A58D66]/50 hover:bg-[#A58D66]/10 active:scale-[0.98]"
+                >
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#A58D66]/40 text-[#A58D66] bg-transparent transition-colors group-hover:border-[#A58D66]/70 group-hover:bg-[#A58D66]/10">
+                    <RefreshCw className="h-4 w-4 stroke-[2.2]" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-bold text-foreground">Cambiar moneda</p>
+                      <span className="text-[10px] font-semibold text-[#A58D66] uppercase tracking-wide">FX Tasa Real</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">Conversión USD ↔ UYU con tasa y cuentas</p>
+                  </div>
+                </button>
+
+                {/* 5. Transferencia */}
                 <button
                   onClick={() => handleAction('transfer')}
                   className="group flex items-center gap-3.5 rounded-2xl border border-border/70 bg-surface-soft/40 p-3 text-left transition-all hover:border-primary/40 hover:bg-surface-soft active:scale-[0.98]"
@@ -160,6 +181,14 @@ export default function GlobalActionSheet({ isOpen, onClose }: GlobalActionSheet
       <TransferFormModal
         isOpen={isTransferModalOpen}
         onClose={() => setIsTransferModalOpen(false)}
+        onSuccess={() => {
+          router.refresh()
+        }}
+      />
+
+      <CurrencyExchangeModal
+        isOpen={isExchangeModalOpen}
+        onClose={() => setIsExchangeModalOpen(false)}
         onSuccess={() => {
           router.refresh()
         }}

@@ -76,6 +76,42 @@ export function useFinanceAccounts() {
   return { accounts, loading, error, refetch: fetchAccounts }
 }
 
+export interface FinanceSnapshot {
+  asOf?: string
+  baseCurrency?: 'UYU' | 'USD'
+  balances?: {
+    spendableByCurrency?: Partial<Record<'UYU' | 'USD', string | number>>
+    creditDebtByCurrency?: Partial<Record<'UYU' | 'USD', string | number>>
+    spendableInBase?: { currency?: string; amount?: string | number } | null
+  }
+  spendableByCurrency?: Partial<Record<'UYU' | 'USD', string | number>>
+  creditDebtByCurrency?: Partial<Record<'UYU' | 'USD', string | number>>
+  spendableInBase?: { currency?: string; amount?: string | number } | null
+}
+
+export function useFinanceSnapshot() {
+  const [snapshot, setSnapshot] = useState<FinanceSnapshot | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchSnapshot = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const { data: { session } } = await createClient().auth.getSession()
+      if (!session) throw new Error('No session')
+      setSnapshot(await apiFetch<FinanceSnapshot>('/api/finance/snapshot', {}, session.access_token))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al cargar el balance')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { fetchSnapshot() }, [fetchSnapshot])
+  return { snapshot, loading, error, refetch: fetchSnapshot }
+}
+
 export function useCreateExpense() {
   const [submitting, setSubmitting] = useState(false)
 
