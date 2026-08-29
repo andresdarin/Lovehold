@@ -4,7 +4,7 @@ import { PrismaService } from '../prisma/prisma.service'
 import { FinanceAccountService } from './finance-account.service'
 import { ScheduledCashFlowService } from './scheduled-cash-flow.service'
 import { SavingsGoalService } from './savings-goal.service'
-import { decimalToMinorUnits, localDate, minorUnitsToMoney, normalizeCategory, normalizeMoney } from './finance.normalizer'
+import { decimalToMinorUnits, decimalToString, localDate, minorUnitsToMoney, normalizeCategory, normalizeMoney } from './finance.normalizer'
 import type { FinanceEngineInput, FxAdapter } from './types'
 import { FX_ADAPTER } from './fx'
 
@@ -60,7 +60,7 @@ export class FinanceReadService {
       }
     }
     return {
-      asOf: asOf.toISOString(), baseCurrency, timeZone, minimumBuffer: String(profile.minimumBuffer ?? '0.00'),
+      asOf: asOf.toISOString(), baseCurrency, timeZone, minimumBuffer: decimalToString(profile.minimumBuffer),
       accounts: accounts.map((account) => ({ currency: account.currency, spendable: normalizeMoney(account.balance, account.currency as Currency).amount, nonSpendable: '0.00', balanceAsOf: account.updatedAt.toISOString() })),
       scheduledCashFlows: flows.map((flow) => ({ scheduledCashFlowId: flow.id, scheduledDueOn: localDate(flow.scheduledDueOn, timeZone), amount: normalizeMoney(flow.amount, flow.currency as Currency), direction: flow.direction, lifecycle: flow.lifecycle })),
       goals: goals.map((goal) => ({ id: goal.id, name: goal.name, targetAmount: normalizeMoney(goal.targetAmount, goal.currency as Currency), currentAmount: normalizeMoney(goal.currentAmount, goal.currency as Currency), targetDate: localDate(goal.targetDate, timeZone), status: goal.status })),
