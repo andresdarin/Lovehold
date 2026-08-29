@@ -7,7 +7,10 @@ import { formatMoney, parseMoney } from '@lovehold/shared'
 
 @Injectable()
 export class PersonalFinanceService {
-  constructor(private prisma: PrismaService, private readonly createExpenseUseCase: CreateExpenseUseCase) { }
+  constructor(
+    private prisma: PrismaService,
+    private readonly createExpenseUseCase: CreateExpenseUseCase,
+  ) {}
 
   private async getProfileId(authUserId: string): Promise<string> {
     const profile = await this.prisma.profile.findUnique({
@@ -25,7 +28,11 @@ export class PersonalFinanceService {
 
     const rows = await this.prisma.personalExpense.findMany({
       where: { profileId, monthKey },
-      include: { items: true },
+      include: {
+        items: true,
+        financeAccount: { select: { id: true, name: true, type: true, currency: true } },
+        destinationAccount: { select: { id: true, name: true, type: true, currency: true } },
+      },
       orderBy: { date: 'desc' },
     })
 
@@ -42,22 +49,52 @@ export class PersonalFinanceService {
   }
 
   async create(user: AuthenticatedUser, dto: CreatePersonalExpenseDto) {
-    const profile = await this.prisma.profile.findUnique({ where: { authUserId: user.authUserId }, select: { id: true, baseCurrency: true } })
+    const profile = await this.prisma.profile.findUnique({
+      where: { authUserId: user.authUserId },
+      select: { id: true, baseCurrency: true },
+    })
     if (!profile) throw new NotFoundException('Profile not found')
     const profileId = profile.id
-    return this.createExpenseUseCase.execute({ profileId, input: {
-      title: dto.title, merchant: dto.merchant, amount: dto.amount, currency: dto.currency ?? profile.baseCurrency ?? 'UYU', date: dto.date,
-      type: dto.type as 'fixed' | 'variable' | 'supermarket', category: dto.category, notes: dto.notes,
-      isRecurring: dto.isRecurring, recurrenceDay: dto.recurrenceDay,
-      items: dto.items?.map((item) => ({ name: item.name, category: item.category, quantity: item.quantity, unitPrice: item.unitPrice, totalPrice: item.totalPrice, rawLine: item.rawLine })),
-    }, context: { source: 'web' } })
+
+    return this.createExpenseUseCase.execute({
+      profileId,
+      input: {
+        title: dto.title,
+        merchant: dto.merchant,
+        amount: dto.amount,
+        currency: dto.currency ?? profile.baseCurrency ?? 'UYU',
+        date: dto.date,
+        type: dto.type as 'fixed' | 'variable' | 'supermarket',
+        category: dto.category,
+        notes: dto.notes,
+        isRecurring: dto.isRecurring,
+        recurrenceDay: dto.recurrenceDay,
+        financeAccountId: dto.financeAccountId,
+        movementType: dto.movementType ?? 'EXPENSE',
+        inputMethod: dto.inputMethod ?? 'MANUAL',
+        items: dto.items?.map((item) => ({
+          name: item.name,
+          category: item.category,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          totalPrice: item.totalPrice,
+          rawLine: item.rawLine,
+        })),
+      },
+      context: { source: 'web', inputMethod: dto.inputMethod ?? 'MANUAL' },
+    })
   }
 
   async getSummary(user: AuthenticatedUser, monthKey: string) {
     const profileId = await this.getProfileId(user.authUserId)
 
+    // Strictly filter out transfers and incomes so they never distort expenses
     const expenses = await this.prisma.personalExpense.findMany({
-      where: { profileId, monthKey },
+      where: {
+        profileId,
+        monthKey,
+        movementType: 'EXPENSE',
+      },
       select: { amount: true, type: true, category: true },
     })
 
@@ -77,8 +114,17 @@ export class PersonalFinanceService {
       else variable += amt
     }
 
-    const byCategory = Object.fromEntries(Object.entries(byCategoryMinor).map(([key, value]) => [key, Number(formatMoney(value))]))
-    return { total: Number(formatMoney(total)), fixed: Number(formatMoney(fixed)), variable: Number(formatMoney(variable)), supermarket: Number(formatMoney(supermarket)), count: expenses.length, byCategory }
+    const byCategory = Object.fromEntries(
+      Object.entries(byCategoryMinor).map(([key, value]) => [key, Number(formatMoney(value))]),
+    )
+    return {
+      total: Number(formatMoney(total)),
+      fixed: Number(formatMoney(fixed)),
+      variable: Number(formatMoney(variable)),
+      supermarket: Number(formatMoney(supermarket)),
+      count: expenses.length,
+      byCategory,
+    }
   }
 
   async getProductRanking(user: AuthenticatedUser, monthKey: string) {
@@ -86,7 +132,7 @@ export class PersonalFinanceService {
 
     const items = await this.prisma.personalExpenseItem.findMany({
       where: {
-        expense: { profileId, monthKey },
+        expense: { profileId, monthKey, movementType: 'EXPENSE' },
       },
       select: { name: true, quantity: true, totalPrice: true },
     })

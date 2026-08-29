@@ -108,4 +108,20 @@ export class CreatePersonalExpenseDto {
   @ValidateNested({ each: true })
   @Type(() => CreatePersonalExpenseItemDto)
   items?: CreatePersonalExpenseItemDto[]
+
+  @IsOptional()
+  @IsString()
+  financeAccountId?: string
+
+  @IsOptional()
+  @IsString()
+  destinationAccountId?: string
+
+  @IsOptional()
+  @IsIn(['EXPENSE', 'INCOME', 'TRANSFER'])
+  movementType?: 'EXPENSE' | 'INCOME' | 'TRANSFER'
+
+  @IsOptional()
+  @IsIn(['MANUAL', 'RECEIPT_SCAN', 'IMPORT'])
+  inputMethod?: 'MANUAL' | 'RECEIPT_SCAN' | 'IMPORT'
 }
