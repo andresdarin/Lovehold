@@ -22,3 +22,36 @@ export interface GeminiGenerateContentResponse {
     finishReason?: string
   }>
 }
+
+export interface FunctionDeclaration {
+  name: string
+  description: string
+  parameters: object
+}
+
+export interface FunctionCall {
+  name: string
+  args: Record<string, unknown>
+}
+
+export interface ChatMessage {
+  role: 'user' | 'model'
+  parts: Array<{
+    text?: string
+    functionCall?: FunctionCall
+    functionResponse?: { name: string; response: unknown }
+  }>
+}
+
+export interface ChatGenerateRequest {
+  systemInstruction?: string
+  history: ChatMessage[]
+  tools?: Array<{ functionDeclarations: FunctionDeclaration[] }>
+  generationConfig?: ModelConfig
+}
+
+export interface ChatGenerateResponse {
+  text?: string
+  functionCalls?: FunctionCall[]
+  finishReason?: string
+}

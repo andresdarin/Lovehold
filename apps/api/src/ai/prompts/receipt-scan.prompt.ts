@@ -42,6 +42,6 @@ Reglas:
 
 export const RECEIPT_SCAN_GENERATION_CONFIG = {
   temperature: 0.1,
-  maxOutputTokens: 2048,
+  maxOutputTokens: 16384,
   responseMimeType: 'application/json',
 }

@@ -5,6 +5,11 @@ import {
   RECEIPT_SCAN_PROMPT_V1,
 } from './receipt-scan.prompt'
 import type { ModelConfig } from '../client/gemini.types'
+import {
+  FINNIC_GENERATION_CONFIG,
+  FINNIC_PROMPT_ID,
+  FINNIC_SYSTEM_PROMPT_V1,
+} from './finnic.prompt'
 
 export interface RegisteredPrompt {
   systemPrompt: string
@@ -15,6 +20,7 @@ export interface RegisteredPrompt {
 export class PromptRegistry {
   private readonly prompts = new Map<string, RegisteredPrompt>([
     [RECEIPT_SCAN_PROMPT_ID, { systemPrompt: RECEIPT_SCAN_PROMPT_V1, generationConfig: RECEIPT_SCAN_GENERATION_CONFIG }],
+    [FINNIC_PROMPT_ID, { systemPrompt: FINNIC_SYSTEM_PROMPT_V1, generationConfig: FINNIC_GENERATION_CONFIG }],
   ])
 
   get(promptId: string): RegisteredPrompt {
