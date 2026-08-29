@@ -69,15 +69,15 @@ export default function LoginPage() {
       className="w-full max-w-sm lg:max-w-[460px] lg:w-[40vw] lg:ml-[72px] lg:mr-0 mx-auto flex-1 flex flex-col justify-between h-full lg:h-auto"
     >
       <div className="flex-1 flex flex-col justify-center">
-        {/* Branding Block (Superpuesto en mobile con margen negativo sobre el hero fino) */}
-        <div className="flex flex-col items-center text-center -mt-10 lg:mt-0 z-10 relative">
+        {/* Branding Block */}
+        <div className="flex flex-col items-center text-center -mt-8 lg:mt-0 z-10 relative">
           <img
             src="/icons/favicon.png"
             alt="Lovehold"
-            className="h-14 w-14 lg:h-16 lg:w-16 mx-auto focus:outline-none drop-shadow-[0_4px_12px_rgba(255,107,107,0.25)]"
+            className="h-12 w-12 lg:h-14 lg:w-14 mx-auto focus:outline-none drop-shadow-xs"
           />
 
-          <h1 className="mt-2.5 text-center text-[clamp(1.8rem,7vw,2.4rem)] lg:text-4xl xl:text-5xl font-bold leading-tight text-white lg:text-lh-navy tracking-wide">
+          <h1 className="mt-2.5 text-center text-2xl lg:text-4xl font-extrabold leading-tight text-foreground tracking-tight">
             Welcome to
             <br />
             L<span
@@ -85,31 +85,31 @@ export default function LoginPage() {
               style={{ height: '1em' }}
             >
               <Heart
-                className="block h-[0.62em] w-[0.62em] text-lh-primary stroke-[3.5px] translate-y-[0.04em]"
+                className="block h-[0.62em] w-[0.62em] text-primary stroke-[3.5px] translate-y-[0.04em]"
                 style={{ display: 'block' }}
               />
             </span>vehold
           </h1>
 
-          <p className="mt-1.5 text-center text-xs lg:text-lg text-neutral-400 lg:text-lh-navy/60 max-w-[280px] lg:max-w-none">
+          <p className="mt-1.5 text-center text-xs lg:text-sm text-muted-foreground max-w-[280px] lg:max-w-none">
             Compartan todo. Lleven cuentas de lo que importa.
           </p>
         </div>
 
-        <h2 className="mt-4 lg:mt-6 text-center text-base lg:text-xl font-semibold text-white lg:text-lh-navy">
+        <h2 className="mt-4 lg:mt-6 text-center text-base lg:text-lg font-bold text-foreground">
           Iniciar sesión
         </h2>
 
-        <form onSubmit={handleSubmit} className="mt-3 lg:mt-6 flex flex-col gap-3 lg:gap-4">
+        <form onSubmit={handleSubmit} className="mt-3 lg:mt-5 flex flex-col gap-3">
           <div>
             <label
               htmlFor="email"
-              className="mb-1 block text-xs lg:text-sm font-medium text-lh-navy/70 hidden lg:block"
+              className="mb-1 block text-xs font-semibold text-muted-foreground hidden lg:block"
             >
               Email
             </label>
             <div className="relative">
-              <Mail className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-lh-primary lg:text-lh-navy/40" />
+              <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 id="email"
                 type="email"
@@ -118,7 +118,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
-                className="w-full h-[48px] lg:h-[54px] text-base rounded-xl border border-white/10 lg:border-lh-border-light bg-white/5 lg:bg-lh-surface pl-11 pr-4 text-white lg:text-lh-navy placeholder:text-neutral-500 lg:placeholder:text-lh-navy/40 outline-none transition-all focus:border-lh-primary focus:ring-2 focus:ring-lh-primary/40 focus-visible:ring-2 focus-visible:ring-lh-primary/40"
+                className="w-full h-12 text-sm rounded-2xl border border-border bg-surface pl-11 pr-4 text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
           </div>
@@ -126,12 +126,12 @@ export default function LoginPage() {
           <div>
             <label
               htmlFor="password"
-              className="mb-1 block text-xs lg:text-sm font-medium text-lh-navy/70 hidden lg:block"
+              className="mb-1 block text-xs font-semibold text-muted-foreground hidden lg:block"
             >
               Contraseña
             </label>
             <div className="relative">
-              <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-lh-primary lg:text-lh-navy/40" />
+              <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
@@ -140,51 +140,51 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Contraseña"
-                className="w-full h-[48px] lg:h-[54px] text-base rounded-xl border border-white/10 lg:border-lh-border-light bg-white/5 lg:bg-lh-surface pl-11 pr-12 text-white lg:text-lh-navy placeholder:text-neutral-500 lg:placeholder:text-lh-navy/40 outline-none transition-all focus:border-lh-primary focus:ring-2 focus:ring-lh-primary/40 focus-visible:ring-2 focus-visible:ring-lh-primary/40"
+                className="w-full h-12 text-sm rounded-2xl border border-border bg-surface pl-11 pr-12 text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 lg:text-lh-navy/40 hover:text-white lg:hover:text-lh-navy/70 transition-colors focus:outline-none"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
               >
-                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
           </div>
 
           {error && (
-            <p className="rounded-xl border border-lh-primary/20 bg-lh-primary/10 px-4 py-3 text-sm text-lh-primary">
+            <p className="rounded-2xl border border-danger/30 bg-danger/5 px-4 py-3 text-xs font-medium text-danger">
               {error}
             </p>
           )}
 
-          <div className="flex items-center justify-center gap-3 py-1.5 lg:py-3" aria-hidden="true">
-            <span className="h-px flex-1 bg-white/10 lg:bg-lh-navy/[0.06]" />
-            <Heart className="h-4 w-4 lg:h-6 w-6 text-lh-primary/40" />
-            <span className="h-px flex-1 bg-white/10 lg:bg-lh-navy/[0.06]" />
+          <div className="flex items-center justify-center gap-3 py-1 lg:py-2" aria-hidden="true">
+            <span className="h-px flex-1 bg-border" />
+            <Heart className="h-4 w-4 text-primary/40" />
+            <span className="h-px flex-1 bg-border" />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-[48px] lg:h-[54px] flex items-center justify-center rounded-xl bg-gradient-to-r from-lh-primary to-lh-primary-rose font-semibold text-white shadow-lg shadow-lh-primary/25 transition-all hover:shadow-xl hover:shadow-lh-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lh-primary/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-12 flex items-center justify-center rounded-2xl bg-primary font-bold text-primary-foreground shadow-xs transition-all hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 text-sm"
           >
             {loading ? 'Entrando…' : 'Entrar'}
           </button>
         </form>
       </div>
 
-      <div className="mt-4 lg:mt-8 shrink-0">
-        <p className="text-center text-sm text-neutral-400 lg:text-lh-navy/50">
+      <div className="mt-4 lg:mt-6 shrink-0">
+        <p className="text-center text-xs text-muted-foreground">
           ¿No tenés cuenta?{' '}
           <Link
             href="/signup"
-            className="rounded font-medium text-lh-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lh-primary/50 focus-visible:ring-offset-2"
+            className="font-bold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           >
             Registrate
           </Link>
         </p>
-        <p className="mt-2.5 lg:mt-6 text-center text-xs text-neutral-600 lg:text-lh-navy/30">
+        <p className="mt-2 text-center text-[10px] text-muted-foreground/50">
           v{APP_VERSION}
         </p>
       </div>

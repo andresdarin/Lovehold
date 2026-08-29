@@ -1,4 +1,4 @@
-import { Heart, User, Receipt, ChevronDown, Calendar } from 'lucide-react'
+import { Heart, User, Receipt, ChevronDown } from 'lucide-react'
 import CustomDatePicker from '@/components/ui/CustomDatePicker'
 import type { ExpenseForm } from './types'
 
@@ -12,12 +12,12 @@ export default function ExpenseFormFields({
   const isPersonal = form.scope === 'personal'
 
   return (
-    <div className="rounded-xl border-[0.5px] border-white/[0.08] bg-[#121214]/60 backdrop-blur-[20px] p-4 transition-all duration-200 select-none flex flex-col gap-3">
-      {/* Header plano */}
-      <div className="pb-3 border-b-[0.5px] border-white/[0.08] flex flex-col gap-1">
+    <div className="rounded-3xl border border-border bg-surface p-5 shadow-xs transition-all flex flex-col gap-4">
+      {/* Header */}
+      <div className="pb-3 border-b border-border/70 flex flex-col gap-1">
         <div className="flex items-center gap-2">
-          <Receipt className="h-[18px] w-[18px] text-foreground" />
-          <h2 className="text-[15px] font-medium text-foreground">Datos generales</h2>
+          <Receipt className="h-[18px] w-[18px] text-primary" />
+          <h2 className="text-sm font-bold text-foreground">Datos generales</h2>
         </div>
         <p className="text-xs text-muted-foreground">
           {isPersonal
@@ -27,29 +27,29 @@ export default function ExpenseFormFields({
       </div>
 
       {/* Toggle de Tipo de Gasto */}
-      <div className="flex h-10 gap-1 rounded-lg border border-white/[0.08] bg-black/35 p-1">
+      <div className="flex h-11 gap-1 rounded-2xl border border-border bg-surface-soft p-1">
         <button
           type="button"
           onClick={() => onUpdate('scope', 'personal')}
-          className={`flex flex-1 items-center justify-center gap-1.5 rounded-md text-xs font-semibold transition-all ${
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl text-xs font-bold transition-all ${
             isPersonal 
-              ? 'bg-white/[0.08] border border-white/[0.08] text-foreground shadow-[0_1px_2px_rgba(0,0,0,0.05)]' 
+              ? 'bg-surface border border-border/80 text-foreground shadow-xs' 
               : 'text-muted-foreground hover:text-foreground bg-transparent border border-transparent'
           }`}
         >
-          <User className="h-4 w-4" />
+          <User className="h-3.5 w-3.5" />
           Personal
         </button>
         <button
           type="button"
           onClick={() => onUpdate('scope', 'household')}
-          className={`flex flex-1 items-center justify-center gap-1.5 rounded-md text-xs font-semibold transition-all ${
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl text-xs font-bold transition-all ${
             !isPersonal 
-              ? 'bg-white/[0.08] border border-white/[0.08] text-foreground shadow-[0_1px_2px_rgba(0,0,0,0.05)]' 
+              ? 'bg-surface border border-border/80 text-foreground shadow-xs' 
               : 'text-muted-foreground hover:text-foreground bg-transparent border border-transparent'
           }`}
         >
-          <Heart className="h-4 w-4" />
+          <Heart className="h-3.5 w-3.5 text-primary" />
           Lovehold
         </button>
       </div>
@@ -61,15 +61,14 @@ export default function ExpenseFormFields({
         <TextField label="Categoría general" value={form.category} onChange={(v) => onUpdate('category', v)} placeholder="Compras de súper" required isSelect />
         
         <div className="block">
-          <span className="text-[11px] font-normal uppercase tracking-[0.05em] text-muted-foreground">Fecha</span>
-          <div className="relative mt-1">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Fecha</span>
+          <div className="relative mt-1.5">
             <CustomDatePicker
-              className="w-full text-sm font-normal h-11 rounded-md border border-white/[0.08] bg-black/35 px-3 text-foreground focus:border-primary/45 focus:outline-none transition-colors"
+              className="w-full text-sm font-medium h-11 rounded-2xl border border-border bg-surface-soft px-3.5 text-foreground focus:border-primary focus:outline-none transition-colors"
               value={form.date}
               onChange={(v) => onUpdate('date', v)}
               required
             />
-            <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           </div>
         </div>
 
@@ -91,12 +90,12 @@ export default function ExpenseFormFields({
 
         {/* Notas */}
         <label className="block">
-          <span className="text-[11px] font-normal uppercase tracking-[0.05em] text-muted-foreground">Notas</span>
+          <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Notas</span>
           <textarea
             value={form.notes} 
             onChange={(e) => onUpdate('notes', e.target.value)}
             placeholder="Algo útil para recordar esta compra"
-            className="mt-1 min-h-[80px] w-full resize-none rounded-md border border-white/[0.08] bg-black/35 px-3 py-2 text-sm font-normal text-foreground placeholder:text-muted-foreground focus:border-primary/45 focus:outline-none transition-colors"
+            className="mt-1.5 min-h-[80px] w-full resize-none rounded-2xl border border-border bg-surface-soft px-3.5 py-2.5 text-sm font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
           />
         </label>
       </div>
@@ -111,16 +110,16 @@ function TextField({ label, value, onChange, placeholder, type = 'text', disable
 }) {
   return (
     <label className="block">
-      <span className="text-[11px] font-normal uppercase tracking-[0.05em] text-muted-foreground">{label}</span>
-      <div className="relative mt-1">
+      <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{label}</span>
+      <div className="relative mt-1.5">
         <input
           type={type} value={value} min={min} step={step} required={required} disabled={disabled}
           placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
-          className="h-11 w-full rounded-md border border-white/[0.08] bg-black/35 px-3 pr-10 text-sm font-normal text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-60 focus:border-primary/45 focus:outline-none transition-colors"
+          className="h-11 w-full rounded-2xl border border-border bg-surface-soft px-3.5 pr-10 text-sm font-medium text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-60 focus:border-primary focus:outline-none transition-colors"
         />
         {isSelect && (
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
         )}
       </div>
     </label>

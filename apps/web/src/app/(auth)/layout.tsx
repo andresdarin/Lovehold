@@ -69,7 +69,7 @@ export default function AuthLayout({
   }
 
   return (
-    <div className="min-h-screen bg-lh-cream overflow-x-hidden overflow-y-auto lg:overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden overflow-y-auto lg:overflow-hidden">
       {/* ═══════════ DESKTOP LAYOUT (lg) ═══════════ */}
       <div className="hidden min-h-screen lg:relative lg:flex lg:items-center">
         {/* Contenedor flotante de los formularios */}
@@ -92,7 +92,7 @@ export default function AuthLayout({
       </div>
 
       {/* ═══════════ MOBILE LAYOUT (< lg) ═══════════ */}
-      <div className="flex min-h-[100dvh] flex-col lg:hidden bg-black text-white pb-[calc(16px+env(safe-area-inset-bottom,0px))]">
+      <div className="flex min-h-[100dvh] flex-col lg:hidden bg-background text-foreground pb-[calc(16px+env(safe-area-inset-bottom,0px))]">
         {/* Cabecera con ilustración fina y degradado inferior lineal simple */}
         <div className="w-full h-[clamp(110px,15dvh,140px)] shrink-0 overflow-hidden relative">
           <motion.img
@@ -103,15 +103,15 @@ export default function AuthLayout({
             alt="Lovehold Background"
             className="h-full w-full object-cover"
           />
-          {/* Overlay oscuro general */}
-          <div className="absolute inset-0 bg-black/25" />
+          {/* Overlay suave */}
+          <div className="absolute inset-0 bg-background/20" />
           
-          {/* Degradado inferior recto para fundir con el fondo negro */}
-          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black to-transparent" />
+          {/* Degradado inferior para fundir con el fondo */}
+          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent" />
         </div>
 
         {/* Contenedor del Formulario en Mobile */}
-        <div className="flex-1 flex flex-col bg-black px-6">
+        <div className="flex-1 flex flex-col bg-background px-6">
           <div className="mx-auto w-full max-w-[390px] flex-1 flex flex-col justify-between">
             {children}
           </div>

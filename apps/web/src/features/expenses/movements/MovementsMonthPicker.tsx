@@ -65,7 +65,7 @@ export default function MovementsMonthPicker({ value, onChange }: Props) {
                 const sel = value && Number(value.split('-')[0]) === year && selMonth === m
                 return (
                   <button key={m} type="button" onClick={() => pick(m)}
-                    className={`rounded-xl px-2 py-2.5 text-center text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 ${sel ? 'bg-primary text-white shadow-sm' : 'text-foreground hover:bg-surface-soft'}`}
+                    className={`rounded-xl px-2 py-2.5 text-center text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 ${sel ? 'bg-primary text-primary-foreground shadow-xs' : 'text-foreground hover:bg-surface-soft'}`}
                     aria-label={`${label} de ${year}`}>
                     {label}
                   </button>

@@ -136,11 +136,11 @@ export default function ExpenseForm({ onSubmit, onCancel, submitting, initialIte
 
       <div className="flex gap-3 pt-2">
         <button type="submit" disabled={submitting}
-          className={`${btnCls} flex-1 bg-primary text-white shadow-lg shadow-primary/20 transition hover:bg-primary/90 disabled:opacity-50`}>
+          className={`${btnCls} flex-1 bg-primary text-primary-foreground shadow-xs transition hover:bg-primary-hover disabled:opacity-50 font-bold`}>
           {submitting ? 'Guardando...' : 'Guardar gasto'}
         </button>
         <button type="button" onClick={onCancel}
-          className={`${btnCls} border border-border bg-surface text-foreground transition hover:bg-surface-soft`}>
+          className={`${btnCls} border border-border bg-surface text-foreground transition hover:bg-surface-soft font-semibold`}>
           Cancelar
         </button>
       </div>

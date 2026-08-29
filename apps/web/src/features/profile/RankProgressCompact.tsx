@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight, Trophy } from 'lucide-react'
 import { RankShield } from '@/features/gamification/RankShield'
 import { RankProgressBar } from '@/features/gamification/RankProgressBar'
 import type { GamificationProfile } from '@/features/gamification/ranks.types'
@@ -65,8 +65,9 @@ export function RankProgressCompact({ data, loading }: RankProgressCompactProps)
 
       {/* Progress section */}
       {isMaxRank ? (
-        <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-2.5 text-center text-xs font-medium text-amber-400">
-          🏆 ¡Rango máximo alcanzado!
+        <div className="flex items-center justify-center gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 p-2.5 text-center text-xs font-semibold text-amber-400">
+          <Trophy className="h-4 w-4 shrink-0" />
+          <span>¡Rango máximo alcanzado!</span>
         </div>
       ) : (
         <div className="space-y-2.5">

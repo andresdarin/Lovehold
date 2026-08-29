@@ -26,51 +26,51 @@ export default function MovementDetailDrawer({ movement, onClose }: Props) {
         role="dialog"
         aria-modal="true"
         aria-label="Detalle del movimiento"
-        className="pointer-events-auto fixed inset-x-0 bottom-0 z-50 flex max-h-[88vh] flex-col overflow-hidden rounded-t-2xl border border-white/10 bg-[#121212] shadow-2xl lg:inset-y-0 lg:left-auto lg:right-0 lg:max-h-none lg:w-[420px] lg:rounded-l-2xl lg:rounded-tr-none dark:border-white/10"
+        className="pointer-events-auto fixed inset-x-0 bottom-0 z-50 flex max-h-[88vh] flex-col overflow-hidden rounded-t-3xl border border-border bg-surface shadow-2xl lg:inset-y-0 lg:left-auto lg:right-0 lg:max-h-none lg:w-[420px] lg:rounded-l-3xl lg:rounded-tr-none"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-4 px-5 pb-0 pt-5">
+        <div className="flex items-start justify-between gap-4 px-6 pb-0 pt-6">
           <div className="min-w-0 flex-1">
             <h2 className="text-lg font-bold text-foreground">{movement.title || movement.merchant || 'Sin título'}</h2>
-            <p className="mt-0.5 text-sm text-muted-foreground">{formatDate(movement.date)}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">{formatDate(movement.date)}</p>
           </div>
           <button type="button" onClick={onClose}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-muted-foreground transition hover:bg-white/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition hover:bg-surface-soft hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             aria-label="Cerrar">
             <X className="h-4 w-4" />
           </button>
         </div>
 
         {movement.merchant && movement.title && (
-          <p className="px-5 pt-3 text-sm text-foreground">{movement.merchant}</p>
+          <p className="px-6 pt-2 text-sm font-semibold text-foreground">{movement.merchant}</p>
         )}
 
-        <div className="flex flex-wrap items-center gap-1.5 px-5 pt-4">
-          <span className={`rounded-full px-3 py-1 text-xs font-medium ${kindTone(movement.kind)}`}>
+        <div className="flex flex-wrap items-center gap-1.5 px-6 pt-3">
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${kindTone(movement.kind)}`}>
             {kindLabel(movement.kind)}
           </span>
-          <span className="rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-muted-foreground">{scopeLabel(movement.scope)}</span>
+          <span className="rounded-full bg-surface-soft border border-border px-3 py-1 text-xs font-medium text-muted-foreground">{scopeLabel(movement.scope)}</span>
           {movement.isRecurring && (
-            <span className="flex items-center gap-1 rounded-full bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-400">
+            <span className="flex items-center gap-1 rounded-full bg-warning/10 px-3 py-1 text-xs font-semibold text-warning">
               <RotateCcw className="h-3 w-3" />
               {movement.recurringLabel || 'Recurrente'}
             </span>
           )}
         </div>
 
-        <div className="border-b border-white/5 px-5 pb-5 pt-5">
-          <p className="text-3xl font-bold text-foreground tabular-nums">{formatAmount(movement.total)}</p>
+        <div className="border-b border-border px-6 pb-5 pt-5">
+          <p className="text-3xl font-extrabold text-foreground tabular-nums">{formatAmount(movement.total)}</p>
           {movement.paymentMethod && (
-            <p className="mt-1 text-sm text-muted-foreground">{movement.paymentMethod}</p>
+            <p className="mt-1 text-xs font-medium text-muted-foreground">{movement.paymentMethod}</p>
           )}
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5">
+        <div className="flex-1 overflow-y-auto px-6">
           {movement.itemsCount > 0 && (
             <div className="pt-5">
-              <p className="mb-3 text-sm font-semibold text-foreground">Productos ({movement.itemsCount})</p>
+              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Productos ({movement.itemsCount})</p>
 
-              <div className="divide-y divide-white/5 text-sm">
+              <div className="divide-y divide-border/60 text-sm">
                 {movement.items.map((item) => (
                   <div key={item.id} className="flex items-start justify-between py-2.5 first:pt-0 last:pb-0">
                     <div className="min-w-0 flex-1 pr-4">
@@ -86,15 +86,15 @@ export default function MovementDetailDrawer({ movement, onClose }: Props) {
                 ))}
               </div>
 
-              <div className="mt-2 divide-y divide-white/5 border-t border-white/5 text-sm">
+              <div className="mt-2 divide-y divide-border/40 border-t border-border/70 text-sm">
                 <div className="flex justify-between py-2">
-                  <span className="text-muted-foreground">Suma de ítems</span>
-                  <span className="font-medium text-foreground tabular-nums">{formatAmount(movement.itemsTotal)}</span>
+                  <span className="text-muted-foreground text-xs font-medium">Suma de ítems</span>
+                  <span className="font-bold text-foreground tabular-nums">{formatAmount(movement.itemsTotal)}</span>
                 </div>
                 {movement.discounts != null && movement.discounts > 0 && (
                   <div className="flex justify-between py-2">
-                    <span className="text-muted-foreground">Descuentos</span>
-                    <span className="font-medium text-emerald-400 tabular-nums">-{formatAmount(movement.discounts)}</span>
+                    <span className="text-muted-foreground text-xs font-medium">Descuentos</span>
+                    <span className="font-bold text-success tabular-nums">-{formatAmount(movement.discounts)}</span>
                   </div>
                 )}
               </div>
@@ -102,24 +102,24 @@ export default function MovementDetailDrawer({ movement, onClose }: Props) {
           )}
 
           {movement.notes && (
-            <div className="pt-6">
-              <p className="mb-1 text-sm font-semibold text-foreground">Notas</p>
-              <p className="text-sm text-muted-foreground whitespace-pre-wrap">{movement.notes}</p>
+            <div className="pt-5">
+              <p className="mb-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">Notas</p>
+              <p className="text-sm text-foreground whitespace-pre-wrap">{movement.notes}</p>
             </div>
           )}
 
           {movement.scope === 'household' && (
-            <div className="mt-6 rounded-xl border border-white/5 bg-white/[0.03] p-4 text-sm text-muted-foreground">
-              Este gasto es compartido. La división estará disponible pronto.
+            <div className="mt-5 rounded-2xl border border-border bg-surface-soft p-4 text-xs text-muted-foreground leading-relaxed">
+              Este gasto es compartido 50/50 dentro de tu Lovehold.
             </div>
           )}
         </div>
 
-        <div className="border-t border-white/5 px-5 py-4">
+        <div className="border-t border-border px-6 py-4">
           <button type="button" onClick={handleDelete}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-semibold text-muted-foreground transition hover:bg-white/5 hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/30">
+            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-danger/20 bg-danger/5 px-4 py-3 text-sm font-bold text-danger transition hover:bg-danger/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/30">
             <Trash2 className="h-4 w-4" />
-            Eliminar
+            Eliminar movimiento
           </button>
         </div>
       </div>

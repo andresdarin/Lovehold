@@ -57,7 +57,7 @@ export function ProfileIdentityHeadline({
       {/* Primary CTA — one clear action */}
       <button
         onClick={onEdit}
-        className="mt-1 self-start flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all duration-200 hover:bg-primary/90 hover:shadow-primary/35 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className="mt-1 self-start flex items-center gap-2 rounded-2xl bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground shadow-xs transition-all duration-200 hover:bg-primary-hover active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         aria-label={isComplete ? 'Editar perfil' : 'Completar perfil'}
       >
         <Edit3 className="h-4 w-4" />

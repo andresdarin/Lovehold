@@ -31,7 +31,7 @@ export default function MovementEmptyState({ hasFilters, onClearFilters }: Props
         </button>
       ) : (
         <Link href="/expenses/new"
-          className="rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
+          className="rounded-2xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-xs transition hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
           Nuevo gasto
         </Link>
       )}

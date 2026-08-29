@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { Plus, Wallet } from 'lucide-react'
-import LiquidGlass from '@/components/ui/LiquidGlass'
 
 export default function MovementsHeader() {
   return (
@@ -16,12 +15,13 @@ export default function MovementsHeader() {
           <p className="text-sm text-muted-foreground">Historial de gastos personales y del hogar</p>
         </div>
       </div>
-      <LiquidGlass variant="button" intensity="medium" className="inline-flex self-start sm:self-auto">
-        <Link href="/expenses/new" className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-foreground">
-          <Plus className="h-4 w-4 text-primary" />
-          Nuevo gasto
-        </Link>
-      </LiquidGlass>
+      <Link
+        href="/expenses/new"
+        className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-xs transition-all hover:bg-primary-hover active:scale-95 self-start sm:self-auto"
+      >
+        <Plus className="h-4 w-4" />
+        Nuevo gasto
+      </Link>
     </header>
   )
 }

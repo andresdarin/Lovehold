@@ -9,6 +9,19 @@ interface CategoryBreakdownProps {
 
 
 
+const CATEGORY_COLORS: Record<string, string> = {
+  supermercado: 'bg-cat-super',
+  alimentos: 'bg-cat-super',
+  limpieza: 'bg-cat-super',
+  higiene: 'bg-cat-hygiene',
+  snacks: 'bg-cat-snacks',
+  delivery: 'bg-cat-delivery',
+  transporte: 'bg-cat-fuel',
+  alquiler: 'bg-cat-home',
+  gastos_comunes: 'bg-cat-home',
+  internet: 'bg-cat-delivery',
+}
+
 export default function CategoryBreakdown({ byCategory, total }: CategoryBreakdownProps) {
   const entries = Object.entries(byCategory).sort(([, a], [, b]) => b - a)
 
@@ -17,26 +30,27 @@ export default function CategoryBreakdown({ byCategory, total }: CategoryBreakdo
   }
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-2">
       {entries.map(([key, amount]) => {
         const pct = total > 0 ? (amount / total) * 100 : 0
+        const barColor = CATEGORY_COLORS[key.toLowerCase()] ?? 'bg-primary'
         return (
-          <div key={key} className="flex items-center gap-3 py-1.5 bg-transparent">
+          <div key={key} className="flex items-center gap-3 py-1 bg-transparent">
             {/* Nombre de categoría */}
-            <span className="w-24 shrink-0 truncate text-sm font-medium text-foreground">
+            <span className="w-28 shrink-0 truncate text-xs font-semibold text-foreground">
               {CATEGORY_LABELS[key] ?? key}
             </span>
 
             {/* Barra de progreso en el centro */}
-            <div className="flex-1 h-1 bg-surface-soft rounded-[2px] overflow-hidden">
+            <div className="flex-1 h-2 bg-surface-soft rounded-full overflow-hidden">
               <div
-                className="h-full bg-primary rounded-[2px] transition-all duration-500"
-                style={{ width: `${Math.max(pct, 0.5)}%` }}
+                className={`h-full ${barColor} rounded-full transition-all duration-500`}
+                style={{ width: `${Math.max(pct, 1)}%` }}
               />
             </div>
 
             {/* Porcentaje a la derecha */}
-            <span className="w-10 shrink-0 text-right text-xs text-muted-foreground font-medium">
+            <span className="w-10 shrink-0 text-right text-xs text-muted-foreground font-bold tabular-nums">
               {pct.toFixed(0)}%
             </span>
           </div>

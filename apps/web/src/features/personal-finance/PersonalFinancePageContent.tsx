@@ -99,7 +99,7 @@ export default function PersonalFinancePageContent() {
           </button>
           <button 
             onClick={() => setView('new-expense')} 
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors focus:outline-none"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-2xl bg-primary text-primary-foreground hover:bg-primary-hover transition-all focus:outline-none shadow-xs"
           >
             <Plus className="h-3.5 w-3.5" /> Nuevo gasto
           </button>
