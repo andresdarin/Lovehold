@@ -2,10 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import type { AuthenticatedUser } from '../common/guards/auth.guard'
 import { PrismaService } from '../prisma/prisma.service'
 import type { CreatePersonalExpenseDto } from './dto/create-personal-expense.dto'
+import { CreateExpenseUseCase } from '../finance/application/create-expense.usecase'
+import { formatMoney, parseMoney } from '@lovehold/shared'
 
 @Injectable()
 export class PersonalFinanceService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService, private readonly createExpenseUseCase: CreateExpenseUseCase) { }
 
   private async getProfileId(authUserId: string): Promise<string> {
     const profile = await this.prisma.profile.findUnique({
@@ -40,51 +42,15 @@ export class PersonalFinanceService {
   }
 
   async create(user: AuthenticatedUser, dto: CreatePersonalExpenseDto) {
-    const profileId = await this.getProfileId(user.authUserId)
-    const expenseDate = new Date(dto.date)
-    const monthKey = `${expenseDate.getFullYear()}-${String(expenseDate.getMonth() + 1).padStart(2, '0')}`
-
-    const expense = await this.prisma.personalExpense.create({
-      data: {
-        profileId,
-        title: dto.title.trim(),
-        merchant: dto.merchant?.trim() || null,
-        amount: dto.amount.toFixed(2),
-        date: expenseDate,
-        type: dto.type,
-        category: dto.category,
-        notes: dto.notes?.trim() || null,
-        isRecurring: dto.isRecurring ?? false,
-        recurrenceDay: dto.recurrenceDay ?? null,
-        monthKey,
-        ...(dto.items?.length
-          ? {
-            items: {
-              create: dto.items.map((item) => ({
-                name: item.name.trim(),
-                category: item.category,
-                quantity: (item.quantity === undefined || item.quantity === null) ? null : item.quantity.toFixed(3),
-                unitPrice: (item.unitPrice === undefined || item.unitPrice === null) ? null : item.unitPrice.toFixed(2),
-                totalPrice: item.totalPrice.toFixed(2),
-                rawLine: item.rawLine?.trim() || null,
-              })),
-            },
-          }
-          : {}),
-      },
-      include: { items: true },
-    })
-
-    return {
-      ...expense,
-      amount: Number(expense.amount),
-      items: expense.items.map((item) => ({
-        ...item,
-        quantity: item.quantity === null ? null : Number(item.quantity),
-        unitPrice: item.unitPrice === null ? null : Number(item.unitPrice),
-        totalPrice: Number(item.totalPrice),
-      })),
-    }
+    const profile = await this.prisma.profile.findUnique({ where: { authUserId: user.authUserId }, select: { id: true, baseCurrency: true } })
+    if (!profile) throw new NotFoundException('Profile not found')
+    const profileId = profile.id
+    return this.createExpenseUseCase.execute({ profileId, input: {
+      title: dto.title, merchant: dto.merchant, amount: dto.amount, currency: dto.currency ?? profile.baseCurrency ?? 'UYU', date: dto.date,
+      type: dto.type as 'fixed' | 'variable' | 'supermarket', category: dto.category, notes: dto.notes,
+      isRecurring: dto.isRecurring, recurrenceDay: dto.recurrenceDay,
+      items: dto.items?.map((item) => ({ name: item.name, category: item.category, quantity: item.quantity, unitPrice: item.unitPrice, totalPrice: item.totalPrice, rawLine: item.rawLine })),
+    }, context: { source: 'web' } })
   }
 
   async getSummary(user: AuthenticatedUser, monthKey: string) {
@@ -95,23 +61,24 @@ export class PersonalFinanceService {
       select: { amount: true, type: true, category: true },
     })
 
-    let total = 0
-    let fixed = 0
-    let variable = 0
-    let supermarket = 0
-    const byCategory: Record<string, number> = {}
+    let total = 0n
+    let fixed = 0n
+    let variable = 0n
+    let supermarket = 0n
+    const byCategoryMinor: Record<string, bigint> = {}
 
     for (const e of expenses) {
-      const amt = Number(e.amount)
+      const amt = parseMoney(String(e.amount))
       total += amt
-      byCategory[e.category] = (byCategory[e.category] ?? 0) + amt
+      byCategoryMinor[e.category] = (byCategoryMinor[e.category] ?? 0n) + amt
 
       if (e.type === 'fixed') fixed += amt
       else if (e.type === 'supermarket') supermarket += amt
       else variable += amt
     }
 
-    return { total, fixed, variable, supermarket, count: expenses.length, byCategory }
+    const byCategory = Object.fromEntries(Object.entries(byCategoryMinor).map(([key, value]) => [key, Number(formatMoney(value))]))
+    return { total: Number(formatMoney(total)), fixed: Number(formatMoney(fixed)), variable: Number(formatMoney(variable)), supermarket: Number(formatMoney(supermarket)), count: expenses.length, byCategory }
   }
 
   async getProductRanking(user: AuthenticatedUser, monthKey: string) {
@@ -124,20 +91,20 @@ export class PersonalFinanceService {
       select: { name: true, quantity: true, totalPrice: true },
     })
 
-    type Acc = Record<string, { name: string; count: number; totalQuantity: number; totalSpent: number }>
+    type Acc = Record<string, { name: string; count: number; totalQuantity: number; totalSpentMinor: bigint }>
     const grouped = items.reduce<Acc>((acc, item) => {
       const key = item.name.toLowerCase().trim().replace(/\s+/g, ' ')
       if (!acc[key]) {
-        acc[key] = { name: item.name, count: 0, totalQuantity: 0, totalSpent: 0 }
+        acc[key] = { name: item.name, count: 0, totalQuantity: 0, totalSpentMinor: 0n }
       }
       acc[key].count += 1
       acc[key].totalQuantity += item.quantity === null ? 1 : Number(item.quantity)
-      acc[key].totalSpent += Number(item.totalPrice)
+      acc[key].totalSpentMinor += parseMoney(String(item.totalPrice))
       return acc
     }, {})
 
     return Object.values(grouped)
-      .map((g) => ({ ...g, totalSpent: Math.round(g.totalSpent * 100) / 100 }))
+      .map(({ totalSpentMinor, ...g }) => ({ ...g, totalSpent: Number(formatMoney(totalSpentMinor)) }))
       .sort((a, b) => b.totalSpent - a.totalSpent)
   }
 }

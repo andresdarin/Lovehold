@@ -4,6 +4,7 @@ import {
   IsBoolean,
   IsDateString,
   IsInt,
+  IsIn,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -54,6 +55,10 @@ export class CreatePersonalExpenseItemDto {
 }
 
 export class CreatePersonalExpenseDto {
+  @IsOptional()
+  @IsIn(['UYU', 'USD'])
+  currency?: 'UYU' | 'USD'
+
   @IsString()
   @IsNotEmpty()
   @MaxLength(120)

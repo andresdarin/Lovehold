@@ -126,9 +126,9 @@ model ScheduledCashFlow {
   account              FinanceAccount?     @relation(fields: [accountId], references: [id])
   personalExpenses     PersonalExpense[]
 
+  @@unique([profileId, sourceMessageId])
   @@index([profileId, scheduledDueOn])
   @@index([profileId, lifecycle])
-  @@unique([profileId, sourceMessageId])
 }
 
 enum GoalStatus {
@@ -326,6 +326,7 @@ model PersonalExpense {
   @@unique([scheduledCashFlowId, scheduledDueOn])
   @@unique([profileId, sourceMessageId])
   @@index([profileId, monthKey])
+  @@index([financeAccountId, profileId])
 }
 
 model PersonalExpenseItem {
