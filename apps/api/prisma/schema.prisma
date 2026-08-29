@@ -75,19 +75,42 @@ enum CashFlowResolution {
   SKIPPED
 }
 
+enum FinanceAccountType {
+  CASH
+  BANK
+  CREDIT
+}
+
+enum FinancialMovementType {
+  EXPENSE
+  INCOME
+  TRANSFER
+}
+
+enum FinancialInputMethod {
+  MANUAL
+  RECEIPT_SCAN
+  IMPORT
+}
+
 model FinanceAccount {
   id                 String              @id @default(cuid())
   profileId          String
   name               String
+  type               FinanceAccountType  @default(BANK)
   currency           FinanceCurrency
   balance            Decimal             @db.Decimal(18, 2)
+  creditLimit        Decimal?            @db.Decimal(18, 2)
+  closingDay         Int?
+  dueDay             Int?
   isSpendable        Boolean             @default(true)
   isActive           Boolean             @default(true)
   balanceAsOf        DateTime            @default(now())
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
   profile            Profile             @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  personalExpenses   PersonalExpense[]
+  personalExpenses   PersonalExpense[]   @relation("sourceAccount")
+  receivedTransfers  PersonalExpense[]   @relation("destinationAccount")
   scheduledCashFlows ScheduledCashFlow[]
 
   // Multiple accounts in one currency are supported by distinct names.
@@ -294,32 +317,36 @@ model Settlement {
 }
 
 model PersonalExpense {
-  id                  String    @id @default(cuid())
-  profileId           String
-  title               String
-  merchant            String?
-  amount              Decimal   @db.Decimal(18, 2)
-  date                DateTime
-  type                String // fixed | variable | supermarket
-  category            String
-  notes               String?
-  isRecurring         Boolean   @default(false)
-  recurrenceDay       Int?
-  monthKey            String
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-  currency            String    @default("UYU")
-  scheduledCashFlowId String?
-  scheduledDueOn      DateTime? @db.Date
-  source              String?
-  sourceMessageId     String?
-  financeAccountId    String?
-  categoryKey         String?
+  id                   String                @id @default(cuid())
+  profileId            String
+  title                String
+  merchant             String?
+  amount               Decimal               @db.Decimal(18, 2)
+  date                 DateTime
+  type                 String // fixed | variable | supermarket
+  movementType         FinancialMovementType @default(EXPENSE)
+  inputMethod          FinancialInputMethod  @default(MANUAL)
+  category             String
+  notes                String?
+  isRecurring          Boolean               @default(false)
+  recurrenceDay        Int?
+  monthKey             String
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  currency             String                @default("UYU")
+  scheduledCashFlowId  String?
+  scheduledDueOn       DateTime?             @db.Date
+  source               String?
+  sourceMessageId      String?
+  financeAccountId     String?
+  destinationAccountId String?
+  categoryKey          String?
 
-  items             PersonalExpenseItem[]
-  profile           Profile               @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  financeAccount    FinanceAccount?       @relation(fields: [financeAccountId], references: [id])
-  scheduledCashFlow ScheduledCashFlow?    @relation(fields: [scheduledCashFlowId], references: [id])
+  items              PersonalExpenseItem[]
+  profile            Profile               @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  financeAccount     FinanceAccount?       @relation("sourceAccount", fields: [financeAccountId], references: [id])
+  destinationAccount FinanceAccount?       @relation("destinationAccount", fields: [destinationAccountId], references: [id])
+  scheduledCashFlow  ScheduledCashFlow?    @relation(fields: [scheduledCashFlowId], references: [id])
 
   // PostgreSQL UNIQUE permits multiple NULLs; application validation enforces
   // the logical key only when both schedule fields are present.
@@ -327,6 +354,7 @@ model PersonalExpense {
   @@unique([profileId, sourceMessageId])
   @@index([profileId, monthKey])
   @@index([financeAccountId, profileId])
+  @@index([destinationAccountId, profileId])
 }
 
 model PersonalExpenseItem {

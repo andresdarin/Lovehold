@@ -9,11 +9,21 @@ import { resolveScheduledCashFlow } from './scheduled-cash-flow'
 const warning = (code: string, message?: string) => ({ code, ...(message ? { message } : {}) })
 const dateInZone = (value: string, timeZone = 'America/Montevideo') => new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(value))
 const balanceData = (input: any, baseCurrency: string, asOf: string) => {
-  const spendableByCurrency: Record<string, string> = {}, nonSpendableByCurrency: Record<string, string> = {}
+  const spendableByCurrency: Record<string, string> = {}, nonSpendableByCurrency: Record<string, string> = {}, creditDebtByCurrency: Record<string, string> = {}
   for (const account of input.accounts ?? []) {
-    const currency = account.currency, spendable = account.spendable ?? account.balance ?? '0.00'
-    spendableByCurrency[currency] = formatMoney(parseMoney(spendableByCurrency[currency] ?? '0.00') + parseMoney(spendable))
-    nonSpendableByCurrency[currency] = formatMoney(parseMoney(nonSpendableByCurrency[currency] ?? '0.00') + parseMoney(account.nonSpendable ?? '0.00'))
+    const currency = account.currency, balanceStr = account.balance ?? '0.00'
+    if (account.type === 'CREDIT') {
+      creditDebtByCurrency[currency] = formatMoney(parseMoney(creditDebtByCurrency[currency] ?? '0.00') + parseMoney(balanceStr))
+    } else {
+      const isSpendable = account.isSpendable ?? true
+      if (isSpendable) {
+        const spendable = account.spendable ?? balanceStr
+        spendableByCurrency[currency] = formatMoney(parseMoney(spendableByCurrency[currency] ?? '0.00') + parseMoney(spendable))
+      } else {
+        const nonSpendable = account.nonSpendable ?? balanceStr
+        nonSpendableByCurrency[currency] = formatMoney(parseMoney(nonSpendableByCurrency[currency] ?? '0.00') + parseMoney(nonSpendable))
+      }
+    }
   }
   let spendableInBase: Money | null = spendableByCurrency[baseCurrency] ? money(baseCurrency as any, parseMoney(spendableByCurrency[baseCurrency])) : money(baseCurrency as any, 0n)
   for (const [currency, value] of Object.entries(spendableByCurrency)) if (currency !== baseCurrency) {
@@ -21,7 +31,7 @@ const balanceData = (input: any, baseCurrency: string, asOf: string) => {
     if (!quote) spendableInBase = null
     else if (spendableInBase) spendableInBase.amount = formatMoney(parseMoney(spendableInBase.amount) + parseMoney(convertAssetWithBidFloor({ currency, amount: value } as any, baseCurrency as any, quote).amount))
   }
-  return { spendableByCurrency, nonSpendableByCurrency, spendableInBase, oldestBalanceAsOf: null }
+  return { spendableByCurrency, nonSpendableByCurrency, creditDebtByCurrency, spendableInBase, oldestBalanceAsOf: null }
 }
 
 export const getFinancialSnapshot = (input: any = {}): FinancialSnapshot => {

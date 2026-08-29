@@ -34,10 +34,39 @@ export const FxQuoteSchema = validateFxQuote(FxQuoteBaseSchema)
 /** Historical quotes are selected by transaction date, never by the current quote. */
 export const FxQuoteHistoricalSchema = validateFxQuote(FxQuoteBaseSchema.extend({ transactionOn: DateSchema }))
 
+export const FinanceAccountTypeSchema = z.enum(['CASH', 'BANK', 'CREDIT'])
+export const FinancialMovementTypeSchema = z.enum(['EXPENSE', 'INCOME', 'TRANSFER'])
+export const FinancialInputMethodSchema = z.enum(['MANUAL', 'RECEIPT_SCAN', 'IMPORT'])
+
 export const FinanceCategorySchema = z.enum([
   'HOUSING', 'UTILITIES', 'FOOD', 'TRANSPORT', 'HEALTH', 'LEISURE', 'PETS',
   'SHOPPING', 'EDUCATION', 'DEBT', 'TAXES', 'OTHER',
 ])
+
+export const CreateFinanceAccountSchema = z.object({
+  name: z.string().min(1).max(80),
+  type: FinanceAccountTypeSchema.default('BANK'),
+  currency: CurrencySchema.default('UYU'),
+  initialBalance: DecimalMoneySchema.optional().default('0.00'),
+  creditLimit: DecimalMoneySchema.optional(),
+  closingDay: z.number().int().min(1).max(31).optional(),
+  dueDay: z.number().int().min(1).max(31).optional(),
+  isSpendable: z.boolean().optional().default(true),
+})
+
+export const CreateTransferSchema = z.object({
+  sourceAccountId: z.string().min(1),
+  destinationAccountId: z.string().min(1),
+  amount: PositiveDecimalSchema,
+  currency: CurrencySchema.default('UYU'),
+  date: z.string().datetime(),
+  description: z.string().max(200).optional(),
+})
+
+export const AdjustAccountBalanceSchema = z.object({
+  newBalance: DecimalMoneySchema,
+  reason: z.string().max(200).optional(),
+})
 
 export const WarningSchema = z.object({
   code: z.string().min(1),
@@ -105,6 +134,7 @@ const CurrencyAmountRecordSchema = z.record(CurrencySchema, DecimalMoneySchema)
 const BalanceSchema = z.object({
   spendableByCurrency: CurrencyAmountRecordSchema,
   nonSpendableByCurrency: CurrencyAmountRecordSchema,
+  creditDebtByCurrency: CurrencyAmountRecordSchema.optional().default({}),
   spendableInBase: MoneySchema.nullable(),
   oldestBalanceAsOf: DateTimeSchema.nullable(),
 })

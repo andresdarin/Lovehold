@@ -27,6 +27,31 @@ export const expenseItemCategoryToFinanceCategory = (value?: string | null): Fin
 export const legacyCategoryToFinanceCategory = (value?: string | null): FinanceCategory | undefined =>
   LEGACY_CATEGORY_TO_FINANCE_CATEGORY[String(value ?? '').trim().toLowerCase()]
 
+export const FINANCE_ACCOUNT_TYPES = ['CASH', 'BANK', 'CREDIT'] as const
+export type FinanceAccountType = (typeof FINANCE_ACCOUNT_TYPES)[number]
+
+export const FINANCIAL_MOVEMENT_TYPES = ['EXPENSE', 'INCOME', 'TRANSFER'] as const
+export type FinancialMovementType = (typeof FINANCIAL_MOVEMENT_TYPES)[number]
+
+export const FINANCIAL_INPUT_METHODS = ['MANUAL', 'RECEIPT_SCAN', 'IMPORT'] as const
+export type FinancialInputMethod = (typeof FINANCIAL_INPUT_METHODS)[number]
+
+export interface FinanceAccount {
+  id: string
+  profileId: string
+  name: string
+  type: FinanceAccountType
+  currency: 'UYU' | 'USD'
+  balance: number
+  creditLimit?: number | null
+  closingDay?: number | null
+  dueDay?: number | null
+  isSpendable: boolean
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
 export interface PersonalExpense {
   id: string
   profileId: string
@@ -35,11 +60,16 @@ export interface PersonalExpense {
   amount: number
   date: string
   type: ExpenseType
+  movementType?: FinancialMovementType
+  inputMethod?: FinancialInputMethod
   category: string
   notes: string | null
   isRecurring: boolean
   recurrenceDay: number | null
   monthKey: string
+  currency?: string
+  financeAccountId?: string | null
+  destinationAccountId?: string | null
   createdAt: string
   updatedAt: string
   items?: PersonalExpenseItem[]
