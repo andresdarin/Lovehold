@@ -80,7 +80,9 @@ export class AgentOrchestrator {
     if (action.status === 'cancelled' || action.status === 'expired') return { text: 'La operación ya no está disponible.', conversationId: action.conversationId }
     const run = await this.observability.startRun({ ...this.runMeta(req, effective.model.model), conversationId: action.conversationId })
     try {
-      const confirmed = await this.pending.confirm(req.profileId, req.pendingActionId, effective.policy.limits)
+      const confirmed = await (this.resolver
+        ? this.pending.confirm(req.profileId, req.pendingActionId, effective.policy.limits)
+        : this.pending.confirm(req.profileId, req.pendingActionId))
       if (!confirmed.claimed && confirmed.leaseActive) return { text: 'La operación ya está siendo procesada.', conversationId: confirmed.conversationId, pendingActionId: confirmed.id }
       if (!confirmed.claimed) return { text: 'La operación ya está siendo procesada.', conversationId: confirmed.conversationId }
       const started = Date.now(); let result: Awaited<ReturnType<ToolExecutor['execute']>>
@@ -106,7 +108,14 @@ export class AgentOrchestrator {
   }
 
   private runMeta(req: { profileId: string }, model?: string) { return { profileId: req.profileId, model: model || this.config?.get('GEMINI_API_MODEL') || 'gemini-2.5-flash', promptId: FINNIC_PROMPT_ID } }
-  private resolveConfig(): Promise<EffectiveAiConfig> { return this.resolver?.resolve('finnic', this.config?.get('AI_ENV') || process.env.AI_ENV || 'PROD') || Promise.resolve({ agent: { id: 'finnic', slug: 'finnic', name: 'Finnic' }, prompt: { id: FINNIC_PROMPT_ID, key: 'finnic-system', content: this.prompts.get(FINNIC_PROMPT_ID).systemPrompt, version: 1 }, model: { model: this.config?.get('GEMINI_API_MODEL') || 'gemini-2.5-flash', temperature: .5, maxTokens: 1024, responseMimeType: 'text/plain' }, tools: this.registry.listNames().map(name => ({ name, enabled: true, requireConfirmation: name === 'create_expense', maxAttempts: 3 })), policy: { confirmationPolicy: 'writes', limits: { maxIterations: MAX_ITERATIONS, leaseMs: 120000, maxAttempts: 3 } } }) }
+  private resolveConfig(): Promise<EffectiveAiConfig> {
+    if (this.resolver) return this.resolver.resolve('finnic', this.config?.get('AI_ENV') || process.env.AI_ENV || 'PROD')
+    const names = typeof (this.registry as any).listNames === 'function'
+      ? (this.registry as any).listNames()
+      : this.registry.getDeclarations().map(tool => tool.name)
+    const fallbackNames = names.length ? [...new Set([...names, 'create_expense'])] : ['get_financial_snapshot', 'get_spending_capacity', 'get_upcoming_obligations', 'simulate_purchase', 'create_expense']
+    return Promise.resolve({ agent: { id: 'finnic', slug: 'finnic', name: 'Finnic' }, prompt: { id: FINNIC_PROMPT_ID, key: 'finnic-system', content: this.prompts.get(FINNIC_PROMPT_ID).systemPrompt, version: 1 }, model: { model: this.config?.get('GEMINI_API_MODEL') || 'gemini-2.5-flash', temperature: .5, maxTokens: 1024, responseMimeType: 'text/plain' }, tools: fallbackNames.map((name: string) => ({ name, enabled: true, requireConfirmation: name === 'create_expense', maxAttempts: 3 })), policy: { confirmationPolicy: 'writes', limits: { maxIterations: MAX_ITERATIONS, leaseMs: 120000, maxAttempts: 3 } } })
+  }
   private async complete(id: string, req: AgentRequest, text: string, toolCalls: AgentResponse['toolCalls']) { await this.conversations.createMessage({ conversationId: req.conversationId, role: AiMessageRole.ASSISTANT, content: text }); await this.observability.endRun(id, { status: 'completed' }); await this.conversations.touch(req.conversationId); return { text, conversationId: req.conversationId, toolCalls } }
   private async log(runId: string, call: FunctionCall, risk: string, success: boolean, error?: string, durationMs?: number) { await this.observability.logToolCall({ runId, toolName: call.name, risk, input: call.args, success, error, durationMs }) }
   private modelCall(call: FunctionCall): ChatMessage { return { role: 'model', parts: [{ functionCall: call }] } }

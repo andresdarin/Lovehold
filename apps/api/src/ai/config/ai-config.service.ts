@@ -31,8 +31,13 @@ export class AiConfigService {
   async deploy(input: { agentSlug: string; environment: string; promptVersionId?: string; modelConfigId?: string }) {
     const agent = await (this.prisma as any).aiAgent.findUnique({ where: { slug: input.agentSlug } })
     if (!agent) throw new Error('Agent not found')
-    await (this.prisma as any).aiDeployment.updateMany({ where: { agentId: agent.id, environment: input.environment, isActive: true }, data: { isActive: false } })
-    const result = await (this.prisma as any).aiDeployment.create({ data: { agentId: agent.id, environment: input.environment, promptVersionId: input.promptVersionId, modelConfigId: input.modelConfigId, isActive: true } })
+    const tx = (this.prisma as any).$transaction
+    const operations = [
+      (this.prisma as any).aiDeployment.updateMany({ where: { agentId: agent.id, environment: input.environment, isActive: true }, data: { isActive: false } }),
+      ...(input.promptVersionId ? [(this.prisma as any).aiPromptVersion.update({ where: { id: input.promptVersionId }, data: { status: 'active' } })] : []),
+      (this.prisma as any).aiDeployment.create({ data: { agentId: agent.id, environment: input.environment, promptVersionId: input.promptVersionId, modelConfigId: input.modelConfigId, isActive: true } }),
+    ]
+    const result = tx ? (await tx(operations)).at(-1) : await operations.at(-1)
     this.resolver?.invalidate()
     return result
   }
