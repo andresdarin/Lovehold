@@ -13,24 +13,26 @@ const DateTimeSchema = z.string().datetime({ offset: true })
 const DateSchema = z.string().date()
 const VerdictSchema = z.enum(['SAFE', 'CAUTION', 'UNSAFE'])
 
-export const FxQuoteSchema = z
-  .object({
-    baseCurrency: CurrencySchema,
-    quoteCurrency: CurrencySchema,
-    bid: PositiveDecimalSchema,
-    ask: PositiveDecimalSchema,
-    asOf: DateTimeSchema,
-    source: z.string().min(1),
-  })
-  .superRefine((quote, context) => {
+const FxQuoteBaseSchema = z.object({
+  baseCurrency: CurrencySchema,
+  quoteCurrency: CurrencySchema,
+  bid: PositiveDecimalSchema,
+  ask: PositiveDecimalSchema,
+  asOf: DateTimeSchema,
+  source: z.string().min(1),
+})
+
+const validateFxQuote = <T extends z.ZodTypeAny>(schema: T) => schema.superRefine((quote: z.infer<T>, context) => {
     if (quote.baseCurrency === quote.quoteCurrency)
       context.addIssue({ code: z.ZodIssueCode.custom, path: ['quoteCurrency'], message: 'Currencies must differ' })
     if (Number(quote.bid) - Number(quote.ask) > 1e-9)
       context.addIssue({ code: z.ZodIssueCode.custom, path: ['bid'], message: 'Bid cannot exceed ask' })
   })
 
+export const FxQuoteSchema = validateFxQuote(FxQuoteBaseSchema)
+
 /** Historical quotes are selected by transaction date, never by the current quote. */
-export const FxQuoteHistoricalSchema = FxQuoteSchema.extend({ transactionOn: DateSchema })
+export const FxQuoteHistoricalSchema = validateFxQuote(FxQuoteBaseSchema.extend({ transactionOn: DateSchema }))
 
 export const FinanceCategorySchema = z.enum([
   'HOUSING', 'UTILITIES', 'FOOD', 'TRANSPORT', 'HEALTH', 'LEISURE', 'PETS',
