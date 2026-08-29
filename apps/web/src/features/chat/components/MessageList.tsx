@@ -1,13 +1,19 @@
 'use client'
 
 import React, { useRef, useEffect } from 'react'
-import { Sparkles, Bot, User } from 'lucide-react'
 import type { AiMessage } from '../types'
+import FinnicMarkdown from './FinnicMarkdown'
 
 interface MessageListProps {
   messages: AiMessage[]
   sending: boolean
   onSelectSuggestion: (text: string) => void
+  profile?: {
+    displayName: string | null
+    email: string
+    color: string
+    avatarUrl?: string | null
+  } | null
 }
 
 const INITIAL_SUGGESTIONS = [
@@ -16,8 +22,10 @@ const INITIAL_SUGGESTIONS = [
   'Quiero ahorrar más este mes',
 ]
 
-export default function MessageList({ messages, sending, onSelectSuggestion }: MessageListProps) {
+export default function MessageList({ messages, sending, onSelectSuggestion, profile }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null)
+
+  const userInitial = (profile?.displayName?.[0] ?? profile?.email?.[0] ?? 'U').toUpperCase()
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -25,14 +33,18 @@ export default function MessageList({ messages, sending, onSelectSuggestion }: M
 
   if (messages.length === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center p-4 sm:p-6 text-center select-none space-y-5">
-        {/* Isotipo y Saludo Inicial */}
-        <div className="flex flex-col items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary shadow-xs">
-            <Sparkles className="h-6 w-6 stroke-[2]" />
+      <div className="flex flex-1 flex-col items-center justify-center p-4 sm:p-6 text-center select-none space-y-4">
+        {/* Mascota Finnic y Saludo Inicial */}
+        <div className="flex flex-col items-center gap-2.5">
+          <div className="relative">
+            <img
+              src="/brand/finnic-mascot.png"
+              alt="Finnic el búho financiero"
+              className="h-32 w-32 sm:h-36 sm:w-36 object-contain rounded-3xl drop-shadow-md transition-transform hover:scale-105"
+            />
           </div>
           <div>
-            <h2 className="text-sm sm:text-base font-extrabold text-foreground">
+            <h2 className="text-base sm:text-lg font-extrabold text-foreground">
               ¡Hola! Soy Finnic
             </h2>
             <p className="text-xs text-muted-foreground mt-1 max-w-[280px] leading-relaxed">
@@ -42,7 +54,7 @@ export default function MessageList({ messages, sending, onSelectSuggestion }: M
         </div>
 
         {/* Sugerencias Rápidas */}
-        <div className="w-full max-w-sm flex flex-col gap-2 pt-2">
+        <div className="w-full max-w-sm flex flex-col gap-2 pt-1">
           <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
             Podés preguntarme
           </p>
@@ -70,17 +82,32 @@ export default function MessageList({ messages, sending, onSelectSuggestion }: M
             key={msg.id}
             className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'}`}
           >
-            <div className={`flex items-end gap-2 max-w-[85%] sm:max-w-[78%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
-              {/* Icono discreto de avatar */}
-              <div
-                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] shadow-2xs ${
-                  isUser
-                    ? 'bg-primary text-primary-foreground'
-                    : 'border border-primary/20 bg-primary/10 text-primary'
-                }`}
-              >
-                {isUser ? <User className="h-3 w-3" /> : <Bot className="h-3 w-3" />}
-              </div>
+            <div className={`flex items-end gap-2 ${isUser ? 'max-w-[85%] sm:max-w-[78%] flex-row-reverse' : 'max-w-[90%] sm:max-w-[85%] flex-row'}`}>
+              {/* Avatar */}
+              {isUser ? (
+                <div
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold shadow-2xs overflow-hidden ring-1 ring-primary/30 text-white"
+                  style={{
+                    background: `linear-gradient(135deg, ${profile?.color ?? '#407E8C'}ee, #083A4F)`,
+                  }}
+                >
+                  {profile?.avatarUrl ? (
+                    <img
+                      src={profile.avatarUrl}
+                      alt="Foto de perfil"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span>{userInitial}</span>
+                  )}
+                </div>
+              ) : (
+                <img
+                  src="/brand/finnic-avatar.png"
+                  alt="Finnic"
+                  className="h-9 w-9 shrink-0 object-contain drop-shadow-xs -mb-0.5"
+                />
+              )}
 
               {/* Burbuja del mensaje */}
               <div
@@ -90,7 +117,13 @@ export default function MessageList({ messages, sending, onSelectSuggestion }: M
                     : 'bg-surface border border-border/80 text-foreground font-normal rounded-bl-xs'
                 }`}
               >
-                <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                {isUser ? (
+                  <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                ) : (
+                  <div className="prose-finnic">
+                    <FinnicMarkdown content={msg.content} />
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -100,9 +133,11 @@ export default function MessageList({ messages, sending, onSelectSuggestion }: M
       {/* Indicador de Pensando */}
       {sending && (
         <div className="flex justify-start items-end gap-2">
-          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-primary">
-            <Bot className="h-3 w-3" />
-          </div>
+          <img
+            src="/brand/finnic-avatar.png"
+            alt="Finnic pensando"
+            className="h-9 w-9 shrink-0 object-contain drop-shadow-xs animate-pulse -mb-0.5"
+          />
           <div className="rounded-2xl rounded-bl-xs border border-border/80 bg-surface px-4 py-2.5 shadow-xs flex items-center gap-1.5">
             <span className="flex h-1.5 w-1.5 rounded-full bg-primary/60 animate-bounce [animation-delay:-0.3s]" />
             <span className="flex h-1.5 w-1.5 rounded-full bg-primary/60 animate-bounce [animation-delay:-0.15s]" />

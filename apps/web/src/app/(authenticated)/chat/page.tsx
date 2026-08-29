@@ -1,5 +1,6 @@
 'use client'
 
+import { useProfile } from '@/features/auth/ProfileProvider'
 import { useFinnicChat } from '@/features/chat/hooks'
 import ChatHeader from '@/features/chat/components/ChatHeader'
 import MessageList from '@/features/chat/components/MessageList'
@@ -7,6 +8,7 @@ import MessageComposer from '@/features/chat/components/MessageComposer'
 import { Loader2 } from 'lucide-react'
 
 export default function ChatPage() {
+  const { profile } = useProfile()
   const { messages, loading, sending, error, sendMessage } = useFinnicChat()
 
   return (
@@ -34,6 +36,7 @@ export default function ChatPage() {
             messages={messages}
             sending={sending}
             onSelectSuggestion={sendMessage}
+            profile={profile}
           />
         )}
       </div>
