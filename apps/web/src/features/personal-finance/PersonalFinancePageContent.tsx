@@ -83,60 +83,65 @@ export default function PersonalFinancePageContent() {
     <div className="space-y-6">
       {/* 1. Header */}
       <header className="space-y-3">
-        <div>
-          <h1 className="text-[15px] font-medium text-primary uppercase tracking-wide">
-            Finanzas Personales
-          </h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Control de gastos, ingresos, tarjetas y balances
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full border border-primary/30 text-primary bg-transparent">
+            <Receipt className="h-4 w-4 stroke-[2]" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-foreground">
+              Finanzas Personales
+            </h1>
+            <p className="text-xs text-muted-foreground">
+              Control de gastos, ingresos, tarjetas y balances
+            </p>
+          </div>
         </div>
 
         {/* Navegación del mes */}
-        <div className="flex items-center justify-between border-t border-b border-border/40 py-2">
+        <div className="flex items-center justify-between border-t border-b border-border/50 py-2">
           <button
             onClick={() => shiftMonth(-1)}
             className="text-muted-foreground hover:text-foreground p-1 transition-colors focus:outline-none"
             aria-label="Mes anterior"
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-4 w-4" />
           </button>
-          <span className="text-sm font-medium text-foreground">{monthLabel(monthKey)}</span>
+          <span className="text-xs font-bold text-foreground tracking-wide uppercase">{monthLabel(monthKey)}</span>
           <button
             onClick={() => shiftMonth(1)}
             className="text-muted-foreground hover:text-foreground p-1 transition-colors focus:outline-none"
             aria-label="Siguiente mes"
           >
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Quick Action Pills */}
+        {/* Quick Action Pills alineadas con el modelo del Home */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           <button
             onClick={() => setView('new-expense')}
-            className="flex items-center justify-center gap-1.5 py-2.5 px-3 text-xs font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary-hover transition-all shadow-xs"
+            className="flex items-center justify-center gap-1.5 py-2.5 px-3 text-xs font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary-hover transition-all shadow-xs active:scale-95"
           >
-            <ArrowDown className="h-3.5 w-3.5" /> Gasto
-          </button>
-
-          <button
-            onClick={() => setView('paste-ticket')}
-            className="flex items-center justify-center gap-1.5 py-2.5 px-3 text-xs font-medium rounded-xl border border-border bg-surface text-foreground hover:bg-surface-soft transition-colors"
-          >
-            <Receipt className="h-3.5 w-3.5 text-muted-foreground" /> Ticket
+            <ArrowUp className="h-3.5 w-3.5 stroke-[2.5]" /> Egreso
           </button>
 
           <button
             onClick={() => setIsIncomeModalOpen(true)}
-            className="flex items-center justify-center gap-1.5 py-2.5 px-3 text-xs font-medium rounded-xl border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+            className="flex items-center justify-center gap-1.5 py-2.5 px-3 text-xs font-semibold rounded-xl border border-border/80 bg-surface text-primary hover:bg-surface-soft hover:border-primary/30 transition-all active:scale-95"
           >
-            <ArrowUp className="h-3.5 w-3.5 text-emerald-400" /> Ingreso
+            <ArrowDown className="h-3.5 w-3.5 stroke-[2.5] text-primary" /> Ingreso
+          </button>
+
+          <button
+            onClick={() => setView('paste-ticket')}
+            className="flex items-center justify-center gap-1.5 py-2.5 px-3 text-xs font-semibold rounded-xl border border-[#407E8C]/30 bg-[#407E8C]/10 text-[#407E8C] dark:text-[#C0D5D6] hover:bg-[#407E8C]/20 transition-all active:scale-95"
+          >
+            <Receipt className="h-3.5 w-3.5" /> Ticket
           </button>
 
           <button
             onClick={() => setIsTransferModalOpen(true)}
-            className="flex items-center justify-center gap-1.5 py-2.5 px-3 text-xs font-medium rounded-xl border border-border bg-surface text-foreground hover:bg-surface-soft transition-colors"
+            className="flex items-center justify-center gap-1.5 py-2.5 px-3 text-xs font-medium rounded-xl border border-border bg-surface text-foreground hover:bg-surface-soft transition-colors active:scale-95"
           >
             <ArrowLeftRight className="h-3.5 w-3.5 text-muted-foreground" /> Transferir
           </button>
