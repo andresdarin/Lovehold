@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards, NotFoundException } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, UseGuards, NotFoundException, Logger, InternalServerErrorException } from '@nestjs/common'
 import { CurrentUser } from '../../common/decorators/current-user.decorator'
 import { AuthGuard, type AuthenticatedUser } from '../../common/guards/auth.guard'
 import { PrismaService } from '../../prisma/prisma.service'
@@ -7,6 +7,8 @@ import { AiChatService, CreateConversationDto, SendMessageDto } from './ai-chat.
 @Controller('ai/chat')
 @UseGuards(AuthGuard)
 export class AiChatController {
+  private readonly logger = new Logger(AiChatController.name)
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly chatService: AiChatService,
@@ -18,6 +20,7 @@ export class AiChatController {
       select: { id: true },
     })
     if (!profile) {
+      this.logger.warn(`Profile not found for authUserId: ${user.authUserId}`)
       throw new NotFoundException('Perfil de usuario no encontrado.')
     }
     return profile.id
@@ -28,8 +31,15 @@ export class AiChatController {
    */
   @Get('active')
   async getActiveConversation(@CurrentUser() user: AuthenticatedUser) {
-    const profileId = await this.getProfileId(user)
-    return this.chatService.getOrCreateActiveConversation(profileId)
+    try {
+      this.logger.log(`Fetching active conversation for authUser: ${user.authUserId}`)
+      const profileId = await this.getProfileId(user)
+      return await this.chatService.getOrCreateActiveConversation(profileId)
+    } catch (err: any) {
+      this.logger.error(`Error in getActiveConversation: ${err.message}`, err.stack)
+      if (err instanceof NotFoundException) throw err
+      throw new InternalServerErrorException(err.message || 'Error al obtener conversación activa')
+    }
   }
 
   /**

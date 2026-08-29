@@ -1,12 +1,13 @@
 import { describe, expect, it, vi } from 'vitest'
 import { AgentOrchestrator } from './agent.orchestrator'
+import type { ToolRisk } from '../tools/tool.contract'
 import { z } from 'zod'
 
 const prompt = { systemPrompt: 'Finnic', generationConfig: {} }
-const write = { name: 'create_expense', description: 'crear gasto', risk: 'write', inputSchema: z.object({ amount: z.number() }), execute: vi.fn() }
+const write = { name: 'create_expense', description: 'crear gasto', risk: 'write' as ToolRisk, inputSchema: z.object({ amount: z.number() }), execute: vi.fn() }
 const deps = (gemini: any, pending: any, conversations: any, executor: any = { execute: vi.fn() }) => new AgentOrchestrator(
-  gemini, { has: vi.fn(() => true), get: vi.fn(() => write), getDeclarations: vi.fn(() => []) }, executor, { get: vi.fn(() => prompt) }, conversations, pending,
-  { startRun: vi.fn(async () => ({ id: 'run-1' })), endRun: vi.fn(), logToolCall: vi.fn() }, { assertConversationOwnership: vi.fn() },
+  gemini, { has: vi.fn(() => true), get: vi.fn(() => write as any), getDeclarations: vi.fn(() => []) } as any, executor, { get: vi.fn(() => prompt) } as any, conversations, pending,
+  { startRun: vi.fn(async () => ({ id: 'run-1' })), endRun: vi.fn(), logToolCall: vi.fn() } as any, { assertConversationOwnership: vi.fn() } as any,
 )
 
 describe('AgentOrchestrator Fase 3', () => {
@@ -15,7 +16,7 @@ describe('AgentOrchestrator Fase 3', () => {
     const gemini = { chat: vi.fn(async () => ({ text: 'respuesta' })) }
     const result = await deps(gemini, { create: vi.fn(), getForConfirm: vi.fn() }, conversations).run({ profileId: 'p1', conversationId: 'c1', message: 'nuevo' })
     expect(result.text).toBe('respuesta')
-    expect(gemini.chat.mock.calls[0][0].history).toEqual([
+    expect(gemini.chat.mock.calls[0]![0].history).toEqual([
       { role: 'user', parts: [{ text: 'persistido' }] },
       { role: 'user', parts: [{ text: 'nuevo' }] },
     ])

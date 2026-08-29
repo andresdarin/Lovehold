@@ -21,8 +21,8 @@ function prismaMemory() {
     aiToolConfig: [], aiModelConfig: [], aiRun: [], aiToolCall: [], aiPendingAction: [], personalExpense: [], profile: [], financeAccount: [],
   }
   let sequence = 0
-  const matches = (row: any, where: any = {}) => Object.entries(where).every(([key, value]: any) => {
-    if (key === 'OR') return value.some((part: any) => matches(row, part))
+  const matches = (row: any, where: any = {}): boolean => Object.entries(where).every(([key, value]: [string, any]) => {
+    if (key === 'OR') return (value as any[]).some((part: any) => matches(row, part))
     if (value && typeof value === 'object' && 'in' in value) return value.in.includes(row[key])
     if (value && typeof value === 'object' && 'not' in value) return row[key] !== value.not
     if (value && typeof value === 'object' && 'gte' in value) return row[key] >= value.gte
@@ -39,19 +39,19 @@ function prismaMemory() {
     }),
     findFirst: vi.fn(async ({ where = {}, orderBy, include }: any = {}) => {
       const rows = data[name].filter((row: any) => matches(row, where))
-      if (orderBy) { const [key, direction] = Object.entries(orderBy)[0] as any; rows.sort((a, b) => (a[key] > b[key] ? 1 : -1) * (direction === 'desc' ? -1 : 1)) }
+      if (orderBy) { const [key, direction] = Object.entries(orderBy)[0] as [string, any]; rows.sort((a: any, b: any) => (a[key] > b[key] ? 1 : -1) * (direction === 'desc' ? -1 : 1)) }
       return rows[0] ? enrich(rows[0], include) : null
     }),
     findMany: vi.fn(async ({ where = {}, orderBy, take }: any = {}) => {
       const rows = data[name].filter((row: any) => matches(row, where))
-      if (orderBy) { const [key, direction] = Object.entries(orderBy)[0] as any; rows.sort((a, b) => (a[key] > b[key] ? 1 : -1) * (direction === 'desc' ? -1 : 1)) }
-      return (take ? rows.slice(0, take) : rows).map((row) => enrich(row))
+      if (orderBy) { const [key, direction] = Object.entries(orderBy)[0] as [string, any]; rows.sort((a: any, b: any) => (a[key] > b[key] ? 1 : -1) * (direction === 'desc' ? -1 : 1)) }
+      return (take ? rows.slice(0, take) : rows).map((row: any) => enrich(row))
     }),
     count: vi.fn(async ({ where = {} }: any = {}) => data[name].filter((row: any) => matches(row, where)).length),
     create: vi.fn(async ({ data: input }: any) => { const row = { id: id(name), ...input, createdAt: new Date(), deployedAt: new Date() }; data[name].push(row); return enrich(row) }),
-    update: vi.fn(async ({ where, data: patch }: any) => { const row = data[name].find((candidate: any) => matches(candidate, where)); Object.assign(row, patch); return enrich(row) }),
+    update: vi.fn(async ({ where, data: patch }: any) => { const row = data[name].find((candidate: any) => matches(candidate, where)); if (row) Object.assign(row, patch); return enrich(row) }),
     updateMany: vi.fn(async ({ where, data: patch }: any) => { const rows = data[name].filter((row: any) => matches(row, where)); rows.forEach((row: any) => Object.assign(row, patch)); return { count: rows.length } }),
-    upsert: vi.fn(async ({ where, create, update }: any) => { const row = data[name].find((candidate: any) => matches(candidate, where)); if (row) return Object.assign(row, update); const created = { id: id(name), ...create }; data[name].push(created); return created }),
+    upsert: vi.fn(async ({ where, create, update }: any) => { const row = data[name].find((candidate: any) => matches(candidate, where)); if (row) { Object.assign(row, update); return row; } const created = { id: id(name), ...create }; data[name].push(created); return created }),
   })
   function enrich(row: any, include?: any) {
     if (!row) return row
@@ -111,7 +111,7 @@ describe('Finnic Smoke E2E — Fase 4', () => {
     const orchestrator = new AgentOrchestrator(runtimeGemini as any, tools, executor, { get: vi.fn() } as any, conversations as any, pending, observations, context as any, resolver)
     const runtime = await orchestrator.run({ profileId: 'profile-1', conversationId: 'conversation-1', message: 'hello' })
     expect(runtime.text).toBe('respuesta v2')
-    expect(runtimeGemini.chat.mock.calls[0][0].systemInstruction).toBe('test personality')
+    expect(runtimeGemini.chat.mock.calls[0]![0].systemInstruction).toBe('test personality')
 
     // 9–10. Roll back by deploying the known previous version and verify restoration.
     await config.deploy({ agentSlug: 'finnic', environment: 'PROD', promptVersionId: 'prompt-v1' })
