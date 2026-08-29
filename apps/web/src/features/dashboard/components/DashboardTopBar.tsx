@@ -49,10 +49,10 @@ export default function DashboardTopBar({ profile }: DashboardTopBarProps) {
         <Link
           href="/chat"
           aria-label="Chat con Finnic"
-          className="group flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.06] border border-white/8 backdrop-blur-md transition-all hover:bg-white/[0.14] hover:border-white/20 active:scale-95 focus:outline-none"
+          className="group flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.08] border border-white/12 backdrop-blur-md transition-all hover:bg-white/[0.16] hover:border-white/25 active:scale-95 focus:outline-none"
           title="Copiloto Finnic"
         >
-          <FinnicOwlIcon color="aqua" className="h-4 w-4 group-hover:scale-110 group-hover:brightness-110 transition-all" />
+          <FinnicOwlIcon color="aqua" className="h-5 w-5 group-hover:scale-110 group-hover:brightness-110 transition-all" />
         </Link>
 
         {/* Notificaciones */}

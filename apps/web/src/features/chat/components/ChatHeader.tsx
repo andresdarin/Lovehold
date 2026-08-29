@@ -36,7 +36,7 @@ export default function ChatHeader() {
 
         {/* Icono contextual */}
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#A58D66]/40 bg-[#A58D66]/20 text-[#E5E1DD] shadow-xs">
-          <FinnicOwlIcon color="cream" className="h-4.5 w-4.5" />
+          <FinnicOwlIcon color="cream" className="h-5.5 w-5.5" />
         </div>
       </div>
     </header>

@@ -9,7 +9,7 @@ interface FinnicOwlIconProps {
  * Icono oficial de Finnic (búho financiero con billetera).
  * Con fondo transparente y renderizado nítido.
  */
-export default function FinnicOwlIcon({ className = 'h-4 w-4', color = 'cream' }: FinnicOwlIconProps) {
+export default function FinnicOwlIcon({ className = 'h-5 w-5', color = 'cream' }: FinnicOwlIconProps) {
   const src =
     color === 'navy'
       ? '/brand/finnic-owl-navy.png'
