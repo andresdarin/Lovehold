@@ -11,6 +11,10 @@ import { createRemoteJWKSet, jwtVerify } from 'jose'
 export interface AuthenticatedUser {
   authUserId: string
   email: string
+  role?: string
+  isAdmin?: boolean
+  app_metadata?: Record<string, unknown>
+  user_metadata?: Record<string, unknown>
 }
 
 let jwksCache: ReturnType<typeof createRemoteJWKSet> | null = null
@@ -45,7 +49,7 @@ export class AuthGuard implements CanActivate {
         throw new UnauthorizedException('Auth credentials not configured')
       }
 
-      let payload: { sub: string; email: string }
+      let payload: { sub: string; email: string; role?: string; isAdmin?: boolean; app_metadata?: Record<string, unknown>; user_metadata?: Record<string, unknown> }
 
       try {
         const { payload: verified } = await jwtVerify(
@@ -66,6 +70,10 @@ export class AuthGuard implements CanActivate {
       request.user = {
         authUserId: payload.sub,
         email: payload.email ?? '',
+        role: payload.role,
+        isAdmin: payload.isAdmin,
+        app_metadata: payload.app_metadata,
+        user_metadata: payload.user_metadata,
       } satisfies AuthenticatedUser
 
       return true
