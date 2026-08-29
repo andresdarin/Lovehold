@@ -23,7 +23,7 @@ interface AppShellProps {
 export default function AppShell({ children, profile, onLogout }: AppShellProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const pathname = usePathname()
-  const isDashboard = pathname === '/dashboard' || pathname === '/'
+  const isFullBleedHero = pathname === '/dashboard' || pathname === '/' || pathname === '/finanzas'
 
   return (
     <div className="app-backdrop min-h-screen text-foreground overflow-x-hidden relative">
@@ -35,8 +35,8 @@ export default function AppShell({ children, profile, onLogout }: AppShellProps)
         onToggle={() => setSidebarCollapsed((prev) => !prev)}
       />
 
-      {/* Topbar (Mobile) - Se omite en Dashboard para integrar el hero full-bleed */}
-      {!isDashboard && <Topbar profile={profile} />}
+      {/* Topbar (Mobile) - Se omite en vistas con Hero full-bleed invertido */}
+      {!isFullBleedHero && <Topbar profile={profile} />}
 
       {/* Contenido Principal */}
       <main
@@ -44,7 +44,7 @@ export default function AppShell({ children, profile, onLogout }: AppShellProps)
           sidebarCollapsed ? 'lg:pl-[124px]' : 'lg:pl-[292px]'
         }`}
       >
-        <div className={isDashboard ? '' : 'p-4 md:p-6 lg:p-8'}>
+        <div className={isFullBleedHero ? '' : 'p-4 md:p-6 lg:p-8'}>
           {children}
         </div>
       </main>

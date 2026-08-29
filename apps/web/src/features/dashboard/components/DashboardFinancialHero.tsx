@@ -1,8 +1,6 @@
 'use client'
 
 import React from 'react'
-import Link from 'next/link'
-import { Plus, TrendingUp } from 'lucide-react'
 
 interface StatMetricProps {
   label: string
@@ -47,31 +45,41 @@ function StatMetric({ label, value, dotColor, highlighted = false }: StatMetricP
 export default function DashboardFinancialHero() {
   return (
     <div className="flex flex-col gap-4 sm:gap-5 pt-1">
-      {/* Monto Principal & CTA */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[#C0D5D6]/75">
-            Gasto total del mes
-          </span>
-          <div className="mt-1 flex items-baseline gap-3">
-            <span className="text-4xl font-extrabold tracking-tight text-[#F5F2EE] sm:text-5xl tabular-nums">
+      {/* Monto Principal Dual (Pesos + Dólares) & Ahorro Secundario */}
+      <div className="flex flex-col items-center justify-center text-center">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-[#C0D5D6]/70">
+          Gasto total del mes
+        </span>
+
+        {/* Cifras en Pesos y Dólares */}
+        <div className="mt-1 flex items-baseline justify-center gap-3 sm:gap-4">
+          <div className="flex items-baseline gap-1">
+            <span className="text-3xl font-extrabold tracking-tight text-[#F5F2EE] sm:text-4xl tabular-nums">
               $0
             </span>
-            <span className="inline-flex items-center gap-1 rounded-full border border-[#208B6B]/30 bg-[#208B6B]/20 px-2.5 py-0.5 text-xs font-semibold text-[#4BE3B5]">
-              <TrendingUp className="h-3 w-3 stroke-[2.5]" /> Al día
+            <span className="text-xs font-semibold text-[#C0D5D6]/70">UYU</span>
+          </div>
+          <span className="text-lg text-white/20 font-light">|</span>
+          <div className="flex items-baseline gap-1">
+            <span className="text-2xl font-bold tracking-tight text-[#F5F2EE]/90 sm:text-3xl tabular-nums">
+              US$ 0
             </span>
           </div>
         </div>
 
-        {/* Quick CTA en Desktop */}
-        <div className="hidden sm:flex items-center">
-          <Link
-            href="/expenses/new"
-            className="inline-flex items-center gap-2 rounded-xl bg-[#F5F2EE] px-4 py-2.5 text-xs font-bold text-[#083A4F] shadow-xs transition-all hover:bg-white active:scale-95"
-          >
-            <Plus className="h-3.5 w-3.5 stroke-[3]" />
-            Agregar gasto
-          </Link>
+        {/* Fila inferior de apoyo: Estado 'Al día' + Ahorro secundario */}
+        <div className="mt-2 flex items-center justify-center gap-2.5">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-[#208B6B]/25 bg-[#208B6B]/10 px-2 py-0.5 text-[10px] font-semibold text-[#4BE3B5]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#4BE3B5] shadow-[0_0_4px_rgba(75,227,181,0.8)]" />
+            <span>Al día</span>
+          </div>
+
+          <span className="text-[10px] text-white/20">•</span>
+
+          <div className="inline-flex items-center gap-1 text-[11px] font-medium text-[#C0D5D6]/80">
+            <span className="text-[#A58D66]">Ahorro:</span>
+            <span className="font-bold text-[#F5F2EE] tabular-nums">$0</span>
+          </div>
         </div>
       </div>
 
