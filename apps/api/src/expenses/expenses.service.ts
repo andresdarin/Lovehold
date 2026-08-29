@@ -21,6 +21,9 @@ function moneyFromCents(cents: number) {
   return (cents / 100).toFixed(2)
 }
 
+const moneyValue = (value: number) => value.toFixed(2)
+const quantityValue = (value: number | undefined) => value === undefined ? undefined : value.toFixed(3)
+
 function parseSafeMoney(value: unknown): bigint {
   if (value === null || value === undefined || value === '') return 0n
   const num = typeof value === 'number' ? value : Number(value)

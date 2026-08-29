@@ -278,6 +278,7 @@ describe('Finnic Financial Movements & Account Invariants', () => {
         amount: '5000.00',
         currency: 'UYU',
         dueOn: new Date().toISOString(),
+        frequency: 'ONCE',
         accountId: 'bank-1',
         category: 'sueldo',
       },
@@ -402,6 +403,7 @@ describe('Finnic Financial Movements & Account Invariants', () => {
         amount: '1000.00',
         currency: 'USD',
         dueOn: new Date().toISOString(),
+        frequency: 'ONCE',
         accountId: 'usd-bank-1',
       },
     })
@@ -566,6 +568,7 @@ describe('Finnic Financial Movements & Account Invariants', () => {
         amount: '1000.00',
         currency: 'USD',
         dueOn: new Date().toISOString(),
+        frequency: 'ONCE',
         accountId: 'usd-acc',
       },
     })
