@@ -163,16 +163,32 @@
   html {
     scrollbar-gutter: stable;
   }
+}
 
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  input:-webkit-autofill:active {
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: var(--foreground) !important;
-    transition: background-color 5000s ease-in-out 0s;
-    box-shadow: inset 0 0 0 50px var(--surface) !important;
-  }
+/* ═════════════════════════════════════════════════════════════════════════════
+   AUTOFILL OVERRIDES (Chrome / Safari / Edge / Webkit)
+   Elimina el fondo blanco inyectado forzando el color de fondo del card
+   ═════════════════════════════════════════════════════════════════════════════ */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: #083A4F !important;
+  caret-color: #083A4F !important;
+  -webkit-box-shadow: 0 0 0 1000px #EDE9E3 inset !important;
+  box-shadow: 0 0 0 1000px #EDE9E3 inset !important;
+  transition: background-color 500000s ease-in-out 0s !important;
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active {
+  -webkit-text-fill-color: #F3F1ED !important;
+  caret-color: #F3F1ED !important;
+  -webkit-box-shadow: 0 0 0 1000px #0B2935 inset !important;
+  box-shadow: 0 0 0 1000px #0B2935 inset !important;
+  transition: background-color 500000s ease-in-out 0s !important;
 }
 
 @layer utilities {

@@ -7,23 +7,166 @@ datasource db {
 }
 
 model Profile {
-  id           String   @id @default(cuid())
-  authUserId   String   @unique
-  email        String   @unique
-  displayName  String?
-  avatarUrl    String?
-  color        String   @default("#6366f1")
-  gamificationXp Int    @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id             String           @id @default(cuid())
+  authUserId     String           @unique
+  email          String           @unique
+  displayName    String?
+  avatarUrl      String?
+  color          String           @default("#6366f1")
+  gamificationXp Int              @default(0)
+  // Optional with defaults so legacy profiles can be backfilled safely.
+  baseCurrency   FinanceCurrency? @default(UYU)
+  timeZone       String?          @default("America/Montevideo")
+  minimumBuffer  Decimal?         @default(0) @db.Decimal(18, 2)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
-  createdHouseholds  Household[]        @relation("householdCreator")
-  paidExpenses       Expense[]          @relation("paidBy")
-  createdExpenses    Expense[]          @relation("createdBy")
-  householdMembers   HouseholdMember[]
-  expenseSplits      ExpenseSplit[]
-  settlementsSent    Settlement[]       @relation("settlementSender")
-  settlementsReceived Settlement[]      @relation("settlementReceiver")
+  createdHouseholds   Household[]         @relation("householdCreator")
+  paidExpenses        Expense[]           @relation("paidBy")
+  createdExpenses     Expense[]           @relation("createdBy")
+  householdMembers    HouseholdMember[]
+  expenseSplits       ExpenseSplit[]
+  settlementsSent     Settlement[]        @relation("settlementSender")
+  settlementsReceived Settlement[]        @relation("settlementReceiver")
+  financeAccounts     FinanceAccount[]
+  scheduledCashFlows  ScheduledCashFlow[]
+  personalExpenses    PersonalExpense[]
+  savingsGoals        SavingsGoal[]
+}
+
+enum FinanceCurrency {
+  UYU
+  USD
+}
+
+enum CashFlowDirection {
+  INFLOW
+  OUTFLOW
+}
+
+// Legacy lifecycle is retained for existing API/database consumers.
+enum CashFlowLifecycle {
+  PENDING
+  PAID
+  RECEIVED
+  SKIPPED
+  OVERDUE
+}
+
+enum CashFlowFrequency {
+  ONCE
+  MONTHLY
+}
+
+enum CashFlowCertainty {
+  CONFIRMED
+  ESTIMATED
+}
+
+enum CashFlowStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+enum CashFlowResolution {
+  PAID
+  RECEIVED
+  SKIPPED
+}
+
+model FinanceAccount {
+  id                 String              @id @default(cuid())
+  profileId          String
+  name               String
+  currency           FinanceCurrency
+  balance            Decimal             @db.Decimal(18, 2)
+  isSpendable        Boolean             @default(true)
+  isActive           Boolean             @default(true)
+  balanceAsOf        DateTime            @default(now())
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  profile            Profile             @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  personalExpenses   PersonalExpense[]
+  scheduledCashFlows ScheduledCashFlow[]
+
+  // Multiple accounts in one currency are supported by distinct names.
+  @@unique([profileId, name])
+  @@index([profileId, isActive, isSpendable])
+}
+
+model ScheduledCashFlow {
+  id                   String              @id @default(cuid())
+  profileId            String
+  accountId            String?
+  title                String
+  direction            CashFlowDirection
+  amount               Decimal             @db.Decimal(18, 2)
+  currency             FinanceCurrency
+  frequency            CashFlowFrequency   @default(ONCE)
+  nextDueOn            DateTime?           @db.Date
+  dayOfMonth           Int?
+  endsOn               DateTime?           @db.Date
+  certainty            CashFlowCertainty
+  categoryKey          FinanceCategory?
+  status               CashFlowStatus      @default(ACTIVE)
+  lastResolvedDueOn    DateTime?           @db.Date
+  lastResolutionStatus CashFlowResolution?
+  lastResolvedAt       DateTime?
+  // CHECK: ACTIVE -> nextDueOn IS NOT NULL; COMPLETED -> nextDueOn IS NULL.
+  // CHECK: ONCE -> dayOfMonth IS NULL; MONTHLY -> dayOfMonth BETWEEN 1 AND 31.
+  // Prisma does not model CHECK constraints; service/Zod validation is mandatory.
+  scheduledDueOn       DateTime            @db.Date
+  lifecycle            CashFlowLifecycle   @default(PENDING)
+  description          String?
+  sourceMessageId      String?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  profile              Profile             @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  account              FinanceAccount?     @relation(fields: [accountId], references: [id])
+  personalExpenses     PersonalExpense[]
+
+  @@index([profileId, scheduledDueOn])
+  @@index([profileId, lifecycle])
+  @@unique([profileId, sourceMessageId])
+}
+
+enum GoalStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+enum FinanceCategory {
+  HOUSING
+  UTILITIES
+  FOOD
+  TRANSPORT
+  HEALTH
+  LEISURE
+  PETS
+  SHOPPING
+  EDUCATION
+  DEBT
+  TAXES
+  OTHER
+}
+
+model SavingsGoal {
+  id            String          @id @default(cuid())
+  profileId     String
+  name          String
+  targetAmount  Decimal         @db.Decimal(18, 2)
+  currentAmount Decimal         @default(0) @db.Decimal(18, 2)
+  currency      FinanceCurrency
+  targetDate    DateTime        @db.Date
+  status        GoalStatus      @default(ACTIVE)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  profile       Profile         @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  // currentAmount is informational and must never be reduced by spending logic.
+
+  @@index([profileId, status, targetDate])
 }
 
 model Household {
@@ -33,7 +176,7 @@ model Household {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  createdBy   Profile            @relation("householdCreator", fields: [createdById], references: [id])
+  createdBy   Profile           @relation("householdCreator", fields: [createdById], references: [id])
   members     HouseholdMember[]
   expenses    Expense[]
   categories  Category[]
@@ -82,28 +225,28 @@ enum ExpenseItemCategory {
 }
 
 model Expense {
-  id          String   @id @default(cuid())
-  householdId String
-  categoryId  String
-  paidById    String
-  createdById String
-  amount      Decimal  @db.Decimal(10, 2)
-  description String
-  merchant    String?
+  id            String    @id @default(cuid())
+  householdId   String
+  categoryId    String
+  paidById      String
+  createdById   String
+  amount        Decimal   @db.Decimal(10, 2)
+  description   String
+  merchant      String?
   paymentMethod String?
-  receiptDate DateTime?
-  notes       String?
-  date        DateTime
-  splitType   String   @default("equal")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  receiptDate   DateTime?
+  notes         String?
+  date          DateTime
+  splitType     String    @default("equal")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  household  Household      @relation(fields: [householdId], references: [id], onDelete: Cascade)
-  category   Category       @relation(fields: [categoryId], references: [id])
-  paidBy     Profile        @relation("paidBy", fields: [paidById], references: [id])
-  createdBy  Profile        @relation("createdBy", fields: [createdById], references: [id])
-  splits     ExpenseSplit[]
-  items      ExpenseItem[]
+  household Household      @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  category  Category       @relation(fields: [categoryId], references: [id])
+  paidBy    Profile        @relation("paidBy", fields: [paidById], references: [id])
+  createdBy Profile        @relation("createdBy", fields: [createdById], references: [id])
+  splits    ExpenseSplit[]
+  items     ExpenseItem[]
 }
 
 model ExpenseSplit {
@@ -151,23 +294,37 @@ model Settlement {
 }
 
 model PersonalExpense {
-  id            String   @id @default(cuid())
-  profileId     String
-  title         String
-  merchant      String?
-  amount        Decimal  @db.Decimal(10, 2)
-  date          DateTime
-  type          String   // fixed | variable | supermarket
-  category      String
-  notes         String?
-  isRecurring   Boolean  @default(false)
-  recurrenceDay Int?
-  monthKey      String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                  String    @id @default(cuid())
+  profileId           String
+  title               String
+  merchant            String?
+  amount              Decimal   @db.Decimal(18, 2)
+  date                DateTime
+  type                String // fixed | variable | supermarket
+  category            String
+  notes               String?
+  isRecurring         Boolean   @default(false)
+  recurrenceDay       Int?
+  monthKey            String
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  currency            String    @default("UYU")
+  scheduledCashFlowId String?
+  scheduledDueOn      DateTime? @db.Date
+  source              String?
+  sourceMessageId     String?
+  financeAccountId    String?
+  categoryKey         String?
 
-  items PersonalExpenseItem[]
+  items             PersonalExpenseItem[]
+  profile           Profile               @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  financeAccount    FinanceAccount?       @relation(fields: [financeAccountId], references: [id])
+  scheduledCashFlow ScheduledCashFlow?    @relation(fields: [scheduledCashFlowId], references: [id])
 
+  // PostgreSQL UNIQUE permits multiple NULLs; application validation enforces
+  // the logical key only when both schedule fields are present.
+  @@unique([scheduledCashFlowId, scheduledDueOn])
+  @@unique([profileId, sourceMessageId])
   @@index([profileId, monthKey])
 }
 

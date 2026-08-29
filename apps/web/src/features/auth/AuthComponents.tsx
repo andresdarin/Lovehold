@@ -36,7 +36,7 @@ export function AuthBrand({
 }
 
 /**
- * Campo de entrada horizontal estilizado para glassmorphism mate y cálido.
+ * Campo de entrada horizontal estilizado para glassmorphism mate y cálido con autofill armonizado.
  */
 interface AuthFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string
@@ -64,7 +64,7 @@ export function AuthField({
         </span>
         <input
           id={id}
-          className={`w-full bg-transparent text-sm sm:text-base font-medium text-navy dark:text-foreground placeholder:text-navy/45 dark:placeholder:text-muted-foreground/50 focus:outline-none ${className}`}
+          className={`auth-input w-full bg-transparent text-sm sm:text-base font-medium text-navy dark:text-foreground placeholder:text-navy/45 dark:placeholder:text-muted-foreground/50 focus:outline-none ${className}`}
           {...props}
         />
         {rightElement && (
