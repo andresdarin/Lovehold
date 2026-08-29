@@ -1,0 +1,27 @@
+import React from 'react'
+
+interface FinnicOwlIconProps {
+  className?: string
+  color?: 'cream' | 'aqua' | 'navy'
+}
+
+/**
+ * Icono de contorno oficial de Finnic el búho.
+ * Con fondo transparente y renderizado nítido.
+ */
+export default function FinnicOwlIcon({ className = 'h-4 w-4', color = 'cream' }: FinnicOwlIconProps) {
+  const src =
+    color === 'navy'
+      ? '/brand/finnic-owl-navy.png'
+      : color === 'aqua'
+      ? '/brand/finnic-owl-aqua.png'
+      : '/brand/finnic-owl-cream.png'
+
+  return (
+    <img
+      src={src}
+      alt="Finnic"
+      className={`object-contain select-none pointer-events-none transition-transform ${className}`}
+    />
+  )
+}

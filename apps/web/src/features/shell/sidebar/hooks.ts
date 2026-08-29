@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useLayoutEffect, useRef, useState } from 'react'
-import { Home, Wallet, TrendingUp, Fuel, Target, Settings, BadgeDollarSign } from 'lucide-react'
+import { Home, Wallet, TrendingUp, Fuel, Target, Settings, BadgeDollarSign, Brain } from 'lucide-react'
 
 export const NAV_ITEMS = [
   { label: 'Inicio', href: '/dashboard', icon: Home },
@@ -11,6 +11,7 @@ export const NAV_ITEMS = [
   { label: 'Nafta', href: '/fuel', icon: Fuel },
   { label: 'Metas', href: '/goals', icon: Target },
   { label: 'Ajustes', href: '/settings', icon: Settings },
+  { label: 'Finnic AI', href: '/ai', icon: Brain },
 ] as const
 
 export function useAnimatedIndicator(collapsed: boolean, activeHref: string) {

@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowLeft, Sparkles } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
+import FinnicOwlIcon from '@/components/ui/FinnicOwlIcon'
 
 export default function ChatHeader() {
   return (
@@ -35,7 +36,7 @@ export default function ChatHeader() {
 
         {/* Icono contextual */}
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#A58D66]/40 bg-[#A58D66]/20 text-[#E5E1DD] shadow-xs">
-          <Sparkles className="h-4 w-4 stroke-[2]" />
+          <FinnicOwlIcon color="cream" className="h-4.5 w-4.5" />
         </div>
       </div>
     </header>

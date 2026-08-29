@@ -31,13 +31,29 @@ export class AiConfigService {
   async deploy(input: { agentSlug: string; environment: string; promptVersionId?: string; modelConfigId?: string }) {
     const agent = await (this.prisma as any).aiAgent.findUnique({ where: { slug: input.agentSlug } })
     if (!agent) throw new Error('Agent not found')
-    const tx = (this.prisma as any).$transaction
-    const operations = [
-      (this.prisma as any).aiDeployment.updateMany({ where: { agentId: agent.id, environment: input.environment, isActive: true }, data: { isActive: false } }),
-      ...(input.promptVersionId ? [(this.prisma as any).aiPromptVersion.update({ where: { id: input.promptVersionId }, data: { status: 'active' } })] : []),
-      (this.prisma as any).aiDeployment.create({ data: { agentId: agent.id, environment: input.environment, promptVersionId: input.promptVersionId, modelConfigId: input.modelConfigId, isActive: true } }),
+    const write = (db: any) => [
+      db.aiDeployment.updateMany({ where: { agentId: agent.id, environment: input.environment, isActive: true }, data: { isActive: false } }),
+      ...(input.promptVersionId ? [db.aiPromptVersion.update({ where: { id: input.promptVersionId }, data: { status: 'active' } })] : []),
+      db.aiDeployment.create({ data: { agentId: agent.id, environment: input.environment, promptVersionId: input.promptVersionId, modelConfigId: input.modelConfigId, isActive: true } }),
     ]
-    const result = tx ? (await tx(operations)).at(-1) : await operations.at(-1)
+    const transaction = async () => {
+      if ((this.prisma as any).$executeRaw) {
+        return (await (this.prisma as any).$transaction(async (tx: any) => {
+          await tx.$executeRaw`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE`
+          return (await Promise.all(write(tx))).at(-1)
+        }))
+      }
+      return (await (this.prisma as any).$transaction(write(this.prisma))).at(-1)
+    }
+    let result: any
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        result = await transaction()
+        break
+      } catch (error: any) {
+        if (error?.code !== 'P2002' || attempt === 1) throw error
+      }
+    }
     this.resolver?.invalidate()
     return result
   }

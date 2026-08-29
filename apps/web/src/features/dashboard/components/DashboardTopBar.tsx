@@ -2,7 +2,8 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Bell, Sparkles } from 'lucide-react'
+import { Bell } from 'lucide-react'
+import FinnicOwlIcon from '@/components/ui/FinnicOwlIcon'
 
 interface DashboardTopBarProps {
   profile: {
@@ -48,10 +49,10 @@ export default function DashboardTopBar({ profile }: DashboardTopBarProps) {
         <Link
           href="/chat"
           aria-label="Chat con Finnic"
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.06] text-[#C0D5D6] border border-white/8 backdrop-blur-md transition-all hover:bg-white/[0.12] hover:text-[#F5F2EE] active:scale-95 focus:outline-none"
+          className="group flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.06] border border-white/8 backdrop-blur-md transition-all hover:bg-white/[0.14] hover:border-white/20 active:scale-95 focus:outline-none"
           title="Copiloto Finnic"
         >
-          <Sparkles className="h-3.5 w-3.5 stroke-[2]" />
+          <FinnicOwlIcon color="aqua" className="h-4 w-4 group-hover:scale-110 group-hover:brightness-110 transition-all" />
         </Link>
 
         {/* Notificaciones */}
