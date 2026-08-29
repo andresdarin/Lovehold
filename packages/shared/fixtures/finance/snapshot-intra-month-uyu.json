@@ -1,0 +1,13 @@
+{
+  "profileId": "fixture-finance-intra-month-uyu",
+  "asOf": "2026-08-29T12:00:00-03:00",
+  "timeZone": "America/Montevideo",
+  "baseCurrency": "UYU",
+  "minimumBuffer": { "currency": "UYU", "amount": "5000.00" },
+  "accounts": [{ "id": "acc-intra-uyu", "currency": "UYU", "balance": "30000.00", "spendable": "30000.00", "nonSpendable": "0.00", "managedByLovehold": true }],
+  "balances": { "spendableByCurrency": { "UYU": "30000.00" }, "nonSpendableByCurrency": { "UYU": "0.00" } },
+  "schedules": [{ "id": "rent", "frequency": "MONTHLY", "nextDueOn": "2026-08-30", "amount": { "currency": "UYU", "amount": "25000.00" }, "direction": "OUTFLOW" }, { "id": "salary", "frequency": "MONTHLY", "nextDueOn": "2026-09-03", "amount": { "currency": "UYU", "amount": "50000.00" }, "direction": "INFLOW" }],
+  "scheduledCashFlows": [{ "scheduledCashFlowId": "rent-2026-08-30", "scheduledDueOn": "2026-08-30", "amount": { "currency": "UYU", "amount": "25000.00" }, "direction": "OUTFLOW", "lifecycle": "OVERDUE" }, { "scheduledCashFlowId": "salary-2026-09-03", "scheduledDueOn": "2026-09-03", "amount": { "currency": "UYU", "amount": "50000.00" }, "direction": "INFLOW", "lifecycle": "RECEIVED" }],
+  "goals": [], "expenses": [], "fxQuotes": [],
+  "expected": { "protectedCapacityToday": "0.00" }
+}

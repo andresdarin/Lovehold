@@ -1,0 +1,11 @@
+{
+  "profileId": "fixture-finance-goal-invariant-violated",
+  "asOf": "2026-08-29T12:00:00-03:00", "timeZone": "America/Montevideo", "baseCurrency": "UYU",
+  "minimumBuffer": { "currency": "UYU", "amount": "0.00" },
+  "accounts": [{ "id": "acc-goal", "currency": "UYU", "balance": "60000.00", "spendable": "20000.00", "nonSpendable": "40000.00", "managedByLovehold": true }],
+  "balances": { "spendableByCurrency": { "UYU": "20000.00" }, "nonSpendableByCurrency": { "UYU": "40000.00" } },
+  "schedules": [], "scheduledCashFlows": [],
+  "goals": [{ "id": "goal-violated", "name": "Meta inconsistente", "target": { "currency": "UYU", "amount": "100000.00" }, "current": { "currency": "UYU", "amount": "60000.00" }, "deadline": "2026-12-31" }],
+  "expenses": [], "fxQuotes": [],
+  "expected": { "goalFundingInvariant": "VIOLATED", "reason": "current 60000.00 exceeds nonSpendable 40000.00" }
+}

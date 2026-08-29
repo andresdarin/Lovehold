@@ -1,0 +1,18 @@
+{
+  "profileId": "fixture-finance-historical-spending-uyu",
+  "asOf": "2026-08-29T12:00:00-03:00", "timeZone": "America/Montevideo", "baseCurrency": "UYU",
+  "minimumBuffer": { "currency": "UYU", "amount": "0.00" },
+  "accounts": [{ "id": "acc-history", "currency": "UYU", "balance": "0.00", "spendable": "0.00", "nonSpendable": "0.00", "managedByLovehold": true }],
+  "balances": { "spendableByCurrency": { "UYU": "0.00" }, "nonSpendableByCurrency": { "UYU": "0.00" } },
+  "schedules": [], "scheduledCashFlows": [], "goals": [],
+  "expenses": [
+    { "id": "expense-food-1", "amount": { "currency": "USD", "amount": "10.00" }, "direction": "OUTFLOW", "category": "FOOD", "legacyCategory": "groceries", "occurredOn": "2026-08-01T12:00:00-03:00" },
+    { "id": "expense-transport-1", "amount": { "currency": "UYU", "amount": "820.00" }, "direction": "OUTFLOW", "category": "TRANSPORT", "legacyCategory": "transportation", "occurredOn": "2026-08-10T12:00:00-03:00" },
+    { "id": "expense-food-missing-fx", "amount": { "currency": "USD", "amount": "5.00" }, "direction": "OUTFLOW", "category": "FOOD", "legacyCategory": "groceries", "occurredOn": "2026-08-20T12:00:00-03:00" }
+  ],
+  "fxQuotes": [
+    { "baseCurrency": "UYU", "quoteCurrency": "USD", "bid": "40.00", "ask": "40.40", "asOf": "2026-08-01T09:00:00-03:00", "source": "fixture", "transactionOn": "2026-08-01" },
+    { "baseCurrency": "UYU", "quoteCurrency": "USD", "bid": "40.50", "ask": "40.90", "asOf": "2026-08-10T09:00:00-03:00", "source": "fixture", "transactionOn": "2026-08-10" }
+  ],
+  "expected": { "totalsByCurrency": { "UYU": "820.00", "USD": "15.00" }, "convertedTotal": null, "warning": "MISSING_HISTORICAL_FX", "legacyCategoryMapping": { "groceries": "FOOD", "transportation": "TRANSPORT" } }
+}

@@ -1,0 +1,17 @@
+{
+  "profileId": "fixture-finance-scheduled-day31",
+  "asOf": "2024-01-31T12:00:00-03:00", "timeZone": "America/Montevideo", "baseCurrency": "UYU",
+  "minimumBuffer": { "currency": "UYU", "amount": "0.00" },
+  "accounts": [{ "id": "acc-day31", "currency": "UYU", "balance": "0.00", "spendable": "0.00", "nonSpendable": "0.00", "managedByLovehold": true }],
+  "balances": { "spendableByCurrency": { "UYU": "0.00" }, "nonSpendableByCurrency": { "UYU": "0.00" } },
+  "schedules": [{ "id": "month-end", "frequency": "MONTHLY", "dayOfMonth": 31, "nextDueOn": "2024-01-31", "amount": { "currency": "UYU", "amount": "1000.00" }, "direction": "OUTFLOW" }],
+  "scheduledCashFlows": [
+    { "scheduledCashFlowId": "month-end-2024-01", "scheduledDueOn": "2024-01-31", "amount": { "currency": "UYU", "amount": "1000.00" }, "direction": "OUTFLOW", "lifecycle": "PAID", "personalExpenseId": "expense-month-end-2024-01" },
+    { "scheduledCashFlowId": "month-end-2024-02", "scheduledDueOn": "2024-02-29", "amount": { "currency": "UYU", "amount": "1000.00" }, "direction": "OUTFLOW", "lifecycle": "OVERDUE" },
+    { "scheduledCashFlowId": "month-end-2024-03", "scheduledDueOn": "2024-03-31", "amount": { "currency": "UYU", "amount": "1000.00" }, "direction": "OUTFLOW", "lifecycle": "OVERDUE" },
+    { "scheduledCashFlowId": "month-end-2025-02", "scheduledDueOn": "2025-02-28", "amount": { "currency": "UYU", "amount": "1000.00" }, "direction": "OUTFLOW", "lifecycle": "OVERDUE" },
+    { "scheduledCashFlowId": "month-end-2025-03", "scheduledDueOn": "2025-03-31", "amount": { "currency": "UYU", "amount": "1000.00" }, "direction": "OUTFLOW", "lifecycle": "OVERDUE" }
+  ],
+  "goals": [], "expenses": [{ "id": "expense-month-end-2024-01", "amount": { "currency": "UYU", "amount": "1000.00" }, "direction": "OUTFLOW", "occurredOn": "2024-01-31T12:00:00-03:00", "scheduledCashFlowId": "month-end-2024-01", "scheduledDueOn": "2024-01-31" }], "fxQuotes": [],
+  "expected": { "nextDueOnAfter2024-01-31": "2024-02-29", "nextDueOnAfter2024-02-29": "2024-03-31", "nextDueOnAfter2025-02-28": "2025-03-31" }
+}
