@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { SwDevCleanup } from './SwDevCleanup'
 
 export const metadata: Metadata = {
   title: 'Finnic',
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
     ],
   },
   other: {
+    'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
     'apple-mobile-web-app-title': 'Finnic',
@@ -51,6 +53,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-background text-foreground font-sans antialiased">
+        <SwDevCleanup />
         {children}
       </body>
     </html>

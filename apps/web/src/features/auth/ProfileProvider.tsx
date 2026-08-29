@@ -68,6 +68,11 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       try {
         await fetchProfile(session.access_token)
       } catch (err) {
+        if (err instanceof ApiError && err.status === 401) {
+          await supabase.auth.signOut()
+          router.push('/login')
+          return
+        }
         if (err instanceof ApiError && err.status === 404) {
           setError('Perfil no encontrado. Por favor, volvé a iniciar sesión.')
         } else {

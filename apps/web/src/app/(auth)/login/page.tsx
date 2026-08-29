@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Mail, LockKeyhole, Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { apiFetch } from '@/lib/api'
+import { apiFetch, ApiError } from '@/lib/api'
 import { AuthBrand, AuthField, AuthSubmitButton } from '@/features/auth/AuthComponents'
 
 /**
@@ -55,7 +55,12 @@ export default function LoginPage() {
 
       router.push('/dashboard')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al conectar con el servidor')
+      if (err instanceof ApiError && err.status === 401) {
+        await supabase.auth.signOut()
+        setError(err.message || 'Sesión no válida. Tu token no fue aceptado por el servidor.')
+      } else {
+        setError(err instanceof Error ? err.message : 'Error al conectar con el servidor')
+      }
       setLoading(false)
     }
   }
