@@ -14,6 +14,8 @@ interface SidebarNavProps {
     displayName: string | null
     email: string
     color: string
+    isAdmin?: boolean
+    role?: string | null
   } | null
   navRef: MutableRefObject<HTMLElement | null>
   itemRefs: MutableRefObject<Record<string, HTMLAnchorElement | null>>
@@ -26,7 +28,7 @@ export default function SidebarNav({ collapsed, profile, navRef, itemRefs, indic
   const pathname = usePathname()
 
   const visibleItems = NAV_ITEMS.filter(
-    (item) => item.href !== '/finanzas' || profile
+    (item) => (item.href !== '/finanzas' || profile) && (item.href !== '/ai' || profile?.isAdmin === true)
   )
 
   const activeHref = visibleItems.find((item) => pathname === item.href)?.href ?? '/dashboard'

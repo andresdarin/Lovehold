@@ -12,6 +12,8 @@ interface SidebarProps {
     displayName: string | null
     email: string
     color: string
+    isAdmin?: boolean
+    role?: string | null
   } | null
   onLogout: () => void
   collapsed: boolean
@@ -20,7 +22,8 @@ interface SidebarProps {
 
 export default function Sidebar({ profile, onLogout, collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname()
-  const activeHref = NAV_ITEMS.find((item) => pathname === item.href)?.href ?? '/dashboard'
+  const activeHref = NAV_ITEMS.filter((item) => item.href !== '/ai' || profile?.isAdmin === true)
+    .find((item) => pathname === item.href)?.href ?? '/dashboard'
   const { navRef, itemRefs, indicator, hoveredHref, setHoveredHref } = useAnimatedIndicator(collapsed, activeHref)
 
   return (

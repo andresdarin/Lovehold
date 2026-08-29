@@ -12,6 +12,8 @@ interface AppShellProps {
     displayName: string | null
     email: string
     color: string
+    isAdmin?: boolean
+    role?: string | null
   } | null
   onLogout: () => void
 }
