@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, SlidersHorizontal, X } from 'lucide-react'
+import { Search, SlidersHorizontal, X, RotateCcw, Calendar, DollarSign, Wallet, Layers } from 'lucide-react'
 import MovementsMonthPicker from './MovementsMonthPicker'
 import type { MovementFilters } from './types'
 
@@ -11,45 +11,282 @@ interface Props {
   onClear: () => void
 }
 
-const selectClass = 'h-10 shrink-0 appearance-none rounded-2xl border border-border/60 bg-surface px-4 text-xs font-semibold text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/15'
+const TYPE_OPTIONS = [
+  { value: '', label: 'Todos los tipos' },
+  { value: 'INCOME', label: 'Ingreso' },
+  { value: 'EXPENSE', label: 'Egreso' },
+  { value: 'TRANSFER', label: 'Transferencia' },
+  { value: 'FX', label: 'Cambio de moneda' },
+] as const
+
+const CURRENCY_OPTIONS = [
+  { value: '', label: 'Todas las monedas' },
+  { value: 'UYU', label: 'Pesos Uruguayos (UYU)' },
+  { value: 'USD', label: 'Dólares (USD)' },
+] as const
 
 export default function MovementsFilters({ filters, onChange, onClear }: Props) {
   const [open, setOpen] = useState(false)
-  const active = Boolean(filters.financialType || filters.account || filters.category || filters.currency || filters.period)
+  const activeCount = [
+    Boolean(filters.financialType),
+    Boolean(filters.currency),
+    Boolean(filters.account),
+    Boolean(filters.category),
+    Boolean(filters.period),
+  ].filter(Boolean).length
+
   return (
-    <section className="space-y-3" aria-label="Buscar y filtrar movimientos">
-      <div className="relative">
-        <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <input value={filters.q} onChange={(e) => onChange('q', e.target.value)} placeholder="Buscar movimientos..."
-          className="h-12 w-full rounded-2xl border border-border/60 bg-surface pl-11 pr-4 text-sm text-foreground shadow-xs outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15" />
-      </div>
-      <div className="flex max-w-full gap-2 overflow-x-auto pb-1">
-        <MovementsMonthPicker value={filters.month} onChange={(v) => onChange('month', v)} />
-        <select aria-label="Tipo de movimiento" value={filters.financialType} onChange={(e) => onChange('financialType', e.target.value)} className={selectClass}>
-          <option value="">Todos</option><option value="INCOME">Ingresos</option><option value="EXPENSE">Egresos</option><option value="TRANSFER">Transferencias</option><option value="FX">Cambios de moneda</option>
-        </select>
-        <button type="button" onClick={() => setOpen(true)} className={`${selectClass} ${filters.account ? 'border-primary/50 text-primary' : ''}`}>{filters.account || 'Cuenta'}</button>
-        <button type="button" onClick={() => setOpen(true)} className={`${selectClass} flex items-center gap-2 ${active ? 'border-primary/50 text-primary' : ''}`}>
-          <SlidersHorizontal className="h-3.5 w-3.5" /> Filtros{active ? ' ·' : ''}
+    <section className="flex flex-col gap-2.5" aria-label="Buscar y filtrar movimientos">
+      {/* 1. Fila Principal: Buscador Pill con lupa a la derecha + Botón Calendario Redondo + Botón Filtros Redondo */}
+      <div className="flex items-center gap-2">
+        {/* Barra de Búsqueda Estilo Pill con Lupa a la Derecha */}
+        <div className="relative flex-1">
+          <input
+            type="text"
+            value={filters.q}
+            onChange={(e) => onChange('q', e.target.value)}
+            placeholder="Buscar por comercio, concepto, cuenta..."
+            className="h-11 w-full rounded-full border border-border/80 bg-surface pl-4 pr-11 text-xs sm:text-sm text-foreground shadow-xs outline-none placeholder:text-muted-foreground transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+          />
+          {filters.q ? (
+            <button
+              type="button"
+              onClick={() => onChange('q', '')}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:bg-surface-soft hover:text-foreground transition-colors"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          ) : (
+            <div className="pointer-events-none absolute right-3.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground">
+              <Search className="h-4 w-4 stroke-[2]" />
+            </div>
+          )}
+        </div>
+
+        {/* Botón de Calendario Redondo */}
+        <MovementsMonthPicker
+          value={filters.month}
+          onChange={(v) => onChange('month', v)}
+          iconOnly
+        />
+
+        {/* Botón de Filtros Redondo con Badge */}
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Abrir filtros"
+          title="Filtros de movimientos"
+          className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-all shadow-xs active:scale-95 ${
+            activeCount > 0
+              ? 'border-primary/40 bg-primary text-primary-foreground'
+              : 'border-border/80 bg-surface text-foreground hover:bg-surface-soft hover:border-primary/30'
+          }`}
+        >
+          <SlidersHorizontal className="h-4 w-4 stroke-[2]" />
+          {activeCount > 0 && (
+            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#A58D66] text-white text-[9px] font-extrabold shadow-xs">
+              {activeCount}
+            </span>
+          )}
         </button>
       </div>
-      {active && <button type="button" onClick={onClear} className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground"><X className="h-3.5 w-3.5" /> Limpiar filtros</button>}
+
+      {/* 2. Filtros Activos / Badges y Limpiar */}
+      {(activeCount > 0 || filters.q || filters.month) && (
+        <div className="flex flex-wrap items-center justify-between gap-1.5 px-1 pt-0.5">
+          <div className="flex flex-wrap items-center gap-1.5">
+            {filters.month && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-surface border border-border/80 px-2.5 py-0.5 text-[11px] font-semibold text-foreground">
+                <Calendar className="h-3 w-3 text-muted-foreground" />
+                {filters.month}
+                <button type="button" onClick={() => onChange('month', '')} className="hover:text-danger">
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            {filters.currency && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-surface border border-border/80 px-2.5 py-0.5 text-[11px] font-bold text-[#A58D66]">
+                {filters.currency}
+                <button type="button" onClick={() => onChange('currency', '')} className="hover:text-danger">
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            {filters.financialType && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-surface border border-border/80 px-2.5 py-0.5 text-[11px] font-bold text-primary">
+                {TYPE_OPTIONS.find((t) => t.value === filters.financialType)?.label ?? filters.financialType}
+                <button type="button" onClick={() => onChange('financialType', '')} className="hover:text-danger">
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={onClear}
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-muted-foreground hover:text-foreground transition-colors ml-auto"
+          >
+            <RotateCcw className="h-3 w-3" />
+            Limpiar filtros
+          </button>
+        </div>
+      )}
+
+      {/* 3. Modal Completo y Ordenado de Filtros */}
       {open && <FilterSheet filters={filters} onChange={onChange} onClear={onClear} onClose={() => setOpen(false)} />}
     </section>
   )
 }
 
 function FilterSheet({ filters, onChange, onClear, onClose }: Props & { onClose: () => void }) {
-  return <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#071D27]/45 p-0 sm:items-center sm:p-6" onClick={onClose}>
-    <div role="dialog" aria-modal="true" aria-label="Filtros de movimientos" onClick={(e) => e.stopPropagation()} className="w-full max-w-lg rounded-t-3xl border border-border bg-surface p-6 shadow-2xl sm:rounded-3xl">
-      <div className="mb-5 flex items-center justify-between"><h2 className="text-lg font-bold text-foreground">Filtrar movimientos</h2><button type="button" aria-label="Cerrar" onClick={onClose} className="rounded-full p-2 text-muted-foreground hover:bg-surface-soft"><X className="h-4 w-4" /></button></div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <label className="text-xs font-semibold text-muted-foreground">Cuenta<input value={filters.account} onChange={(e) => onChange('account', e.target.value)} placeholder="Todas" className="mt-1 h-11 w-full rounded-xl border border-border bg-surface-soft px-3 text-sm text-foreground outline-none focus:border-primary" /></label>
-        <label className="text-xs font-semibold text-muted-foreground">Categoría<input value={filters.category} onChange={(e) => onChange('category', e.target.value)} placeholder="Todas" className="mt-1 h-11 w-full rounded-xl border border-border bg-surface-soft px-3 text-sm text-foreground outline-none focus:border-primary" /></label>
-        <label className="text-xs font-semibold text-muted-foreground">Moneda<select value={filters.currency} onChange={(e) => onChange('currency', e.target.value)} className="mt-1 h-11 w-full rounded-xl border border-border bg-surface-soft px-3 text-sm text-foreground outline-none"><option value="">Todas</option><option value="UYU">UYU</option><option value="USD">USD</option></select></label>
-        <label className="text-xs font-semibold text-muted-foreground">Período<input type="date" value={filters.period} onChange={(e) => onChange('period', e.target.value)} className="mt-1 h-11 w-full rounded-xl border border-border bg-surface-soft px-3 text-sm text-foreground outline-none" /></label>
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-xs p-0 sm:items-center sm:p-6 select-none"
+      onClick={onClose}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Filtros de movimientos"
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-lg rounded-t-3xl border border-border bg-surface p-6 shadow-2xl sm:rounded-3xl flex flex-col gap-5 max-h-[90vh] overflow-y-auto"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between pb-3 border-b border-border/60">
+          <div className="flex items-center gap-2">
+            <SlidersHorizontal className="h-4 w-4 text-primary" />
+            <h2 className="text-base font-bold text-foreground">Filtros de Movimientos</h2>
+          </div>
+          <button
+            type="button"
+            aria-label="Cerrar"
+            onClick={onClose}
+            className="rounded-full p-2 text-muted-foreground hover:bg-surface-soft hover:text-foreground transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Grupos de Filtros Ordenados */}
+        <div className="flex flex-col gap-4">
+          {/* Tipo de Movimiento */}
+          <div className="flex flex-col gap-1.5">
+            <label className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+              <Layers className="h-3.5 w-3.5 text-primary" />
+              Tipo de movimiento
+            </label>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {TYPE_OPTIONS.map((t) => {
+                const isSelected = (filters.financialType ?? '') === t.value
+                return (
+                  <button
+                    key={t.value}
+                    type="button"
+                    onClick={() => onChange('financialType', t.value)}
+                    className={`rounded-xl border py-2 px-2.5 text-xs font-semibold text-center transition-all ${
+                      isSelected
+                        ? 'border-primary bg-primary text-primary-foreground shadow-xs'
+                        : 'border-border/80 bg-surface-soft/60 text-muted-foreground hover:bg-surface-soft hover:text-foreground'
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Moneda */}
+          <div className="flex flex-col gap-1.5">
+            <label className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+              <DollarSign className="h-3.5 w-3.5 text-[#A58D66]" />
+              Moneda
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {CURRENCY_OPTIONS.map((c) => {
+                const isSelected = (filters.currency ?? '') === c.value
+                return (
+                  <button
+                    key={c.value}
+                    type="button"
+                    onClick={() => onChange('currency', c.value)}
+                    className={`rounded-xl border py-2 px-2.5 text-xs font-semibold text-center transition-all ${
+                      isSelected
+                        ? 'border-[#A58D66] bg-[#A58D66] text-white shadow-xs'
+                        : 'border-border/80 bg-surface-soft/60 text-muted-foreground hover:bg-surface-soft hover:text-foreground'
+                    }`}
+                  >
+                    {c.value ? c.value : 'Todas'}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Cuenta / Banco */}
+          <div className="flex flex-col gap-1.5">
+            <label className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+              <Wallet className="h-3.5 w-3.5 text-primary" />
+              Cuenta o Banco
+            </label>
+            <input
+              type="text"
+              value={filters.account}
+              onChange={(e) => onChange('account', e.target.value)}
+              placeholder="Ej: Itaú, Santander, Efectivo..."
+              className="h-11 w-full rounded-xl border border-border/80 bg-surface-soft/60 px-3.5 text-xs sm:text-sm text-foreground outline-none transition-all focus:border-primary focus:bg-surface focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+
+          {/* Categoría */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-foreground">Categoría</label>
+            <input
+              type="text"
+              value={filters.category}
+              onChange={(e) => onChange('category', e.target.value)}
+              placeholder="Ej: Supermercado, Alquiler, Salidas..."
+              className="h-11 w-full rounded-xl border border-border/80 bg-surface-soft/60 px-3.5 text-xs sm:text-sm text-foreground outline-none transition-all focus:border-primary focus:bg-surface focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+
+          {/* Fecha Específica */}
+          <div className="flex flex-col gap-1.5">
+            <label className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+              <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+              Día exacto (opcional)
+            </label>
+            <input
+              type="date"
+              value={filters.period}
+              onChange={(e) => onChange('period', e.target.value)}
+              className="h-11 w-full rounded-xl border border-border/80 bg-surface-soft/60 px-3.5 text-xs sm:text-sm text-foreground outline-none transition-all focus:border-primary focus:bg-surface focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+        </div>
+
+        {/* Acciones del Modal */}
+        <div className="flex items-center gap-2 pt-2 border-t border-border/60">
+          <button
+            type="button"
+            onClick={() => {
+              onClear()
+              onClose()
+            }}
+            className="flex-1 rounded-2xl border border-border/80 bg-surface-soft py-3 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-surface transition-colors"
+          >
+            Limpiar filtros
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 rounded-2xl bg-primary py-3 text-xs font-bold text-primary-foreground hover:bg-primary-hover transition-colors shadow-xs"
+          >
+            Aplicar
+          </button>
+        </div>
       </div>
-      <button type="button" onClick={() => { onClear(); onClose() }} className="mt-6 w-full rounded-2xl border border-border px-4 py-3 text-sm font-bold text-muted-foreground hover:bg-surface-soft">Limpiar y cerrar</button>
     </div>
-  </div>
+  )
 }

@@ -17,13 +17,24 @@ export function AuthBrand({
 }) {
   return (
     <header className="flex flex-col items-center text-center select-none">
-      <span className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.32em] text-navy/90 dark:text-aqua">
-        FINNIC
-      </span>
-      <h1 className="mt-2 text-3xl sm:text-4xl md:text-[2.6rem] font-extrabold tracking-tight text-navy dark:text-foreground leading-tight">
+      {/* Logotipo Horizontal Completo Finnic (Transparente Light/Dark) */}
+      <div className="flex items-center justify-center mb-3">
+        <img
+          src="/brand/finnic-logo-navy.png"
+          alt="Finnic Logo"
+          className="h-10 sm:h-12 w-auto object-contain dark:hidden drop-shadow-xs"
+        />
+        <img
+          src="/brand/finnic-logo-cream.png"
+          alt="Finnic Logo"
+          className="hidden h-10 sm:h-12 w-auto object-contain dark:block drop-shadow-[0_4px_16px_rgba(192,213,214,0.2)]"
+        />
+      </div>
+
+      <h1 className="text-2xl sm:text-3xl md:text-[2.2rem] font-extrabold tracking-tight text-navy dark:text-foreground leading-tight">
         {title}
       </h1>
-      <p className="mt-2 text-xs sm:text-sm font-medium text-navy/75 dark:text-text-secondary tracking-wide max-w-[280px] sm:max-w-none">
+      <p className="mt-1.5 text-xs sm:text-sm font-medium text-navy/75 dark:text-text-secondary tracking-wide max-w-[280px] sm:max-w-none">
         {subtitle}
       </p>
       {tagline && (

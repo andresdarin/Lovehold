@@ -23,7 +23,7 @@ interface AppShellProps {
 export default function AppShell({ children, profile, onLogout }: AppShellProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const pathname = usePathname()
-  const isFullBleedHero = pathname === '/dashboard' || pathname === '/' || pathname === '/finanzas' || pathname === '/balance'
+  const isFullBleedHero = pathname === '/dashboard' || pathname === '/' || pathname === '/finanzas' || pathname === '/balance' || pathname === '/expenses'
 
   return (
     <div className="app-backdrop min-h-screen text-foreground overflow-x-hidden relative">
