@@ -14,6 +14,8 @@ interface SidebarNavProps {
     displayName: string | null
     email: string
     color: string
+    isAdmin?: boolean
+    role?: string | null
   } | null
   navRef: MutableRefObject<HTMLElement | null>
   itemRefs: MutableRefObject<Record<string, HTMLAnchorElement | null>>
@@ -26,7 +28,7 @@ export default function SidebarNav({ collapsed, profile, navRef, itemRefs, indic
   const pathname = usePathname()
 
   const visibleItems = NAV_ITEMS.filter(
-    (item) => item.href !== '/finanzas' || profile
+    (item) => (item.href !== '/finanzas' || profile) && (item.href !== '/ai' || profile?.isAdmin === true)
   )
 
   const activeHref = visibleItems.find((item) => pathname === item.href)?.href ?? '/dashboard'
@@ -64,20 +66,22 @@ export default function SidebarNav({ collapsed, profile, navRef, itemRefs, indic
             onFocus={() => onHoverChange(item.href)}
             onBlur={() => onHoverChange(null)}
             title={collapsed ? item.label : undefined}
-            className={`group relative z-10 flex h-12 items-center rounded-full text-sm font-semibold transition-all duration-200 ${
-              collapsed ? 'mx-auto w-12 justify-center' : 'gap-3 px-3'
+            className={`group relative z-10 flex h-11 items-center rounded-full text-sm font-semibold transition-all duration-200 ${
+              collapsed ? 'mx-auto w-11 justify-center' : 'gap-3 px-3'
             } ${
               isActive || isTarget
-                ? 'text-[#2D255F] dark:text-white'
-                : 'text-[#2D255F]/56 hover:text-[#2D255F] dark:text-white/52 dark:hover:text-white'
+                ? 'text-foreground font-bold'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <span
-              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors ${
-                isActive || isTarget ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white/55 group-hover:bg-white/70 dark:bg-white/[0.06] dark:group-hover:bg-white/[0.12]'
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${
+                isActive || isTarget 
+                  ? 'bg-primary text-primary-foreground shadow-xs' 
+                  : 'bg-surface-soft group-hover:bg-surface-alt text-muted-foreground group-hover:text-foreground'
               }`}
             >
-              <Icon className="h-[18px] w-[18px]" />
+              <Icon className="h-4 w-4" />
             </span>
             {!collapsed && <span className="truncate">{item.label}</span>}
           </Link>

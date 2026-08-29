@@ -6,6 +6,9 @@ import { ProfilesModule } from './profiles/profiles.module'
 import { PersonalFinanceModule } from './personal-finance/personal-finance.module'
 import { GamificationModule } from './gamification/gamification.module'
 import { HealthModule } from './health/health.module'
+import { FinanceModule } from './finance/finance.module'
+import { AiModule } from './ai/ai.module'
+import { WebhooksModule } from './webhooks/webhooks.module'
 
 @Module({
   imports: [
@@ -19,6 +22,9 @@ import { HealthModule } from './health/health.module'
     PersonalFinanceModule,
     GamificationModule,
     HealthModule,
+    FinanceModule,
+    AiModule,
+    WebhooksModule,
   ],
 })
 export class AppModule {}

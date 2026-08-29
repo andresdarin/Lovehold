@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { SwDevCleanup } from './SwDevCleanup'
 
 export const metadata: Metadata = {
-  title: 'Lovehold',
-  description: 'Gastos compartidos para parejas',
+  title: 'Finnic',
+  description: 'Tu copiloto financiero personal y en pareja',
   manifest: '/manifest.json',
   icons: {
     icon: '/icons/favicon.png',
@@ -15,9 +16,10 @@ export const metadata: Metadata = {
     ],
   },
   other: {
+    'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
-    'apple-mobile-web-app-title': 'Lovehold',
+    'apple-mobile-web-app-title': 'Finnic',
   },
 }
 
@@ -29,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
-        <meta name="theme-color" content="#FF6B6B" />
+        <meta name="theme-color" content="#083A4F" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -51,6 +53,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-background text-foreground font-sans antialiased">
+        <SwDevCleanup />
         {children}
       </body>
     </html>

@@ -41,9 +41,9 @@ export default function MovementsSummaryCards({ summary, loading }: Props) {
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       {cards.map((card) => (
-        <div key={card.label} className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
-          <p className="text-xs font-medium text-muted-foreground">{card.label}</p>
-          <p className="mt-1 text-lg font-bold text-foreground tabular-nums">{formatAmount(card.value)}</p>
+        <div key={card.label} className="rounded-2xl border border-border bg-surface p-4 shadow-xs">
+          <p className="text-xs font-semibold text-muted-foreground">{card.label}</p>
+          <p className="mt-1 text-lg font-extrabold text-foreground tabular-nums">{formatAmount(card.value)}</p>
         </div>
       ))}
     </div>

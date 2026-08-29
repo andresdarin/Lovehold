@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback, useLayoutEffect, useRef, useState } from 'react'
-import { Home, Wallet, TrendingUp, Fuel, Target, Settings, BadgeDollarSign } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Home, Wallet, TrendingUp, Fuel, Target, Settings, BadgeDollarSign, Brain } from 'lucide-react'
 
 export const NAV_ITEMS = [
   { label: 'Inicio', href: '/dashboard', icon: Home },
@@ -11,6 +11,7 @@ export const NAV_ITEMS = [
   { label: 'Nafta', href: '/fuel', icon: Fuel },
   { label: 'Metas', href: '/goals', icon: Target },
   { label: 'Ajustes', href: '/settings', icon: Settings },
+  { label: 'Finnic AI', href: '/ai', icon: Brain },
 ] as const
 
 export function useAnimatedIndicator(collapsed: boolean, activeHref: string) {
@@ -36,15 +37,29 @@ export function useAnimatedIndicator(collapsed: boolean, activeHref: string) {
     })
   }, [targetHref])
 
-  useLayoutEffect(() => {
-    updateIndicator()
-    const frame = window.requestAnimationFrame(updateIndicator)
-    const timeout = window.setTimeout(updateIndicator, 320)
-    window.addEventListener('resize', updateIndicator)
+  useEffect(() => {
+    let mounted = true
+    let frameId: number | null = null
+
+    // Esperar a que el browser resuelva layout de los refs
+    frameId = window.requestAnimationFrame(() => {
+      if (mounted) updateIndicator()
+    })
+
+    const timeout = window.setTimeout(() => {
+      if (mounted) updateIndicator()
+    }, 150)
+
+    const handleResize = () => {
+      if (mounted) updateIndicator()
+    }
+
+    window.addEventListener('resize', handleResize)
     return () => {
-      window.cancelAnimationFrame(frame)
+      mounted = false
+      if (frameId) window.cancelAnimationFrame(frameId)
       window.clearTimeout(timeout)
-      window.removeEventListener('resize', updateIndicator)
+      window.removeEventListener('resize', handleResize)
     }
   }, [collapsed, updateIndicator])
 

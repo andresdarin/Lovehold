@@ -1,4 +1,14 @@
 import { parseReceiptText, normalizeProductName } from './parseReceiptText.ts'
+import { describe, expect, it } from 'vitest'
+
+describe('parseReceiptText', () => {
+  it('parses a structured receipt line', () => {
+    const result = parseReceiptText('Leche — Alimentos — $89,90')
+    expect(result.items).toHaveLength(1)
+    expect(result.items[0]?.name).toBe('Leche')
+    expect(result.items[0]?.totalPrice).toBe(89.9)
+  })
+})
 
 function assert(condition: boolean, msg: string) {
   if (!condition) throw new Error(`FAIL: ${msg}`)

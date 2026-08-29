@@ -7,6 +7,11 @@ export function formatAmount(value: number): string {
   return currencyFormat.format(value)
 }
 
+export function formatMovementAmount(value: number, currency = 'UYU'): string {
+  const code = currency === 'USD' ? 'USD' : 'UYU'
+  return new Intl.NumberFormat('es-UY', { style: 'currency', currency: code, maximumFractionDigits: 2 }).format(value)
+}
+
 const dateFormat = new Intl.DateTimeFormat('es-UY', { day: 'numeric', month: 'long' })
 const dateFormatShort = new Intl.DateTimeFormat('es-UY', { day: 'numeric', month: 'long', year: 'numeric' })
 
@@ -82,7 +87,11 @@ export function getMovementSubtitleParts(movement: Movement): string[] {
   if (movement.itemsCount > 0) {
     parts.push(`${movement.itemsCount} producto${movement.itemsCount !== 1 ? 's' : ''}`)
   }
-  parts.push(scopeLabel(movement.scope))
+  if (movement.accountName) parts.push(movement.accountName)
+  else if (movement.paymentMethod) parts.push(movement.paymentMethod)
+  else parts.push(scopeLabel(movement.scope))
+  if (movement.destinationAccountName) parts.push(`→ ${movement.destinationAccountName}`)
+  if (movement.financialType === 'FX' && movement.exchangeRate) parts.push(`1 USD = ${formatMovementAmount(movement.exchangeRate, 'UYU')}`)
   return parts
 }
 

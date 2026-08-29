@@ -53,17 +53,17 @@ export function FeaturedAchievements() {
               <div
                 className={`relative flex h-16 w-16 items-center justify-center rounded-full border transition-all duration-300 ${
                   badge.unlocked
-                    ? 'border-primary/25 bg-primary/[0.06] text-primary group-hover:scale-105 group-hover:border-primary/50 group-hover:bg-primary/10 group-hover:shadow-lg group-hover:shadow-primary/5'
-                    : 'border-border/40 bg-surface-soft/15 text-muted-foreground/60 group-hover:border-border/60 group-hover:bg-surface-soft/30'
+                    ? 'border-gold/40 bg-gold/10 text-gold group-hover:scale-105 group-hover:border-gold/70 group-hover:bg-gold/15 group-hover:shadow-md group-hover:shadow-gold/10'
+                    : 'border-border/60 bg-surface-soft/40 text-muted-foreground/60 group-hover:border-border group-hover:bg-surface-soft'
                 }`}
               >
                 <Icon className="h-6 w-6" aria-hidden="true" />
                 {badge.unlocked ? (
-                  <div className="absolute -right-1 -top-0.5 rounded-full bg-success p-0.5 border-2 border-background shadow-sm">
-                    <CheckCircle2 className="h-2.5 w-2.5 text-white" />
+                  <div className="absolute -right-1 -top-0.5 rounded-full bg-gold p-0.5 border-2 border-background shadow-xs">
+                    <CheckCircle2 className="h-2.5 w-2.5 text-primary-foreground" />
                   </div>
                 ) : (
-                  <div className="absolute -right-1 -top-0.5 rounded-full bg-surface-soft border-2 border-background p-0.5 shadow-sm">
+                  <div className="absolute -right-1 -top-0.5 rounded-full bg-surface-soft border-2 border-background p-0.5 shadow-xs">
                     <Lock className="h-2.5 w-2.5 text-muted-foreground/60" aria-hidden="true" />
                   </div>
                 )}

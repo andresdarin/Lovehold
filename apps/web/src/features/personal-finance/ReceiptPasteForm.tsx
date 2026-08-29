@@ -58,11 +58,11 @@ export default function ReceiptPasteForm({ onSubmit, onCancel, submitting }: Rec
 
       <div className="flex gap-3">
         <button type="button" onClick={handleProcess} disabled={!rawText.trim()}
-          className="flex-1 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition hover:bg-primary/90 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary/45">
+          className="flex-1 rounded-2xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-xs transition hover:bg-primary-hover disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary/45">
           Procesar ticket
         </button>
         <button type="button" onClick={onCancel}
-          className="rounded-xl border border-border bg-surface px-5 py-2.5 text-sm font-medium text-foreground transition hover:bg-surface-soft focus:outline-none focus:ring-2 focus:ring-primary/45">
+          className="rounded-2xl border border-border bg-surface px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface-soft focus:outline-none focus:ring-2 focus:ring-primary/45">
           Cancelar
         </button>
       </div>

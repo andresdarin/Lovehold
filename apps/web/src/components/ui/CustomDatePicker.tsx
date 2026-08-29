@@ -241,9 +241,9 @@ export default function CustomDatePicker({
                     key={dateStr}
                     type="button"
                     onClick={() => handleSelect(dateStr)}
-                    className={`h-8 w-8 rounded-xl text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 ${
+                    className={`h-8 w-8 rounded-xl text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 ${
                       isSelected
-                        ? 'bg-primary text-white shadow-sm shadow-primary/20'
+                        ? 'bg-primary text-primary-foreground shadow-xs'
                         : isToday
                         ? 'border border-primary bg-primary/5 text-primary'
                         : isCurrentMonth

@@ -13,6 +13,9 @@
     "prisma:studio": "dotenv -- prisma studio",
     "prisma:seed": "tsx prisma/seed.ts"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "dependencies": {
     "@lovehold/shared": "workspace:*",
     "@nestjs/common": "^11.0.0",
@@ -26,7 +29,8 @@
     "jose": "^6.2.3",
     "jsonwebtoken": "^9.0.3",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.0"
+    "rxjs": "^7.8.0",
+    "zod": "^3.24.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -37,6 +41,7 @@
     "dotenv-cli": "^11.0.0",
     "eslint": "^10.5.0",
     "prisma": "^7.0.0",
+    "ts-node": "^10.9.2",
     "tsx": "^4.19.0",
     "typescript": "^5.8.0",
     "typescript-eslint": "^8.61.1",

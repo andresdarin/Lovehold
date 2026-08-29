@@ -1,0 +1,15 @@
+{
+  "profileId": "fixture-finance-2026-08-29-uyu",
+  "asOf": "2026-08-29T12:00:00-03:00",
+  "timeZone": "America/Montevideo",
+  "baseCurrency": "UYU",
+  "minimumBuffer": { "currency": "UYU", "amount": "7000.00" },
+  "accounts": [{ "id": "acc-spendable-uyu", "currency": "UYU", "balance": "48000.00", "spendable": "48000.00", "nonSpendable": "0.00", "managedByLovehold": true }],
+  "balances": { "spendableByCurrency": { "UYU": "48000.00" }, "nonSpendableByCurrency": { "UYU": "0.00" } },
+  "schedules": [{ "id": "obligations-uyu", "frequency": "MONTHLY", "nextDueOn": "2026-09-05", "amount": { "currency": "UYU", "amount": "18000.00" }, "direction": "OUTFLOW" }],
+  "scheduledCashFlows": [{ "scheduledCashFlowId": "obligation-2026-09-05", "scheduledDueOn": "2026-09-05", "amount": { "currency": "UYU", "amount": "18000.00" }, "currency": "UYU", "direction": "OUTFLOW", "lifecycle": "OVERDUE" }],
+  "goals": [{ "id": "goal-100k", "name": "Meta anual", "target": { "currency": "UYU", "amount": "100000.00" }, "current": { "currency": "UYU", "amount": "60000.00" }, "deadline": "2026-12-31", "remainingPeriods": 5, "periodContribution": { "currency": "UYU", "amount": "8000.00" } }],
+  "expenses": [],
+  "fxQuotes": [],
+  "expected": { "protectedCapacity": "15000.00", "recommendedSpend": { "today": "5000.00", "weekend": "10000.00", "restOfMonth": "15000.00" } }
+}

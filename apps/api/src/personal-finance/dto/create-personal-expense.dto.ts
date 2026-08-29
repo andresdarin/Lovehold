@@ -4,6 +4,7 @@ import {
   IsBoolean,
   IsDateString,
   IsInt,
+  IsIn,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -54,6 +55,10 @@ export class CreatePersonalExpenseItemDto {
 }
 
 export class CreatePersonalExpenseDto {
+  @IsOptional()
+  @IsIn(['UYU', 'USD'])
+  currency?: 'UYU' | 'USD'
+
   @IsString()
   @IsNotEmpty()
   @MaxLength(120)
@@ -103,4 +108,20 @@ export class CreatePersonalExpenseDto {
   @ValidateNested({ each: true })
   @Type(() => CreatePersonalExpenseItemDto)
   items?: CreatePersonalExpenseItemDto[]
+
+  @IsOptional()
+  @IsString()
+  financeAccountId?: string
+
+  @IsOptional()
+  @IsString()
+  destinationAccountId?: string
+
+  @IsOptional()
+  @IsIn(['EXPENSE', 'INCOME', 'TRANSFER'])
+  movementType?: 'EXPENSE' | 'INCOME' | 'TRANSFER'
+
+  @IsOptional()
+  @IsIn(['MANUAL', 'RECEIPT_SCAN', 'IMPORT'])
+  inputMethod?: 'MANUAL' | 'RECEIPT_SCAN' | 'IMPORT'
 }

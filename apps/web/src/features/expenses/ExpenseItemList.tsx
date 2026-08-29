@@ -26,33 +26,35 @@ export default function ExpenseItemList({
   }
 
   return (
-    <section className="rounded-xl border-[0.5px] border-white/[0.08] bg-[#121214]/60 backdrop-blur-[20px] p-4 transition-all duration-200 select-none flex flex-col gap-3">
+    <section className="rounded-3xl border border-border/80 bg-surface p-4 sm:p-5 shadow-xs transition-all flex flex-col gap-3.5 select-none">
       {/* Header en una fila con Badge */}
-      <div className="pb-3 border-b-[0.5px] border-white/[0.08] flex flex-col gap-1">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <ShoppingBasket className="h-[18px] w-[18px] text-foreground" />
-            <h2 className="text-[15px] font-medium text-foreground">Productos del ticket</h2>
+      <div className="pb-3 border-b border-border/60 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full border border-primary/20 bg-primary/5 text-primary">
+            <ShoppingBasket className="h-3.5 w-3.5 stroke-[2]" />
           </div>
-          <span className="text-xs font-medium text-muted-foreground bg-white/[0.04] border border-white/[0.08] px-2 py-0.5 rounded-full">
-            {items.length} {items.length === 1 ? 'producto' : 'productos'}
-          </span>
+          <div>
+            <h2 className="text-xs sm:text-sm font-bold text-foreground">Productos del comprobante</h2>
+            <p className="text-[11px] text-muted-foreground">Ítems discriminados detectados o agregados.</p>
+          </div>
         </div>
-        <p className="text-xs text-muted-foreground">Revisá y editá los productos detectados en el ticket.</p>
+        <span className="text-[11px] font-bold text-muted-foreground bg-surface-soft border border-border/80 px-2.5 py-0.5 rounded-full">
+          {items.length} {items.length === 1 ? 'ítem' : 'ítems'}
+        </span>
       </div>
 
       {/* Contenido / Listado de Productos */}
       <div>
         {items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 text-center bg-transparent gap-2 select-none">
-            <PackageOpen className="h-8 w-8 text-muted-foreground/60" />
-            <p className="text-sm font-medium text-foreground">No se detectaron productos.</p>
-            <p className="text-[13px] text-muted-foreground max-w-[280px]">
-              Podés guardar el gasto general o agregar ítems manualmente.
+          <div className="flex flex-col items-center justify-center py-6 text-center bg-transparent gap-2 select-none">
+            <PackageOpen className="h-7 w-7 text-muted-foreground/40" />
+            <p className="text-xs font-bold text-foreground">Sin productos discriminados</p>
+            <p className="text-[11px] text-muted-foreground max-w-[260px]">
+              Podés registrar el egreso con el total general o agregar ítems manualmente.
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2.5">
             <ExpenseItemsTable
               items={items}
               onUpdateItem={onUpdateItem}
@@ -68,28 +70,29 @@ export default function ExpenseItemList({
         )}
       </div>
 
-      {/* Botones de acción */}
-      <div className="flex flex-col gap-2 mt-1">
-        {/* Botón Agregar producto (Ghost/Outline) */}
+      {/* Botones de acción de productos */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+        {/* Botón Agregar producto */}
         <button
           type="button"
           onClick={onAddItem}
-          className="w-full flex items-center justify-center gap-1.5 h-11 rounded-lg border border-white/[0.08] bg-white/[0.02] text-sm font-medium text-foreground hover:bg-white/[0.06] transition-colors focus:outline-none"
+          className="w-full flex items-center justify-center gap-1.5 h-11 rounded-2xl border border-border/80 bg-surface-soft text-xs font-bold text-foreground hover:bg-surface transition-colors focus:outline-none"
         >
-          <Plus className="h-4 w-4 text-muted-foreground" />
+          <Plus className="h-3.5 w-3.5 text-muted-foreground" />
           Agregar producto
         </button>
 
-        {/* Botón de acción principal "Usar $X,XX" (Único con fill de color) */}
-        <button
-          type="button"
-          onClick={onUseItemsTotal}
-          disabled={items.length === 0}
-          className="w-full flex items-center justify-center gap-1.5 h-12 rounded-lg bg-primary text-sm font-medium text-white hover:bg-primary/90 transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Check className="h-4 w-4" />
-          Usar {money(itemsTotal)}
-        </button>
+        {/* Botón "Usar $X,XX" si hay ítems */}
+        {items.length > 0 && (
+          <button
+            type="button"
+            onClick={onUseItemsTotal}
+            className="w-full flex items-center justify-center gap-1.5 h-11 rounded-2xl bg-surface-soft border border-primary/30 text-xs font-bold text-primary hover:bg-primary/5 transition-all focus:outline-none active:scale-[0.98]"
+          >
+            <Check className="h-3.5 w-3.5" />
+            Usar suma ({money(itemsTotal)})
+          </button>
+        )}
       </div>
 
       <ExpenseItemEditDrawer

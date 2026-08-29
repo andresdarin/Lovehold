@@ -5,6 +5,8 @@ import { PrismaService } from '../prisma/prisma.service'
 import type { CreateExpenseDto, CreateExpenseItemDto } from './dto/create-expense.dto'
 import type { ExpenseListResponse, ExpenseDetailResponse } from './dto/list-expenses.dto'
 import type { ListExpensesDto } from './dto/list-expenses.dto'
+import { CreateExpenseUseCase } from '../finance/application/create-expense.usecase'
+import { formatMoney, parseMoney } from '@lovehold/shared'
 
 type PersonalExpenseWithItems = Prisma.PersonalExpenseGetPayload<{ include: { items: true } }>
 type ExpenseWithItemsAndCategory = Prisma.ExpenseGetPayload<{ include: { items: true; category: true } }>
@@ -19,17 +21,22 @@ function moneyFromCents(cents: number) {
   return (cents / 100).toFixed(2)
 }
 
-function moneyValue(value: number) {
-  return value.toFixed(2)
+const moneyValue = (value: number) => value.toFixed(2)
+const quantityValue = (value: number | undefined) => value === undefined ? undefined : value.toFixed(3)
+
+function parseSafeMoney(value: unknown): bigint {
+  if (value === null || value === undefined || value === '') return 0n
+  const num = typeof value === 'number' ? value : Number(value)
+  if (Number.isNaN(num)) return 0n
+  return parseMoney(num.toFixed(2))
 }
 
-function quantityValue(value?: number) {
-  return value === undefined ? undefined : value.toFixed(3)
-}
+const exactMoneyTotal = (values: Iterable<unknown>) =>
+  Number(formatMoney(Array.from(values).reduce<bigint>((sum, value) => sum + parseSafeMoney(value), 0n)))
 
 @Injectable()
 export class ExpensesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private readonly createExpenseUseCase: CreateExpenseUseCase) {}
 
   async findAll(user: AuthenticatedUser, query: ListExpensesDto): Promise<ExpenseListResponse> {
     const profile = await this.prisma.profile.findUnique({
@@ -73,8 +80,9 @@ export class ExpensesService {
       }
     }
 
+    // Shared expense access is owned by household membership, not payer ownership.
     const householdWhere: Record<string, unknown> = {
-      paidById: profile.id,
+      household: { members: { some: { profileId: profile.id } } },
     }
 
     if (query.month) {
@@ -136,7 +144,7 @@ export class ExpensesService {
       scope: 'personal',
       splitStatus: 'none',
       total: Number(expense.amount),
-      currency: 'UYU',
+      currency: expense.currency,
       paymentMethod: null,
       itemsCount: expense.items.length,
       itemsTotal: expense.items.reduce((sum, item) => sum + Number(item.totalPrice), 0),
@@ -166,7 +174,7 @@ export class ExpensesService {
       scope: 'household',
       splitStatus: expense.splitType === 'equal' ? 'split' : 'pending',
       total: Number(expense.amount),
-      currency: 'UYU',
+      currency: profile.baseCurrency ?? 'UYU',
       paymentMethod: expense.paymentMethod ?? null,
       itemsCount: expense.items.length,
       itemsTotal: expense.items.reduce((sum, item) => sum + Number(item.total), 0),
@@ -194,15 +202,25 @@ export class ExpensesService {
 
     const paginatedItems = merged.slice(offset, offset + limit)
 
+    // Keep aggregation in minor units. Decimal values must not pass through JS
+    // floating point until the final response serialization.
+    const sumMinor = (rows: { amount: unknown }[]) =>
+      rows.reduce((sum, row) => sum + parseSafeMoney(row.amount), 0n)
+    const amount = (minor: bigint) => Number(formatMoney(minor))
+    const personalTotal = sumMinor(personalExpenses)
+    const householdTotal = sumMinor(householdExpenses)
+    const fixedTotal = sumMinor(personalExpenses.filter((expense) => expense.type === 'fixed'))
+    const variableTotal = sumMinor(personalExpenses.filter((expense) => expense.type === 'variable'))
+    const supermarketPersonalTotal = sumMinor(personalExpenses.filter((expense) => expense.type === 'supermarket'))
     const summary = {
       month: query.month || new Date().toISOString().slice(0, 7),
-      totalSpent: paginatedItems.reduce((sum, i) => sum + i.total, 0),
-      fixedTotal: paginatedItems.filter((i) => i.kind === 'fixed').reduce((sum, i) => sum + i.total, 0),
-      variableTotal: paginatedItems.filter((i) => i.kind === 'variable').reduce((sum, i) => sum + i.total, 0),
-      supermarketTotal: paginatedItems.filter((i) => i.kind === 'supermarket').reduce((sum, i) => sum + i.total, 0),
-      householdTotal: paginatedItems.filter((i) => i.scope === 'household').reduce((sum, i) => sum + i.total, 0),
-      personalTotal: paginatedItems.filter((i) => i.scope === 'personal').reduce((sum, i) => sum + i.total, 0),
-      itemsCount: paginatedItems.length,
+      totalSpent: amount(personalTotal + householdTotal),
+      fixedTotal: amount(fixedTotal),
+      variableTotal: amount(variableTotal),
+      supermarketTotal: amount(supermarketPersonalTotal + householdTotal),
+      householdTotal: amount(householdTotal),
+      personalTotal: amount(personalTotal),
+      itemsCount: merged.length,
     }
 
     return {
@@ -225,16 +243,12 @@ export class ExpensesService {
       throw new NotFoundException('Profile not found.')
     }
 
-    const personalExpense = await this.prisma.personalExpense.findUnique({
-      where: { id },
+    const personalExpense = await this.prisma.personalExpense.findFirst({
+      where: { id, profileId: profile.id },
       include: { items: true },
     })
 
     if (personalExpense) {
-      if (personalExpense.profileId !== profile.id) {
-        throw new NotFoundException('Expense not found')
-      }
-
       return {
         id: personalExpense.id,
         title: personalExpense.title,
@@ -245,7 +259,7 @@ export class ExpensesService {
         scope: 'personal',
         splitStatus: 'none',
         total: Number(personalExpense.amount),
-        currency: 'UYU',
+        currency: personalExpense.currency,
         paymentMethod: null,
         itemsCount: personalExpense.items.length,
         itemsTotal: personalExpense.items.reduce((sum, item) => sum + Number(item.totalPrice), 0),
@@ -266,16 +280,12 @@ export class ExpensesService {
       }
     }
 
-    const householdExpense = await this.prisma.expense.findUnique({
-      where: { id },
+    const householdExpense = await this.prisma.expense.findFirst({
+      where: { id, household: { members: { some: { profileId: profile.id } } } },
       include: { items: true, category: true },
     })
 
     if (householdExpense) {
-      if (householdExpense.paidById !== profile.id) {
-        throw new NotFoundException('Expense not found')
-      }
-
       return {
         id: householdExpense.id,
         title: householdExpense.description,
@@ -286,7 +296,7 @@ export class ExpensesService {
         scope: 'household',
         splitStatus: householdExpense.splitType === 'equal' ? 'split' : 'pending',
         total: Number(householdExpense.amount),
-        currency: 'UYU',
+        currency: profile.baseCurrency ?? 'UYU',
         paymentMethod: householdExpense.paymentMethod ?? null,
         itemsCount: householdExpense.items.length,
         itemsTotal: householdExpense.items.reduce((sum, item) => sum + Number(item.total), 0),
@@ -328,6 +338,13 @@ export class ExpensesService {
     this.validateItemsTotal(dto.amount, dto.items)
 
     const isPersonal = dto.scope === 'personal'
+    if (isPersonal) {
+      const expense = await this.createExpenseUseCase.execute({ profileId: profile.id, input: {
+        title: dto.title, merchant: dto.merchant, amount: dto.amount, currency: profile.baseCurrency ?? 'UYU', date: dto.date,
+        category: dto.category, notes: dto.notes, items: dto.items?.map((item) => ({ name: item.name, itemCategory: item.itemCategory, quantity: item.quantity, unitPrice: item.unitPrice, total: item.total, rawText: item.rawText })),
+      }, context: { source: 'web' } })
+      return { ...expense, scope: 'personal', xpEarned: this.calculateExpenseXp(dto) }
+    }
     const expense = isPersonal
       ? await this.createPersonalExpense(profile.id, dto)
       : await this.createHouseholdExpense(profile, dto)

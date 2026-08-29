@@ -7,23 +7,194 @@ datasource db {
 }
 
 model Profile {
-  id           String   @id @default(cuid())
-  authUserId   String   @unique
-  email        String   @unique
-  displayName  String?
-  avatarUrl    String?
-  color        String   @default("#6366f1")
-  gamificationXp Int    @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id             String           @id @default(cuid())
+  authUserId     String           @unique
+  email          String           @unique
+  whatsappPhone  String?          @unique
+  displayName    String?
+  avatarUrl      String?
+  color          String           @default("#6366f1")
+  gamificationXp Int              @default(0)
+  // Optional with defaults so legacy profiles can be backfilled safely.
+  baseCurrency   FinanceCurrency? @default(UYU)
+  timeZone       String?          @default("America/Montevideo")
+  minimumBuffer  Decimal?         @default(0) @db.Decimal(18, 2)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
-  createdHouseholds  Household[]        @relation("householdCreator")
-  paidExpenses       Expense[]          @relation("paidBy")
-  createdExpenses    Expense[]          @relation("createdBy")
-  householdMembers   HouseholdMember[]
-  expenseSplits      ExpenseSplit[]
-  settlementsSent    Settlement[]       @relation("settlementSender")
-  settlementsReceived Settlement[]      @relation("settlementReceiver")
+  createdHouseholds   Household[]              @relation("householdCreator")
+  paidExpenses        Expense[]                @relation("paidBy")
+  createdExpenses     Expense[]                @relation("createdBy")
+  householdMembers    HouseholdMember[]
+  expenseSplits       ExpenseSplit[]
+  settlementsSent     Settlement[]             @relation("settlementSender")
+  settlementsReceived Settlement[]             @relation("settlementReceiver")
+  financeAccounts     FinanceAccount[]
+  scheduledCashFlows  ScheduledCashFlow[]
+  personalExpenses    PersonalExpense[]
+  savingsGoals        SavingsGoal[]
+  aiConversations     AiConversation[]
+  aiPendingActions    AiPendingAction[]
+  aiRuns              AiRun[]
+  inboundMessages     WhatsAppInboundMessage[]
+}
+
+enum FinanceCurrency {
+  UYU
+  USD
+}
+
+enum CashFlowDirection {
+  INFLOW
+  OUTFLOW
+}
+
+// Legacy lifecycle is retained for existing API/database consumers.
+enum CashFlowLifecycle {
+  PENDING
+  PAID
+  RECEIVED
+  SKIPPED
+  OVERDUE
+}
+
+enum CashFlowFrequency {
+  ONCE
+  MONTHLY
+}
+
+enum CashFlowCertainty {
+  CONFIRMED
+  ESTIMATED
+}
+
+enum CashFlowStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+enum CashFlowResolution {
+  PAID
+  RECEIVED
+  SKIPPED
+}
+
+enum FinanceAccountType {
+  CASH
+  BANK
+  CREDIT
+}
+
+enum FinancialMovementType {
+  EXPENSE
+  INCOME
+  TRANSFER
+}
+
+enum FinancialInputMethod {
+  MANUAL
+  RECEIPT_SCAN
+  IMPORT
+}
+
+model FinanceAccount {
+  id                 String              @id @default(cuid())
+  profileId          String
+  name               String
+  type               FinanceAccountType  @default(BANK)
+  currency           FinanceCurrency
+  balance            Decimal             @db.Decimal(18, 2)
+  creditLimit        Decimal?            @db.Decimal(18, 2)
+  closingDay         Int?
+  dueDay             Int?
+  isSpendable        Boolean             @default(true)
+  isActive           Boolean             @default(true)
+  balanceAsOf        DateTime            @default(now())
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  profile            Profile             @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  personalExpenses   PersonalExpense[]   @relation("sourceAccount")
+  receivedTransfers  PersonalExpense[]   @relation("destinationAccount")
+  scheduledCashFlows ScheduledCashFlow[]
+
+  // Multiple accounts in one currency are supported by distinct names.
+  @@unique([profileId, name])
+  @@index([profileId, isActive, isSpendable])
+}
+
+model ScheduledCashFlow {
+  id                   String              @id @default(cuid())
+  profileId            String
+  accountId            String?
+  title                String
+  direction            CashFlowDirection
+  amount               Decimal             @db.Decimal(18, 2)
+  currency             FinanceCurrency
+  frequency            CashFlowFrequency   @default(ONCE)
+  nextDueOn            DateTime?           @db.Date
+  dayOfMonth           Int?
+  endsOn               DateTime?           @db.Date
+  certainty            CashFlowCertainty
+  categoryKey          FinanceCategory?
+  status               CashFlowStatus      @default(ACTIVE)
+  lastResolvedDueOn    DateTime?           @db.Date
+  lastResolutionStatus CashFlowResolution?
+  lastResolvedAt       DateTime?
+  // CHECK: ACTIVE -> nextDueOn IS NOT NULL; COMPLETED -> nextDueOn IS NULL.
+  // CHECK: ONCE -> dayOfMonth IS NULL; MONTHLY -> dayOfMonth BETWEEN 1 AND 31.
+  // Prisma does not model CHECK constraints; service/Zod validation is mandatory.
+  scheduledDueOn       DateTime            @db.Date
+  lifecycle            CashFlowLifecycle   @default(PENDING)
+  description          String?
+  sourceMessageId      String?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  profile              Profile             @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  account              FinanceAccount?     @relation(fields: [accountId], references: [id])
+  personalExpenses     PersonalExpense[]
+
+  @@unique([profileId, sourceMessageId])
+  @@index([profileId, scheduledDueOn])
+  @@index([profileId, lifecycle])
+}
+
+enum GoalStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+enum FinanceCategory {
+  HOUSING
+  UTILITIES
+  FOOD
+  TRANSPORT
+  HEALTH
+  LEISURE
+  PETS
+  SHOPPING
+  EDUCATION
+  DEBT
+  TAXES
+  OTHER
+}
+
+model SavingsGoal {
+  id            String          @id @default(cuid())
+  profileId     String
+  name          String
+  targetAmount  Decimal         @db.Decimal(18, 2)
+  currentAmount Decimal         @default(0) @db.Decimal(18, 2)
+  currency      FinanceCurrency
+  targetDate    DateTime        @db.Date
+  status        GoalStatus      @default(ACTIVE)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  profile       Profile         @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  // currentAmount is informational and must never be reduced by spending logic.
+
+  @@index([profileId, status, targetDate])
 }
 
 model Household {
@@ -33,7 +204,7 @@ model Household {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  createdBy   Profile            @relation("householdCreator", fields: [createdById], references: [id])
+  createdBy   Profile           @relation("householdCreator", fields: [createdById], references: [id])
   members     HouseholdMember[]
   expenses    Expense[]
   categories  Category[]
@@ -82,28 +253,28 @@ enum ExpenseItemCategory {
 }
 
 model Expense {
-  id          String   @id @default(cuid())
-  householdId String
-  categoryId  String
-  paidById    String
-  createdById String
-  amount      Decimal  @db.Decimal(10, 2)
-  description String
-  merchant    String?
+  id            String    @id @default(cuid())
+  householdId   String
+  categoryId    String
+  paidById      String
+  createdById   String
+  amount        Decimal   @db.Decimal(10, 2)
+  description   String
+  merchant      String?
   paymentMethod String?
-  receiptDate DateTime?
-  notes       String?
-  date        DateTime
-  splitType   String   @default("equal")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  receiptDate   DateTime?
+  notes         String?
+  date          DateTime
+  splitType     String    @default("equal")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  household  Household      @relation(fields: [householdId], references: [id], onDelete: Cascade)
-  category   Category       @relation(fields: [categoryId], references: [id])
-  paidBy     Profile        @relation("paidBy", fields: [paidById], references: [id])
-  createdBy  Profile        @relation("createdBy", fields: [createdById], references: [id])
-  splits     ExpenseSplit[]
-  items      ExpenseItem[]
+  household Household      @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  category  Category       @relation(fields: [categoryId], references: [id])
+  paidBy    Profile        @relation("paidBy", fields: [paidById], references: [id])
+  createdBy Profile        @relation("createdBy", fields: [createdById], references: [id])
+  splits    ExpenseSplit[]
+  items     ExpenseItem[]
 }
 
 model ExpenseSplit {
@@ -151,24 +322,44 @@ model Settlement {
 }
 
 model PersonalExpense {
-  id            String   @id @default(cuid())
-  profileId     String
-  title         String
-  merchant      String?
-  amount        Decimal  @db.Decimal(10, 2)
-  date          DateTime
-  type          String   // fixed | variable | supermarket
-  category      String
-  notes         String?
-  isRecurring   Boolean  @default(false)
-  recurrenceDay Int?
-  monthKey      String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                   String                @id @default(cuid())
+  profileId            String
+  title                String
+  merchant             String?
+  amount               Decimal               @db.Decimal(18, 2)
+  date                 DateTime
+  type                 String // fixed | variable | supermarket
+  movementType         FinancialMovementType @default(EXPENSE)
+  inputMethod          FinancialInputMethod  @default(MANUAL)
+  category             String
+  notes                String?
+  isRecurring          Boolean               @default(false)
+  recurrenceDay        Int?
+  monthKey             String
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  currency             String                @default("UYU")
+  scheduledCashFlowId  String?
+  scheduledDueOn       DateTime?             @db.Date
+  source               String?
+  sourceMessageId      String?
+  financeAccountId     String?
+  destinationAccountId String?
+  categoryKey          String?
 
-  items PersonalExpenseItem[]
+  items              PersonalExpenseItem[]
+  profile            Profile               @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  financeAccount     FinanceAccount?       @relation("sourceAccount", fields: [financeAccountId], references: [id])
+  destinationAccount FinanceAccount?       @relation("destinationAccount", fields: [destinationAccountId], references: [id])
+  scheduledCashFlow  ScheduledCashFlow?    @relation(fields: [scheduledCashFlowId], references: [id])
 
+  // PostgreSQL UNIQUE permits multiple NULLs; application validation enforces
+  // the logical key only when both schedule fields are present.
+  @@unique([scheduledCashFlowId, scheduledDueOn])
+  @@unique([profileId, sourceMessageId])
   @@index([profileId, monthKey])
+  @@index([financeAccountId, profileId])
+  @@index([destinationAccountId, profileId])
 }
 
 model PersonalExpenseItem {
@@ -186,4 +377,226 @@ model PersonalExpenseItem {
   expense PersonalExpense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
 
   @@index([expenseId])
+}
+
+enum AiMessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+model AiConversation {
+  id        String   @id @default(cuid())
+  profileId String
+  title     String?
+  channel   String?  @default("web")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile          Profile                  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  messages         AiMessage[]
+  pendingActions   AiPendingAction[]
+  runs             AiRun[]
+  whatsappMessages WhatsAppInboundMessage[]
+
+  @@index([profileId, updatedAt])
+}
+
+model WhatsAppInboundMessage {
+  id                  String    @id @default(cuid())
+  wamid               String    @unique
+  from                String
+  phoneNumberId       String?
+  profileId           String?
+  conversationId      String?
+  type                String // text
+  body                String?   @db.Text
+  receivedAt          DateTime  @default(now())
+  status              String    @default("received") // received|processing|completed|failed
+  processingStartedAt DateTime?
+  completedAt         DateTime?
+  error               String?   @db.Text
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  profile      Profile?        @relation(fields: [profileId], references: [id], onDelete: SetNull)
+  conversation AiConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+
+  @@index([from, createdAt])
+  @@index([status])
+  @@index([phoneNumberId])
+}
+
+model AiMessage {
+  id             String        @id @default(cuid())
+  conversationId String
+  role           AiMessageRole
+  content        String
+  metadata       Json?
+  createdAt      DateTime      @default(now())
+
+  conversation AiConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+}
+
+model AiPendingAction {
+  // Máquina durable: pending -> executing (lease de 2 minutos) -> completed|failed.
+  // Si el lease vence, se puede reclaimear atómicamente hasta 3 intentos.
+  id                  String    @id @default(cuid())
+  conversationId      String
+  profileId           String
+  toolName            String
+  args                Json
+  risk                String // 'write' (por ahora solo writes)
+  status              String    @default("pending") // pending|executing|completed|cancelled|expired|failed
+  attempts            Int       @default(0)
+  expiresAt           DateTime
+  executionLeaseUntil DateTime?
+  executionStartedAt  DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  executedAt          DateTime?
+  result              Json?
+
+  conversation AiConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  profile      Profile        @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, status])
+  @@index([conversationId, status])
+  @@index([expiresAt])
+  @@index([executionLeaseUntil])
+}
+
+model AiRun {
+  id             String    @id @default(cuid())
+  conversationId String?
+  profileId      String
+  model          String
+  promptId       String // ej finnic-system:v1
+  promptVersion  String? // opcional v1
+  status         String // completed|failed|pending_confirmation
+  startedAt      DateTime  @default(now())
+  finishedAt     DateTime?
+  latencyMs      Int?
+  error          String? // mensaje seguro, nunca stack
+  createdAt      DateTime  @default(now())
+
+  profile      Profile         @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  conversation AiConversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  toolCalls    AiToolCall[]
+
+  @@index([profileId, createdAt])
+  @@index([conversationId, createdAt])
+}
+
+model AiToolCall {
+  id         String   @id @default(cuid())
+  runId      String
+  toolName   String
+  risk       String // read|write|destructive
+  input      Json // args validados
+  success    Boolean
+  error      String? // seguro
+  durationMs Int?
+  createdAt  DateTime @default(now())
+
+  run AiRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId])
+  @@index([toolName])
+}
+
+model AiAgent {
+  id           String          @id @default(cuid())
+  slug         String          @unique
+  name         String
+  description  String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  prompts      AiPrompt[]
+  deployments  AiDeployment[]
+  modelConfigs AiModelConfig[]
+  toolConfigs  AiToolConfig[]
+
+  @@index([slug])
+}
+
+model AiPrompt {
+  id          String            @id @default(cuid())
+  agentId     String
+  key         String
+  description String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  agent       AiAgent           @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  versions    AiPromptVersion[]
+
+  @@unique([agentId, key])
+  @@index([agentId])
+}
+
+model AiPromptVersion {
+  id          String         @id @default(cuid())
+  promptId    String
+  version     Int
+  content     String         @db.Text
+  status      String         @default("draft")
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  prompt      AiPrompt       @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  deployments AiDeployment[]
+
+  @@unique([promptId, version])
+  @@index([promptId, status])
+  @@index([status])
+}
+
+model AiDeployment {
+  id              String           @id @default(cuid())
+  agentId         String
+  environment     String
+  promptVersionId String?
+  promptVersion   AiPromptVersion? @relation(fields: [promptVersionId], references: [id])
+  modelConfigId   String?
+  modelConfig     AiModelConfig?   @relation(fields: [modelConfigId], references: [id])
+  isActive        Boolean          @default(true)
+  deployedAt      DateTime         @default(now())
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  agent           AiAgent          @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([environment, isActive])
+}
+
+model AiModelConfig {
+  id               String         @id @default(cuid())
+  agentId          String
+  model            String
+  temperature      Float          @default(0.7)
+  maxTokens        Int            @default(2048)
+  responseMimeType String?        @default("text/plain")
+  status           String         @default("draft")
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  agent            AiAgent        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  deployments      AiDeployment[]
+
+  @@index([agentId, status])
+}
+
+model AiToolConfig {
+  id                  String   @id @default(cuid())
+  agentId             String
+  toolName            String
+  enabled             Boolean  @default(true)
+  requireConfirmation Boolean  @default(true)
+  maxAttempts         Int      @default(3)
+  status              String   @default("active")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  agent               AiAgent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, toolName])
+  @@index([agentId, enabled])
 }

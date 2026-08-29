@@ -1,7 +1,7 @@
 'use client'
 
-import { Inbox } from 'lucide-react'
-import Link from 'next/link'
+import React from 'react'
+import { Inbox, RotateCcw } from 'lucide-react'
 
 interface Props {
   hasFilters?: boolean
@@ -10,30 +10,30 @@ interface Props {
 
 export default function MovementEmptyState({ hasFilters, onClearFilters }: Props) {
   return (
-    <div className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-surface p-12 text-center shadow-sm">
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-soft">
-        <Inbox className="h-6 w-6 text-muted-foreground" />
+    <div className="flex flex-col items-center justify-center rounded-3xl border border-border/80 bg-surface px-6 py-16 text-center shadow-xs">
+      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-primary/30 text-primary bg-transparent">
+        <Inbox className="h-5 w-5 stroke-[1.8]" />
       </div>
-      <div>
-        <h3 className="text-lg font-bold text-foreground">
-          {hasFilters ? 'Sin resultados' : 'Todavía no hay movimientos'}
-        </h3>
-        <p className="mt-1 text-sm text-muted-foreground max-w-sm">
-          {hasFilters
-            ? 'No hay movimientos con estos filtros.'
-            : 'Cargá tu primer gasto para empezar tu historial.'}
-        </p>
-      </div>
-      {hasFilters ? (
-        <button type="button" onClick={onClearFilters}
-          className="rounded-xl border border-border bg-surface-soft px-5 py-2.5 text-sm font-semibold text-muted-foreground transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30">
-          Limpiar filtros
+
+      <h3 className="mt-3.5 text-sm font-bold text-foreground">
+        {hasFilters ? 'Sin resultados para los filtros' : 'No hay movimientos todavía'}
+      </h3>
+
+      <p className="mt-1 max-w-xs text-xs text-muted-foreground">
+        {hasFilters
+          ? 'Probá cambiando el mes o los criterios de búsqueda.'
+          : 'Tus ingresos, egresos, transferencias y cambios de moneda aparecerán acá.'}
+      </p>
+
+      {hasFilters && onClearFilters && (
+        <button
+          type="button"
+          onClick={onClearFilters}
+          className="mt-4 inline-flex items-center gap-1.5 rounded-xl border border-border/80 bg-surface-soft px-4 py-2 text-xs font-semibold text-foreground hover:bg-surface hover:border-primary/40 transition-colors shadow-xs"
+        >
+          <RotateCcw className="h-3.5 w-3.5" />
+          Restablecer filtros
         </button>
-      ) : (
-        <Link href="/expenses/new"
-          className="rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
-          Nuevo gasto
-        </Link>
       )}
     </div>
   )
