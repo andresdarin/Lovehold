@@ -21,16 +21,15 @@ function moneyFromCents(cents: number) {
   return (cents / 100).toFixed(2)
 }
 
-function moneyValue(value: number) {
-  return value.toFixed(2)
-}
-
-function quantityValue(value?: number) {
-  return value === undefined ? undefined : value.toFixed(3)
+function parseSafeMoney(value: unknown): bigint {
+  if (value === null || value === undefined || value === '') return 0n
+  const num = typeof value === 'number' ? value : Number(value)
+  if (Number.isNaN(num)) return 0n
+  return parseMoney(num.toFixed(2))
 }
 
 const exactMoneyTotal = (values: Iterable<unknown>) =>
-  Number(formatMoney(Array.from(values).reduce<bigint>((sum, value) => sum + parseMoney(String(value)), 0n)))
+  Number(formatMoney(Array.from(values).reduce<bigint>((sum, value) => sum + parseSafeMoney(value), 0n)))
 
 @Injectable()
 export class ExpensesService {
@@ -203,7 +202,7 @@ export class ExpensesService {
     // Keep aggregation in minor units. Decimal values must not pass through JS
     // floating point until the final response serialization.
     const sumMinor = (rows: { amount: unknown }[]) =>
-      rows.reduce((sum, row) => sum + parseMoney(String(row.amount)), 0n)
+      rows.reduce((sum, row) => sum + parseSafeMoney(row.amount), 0n)
     const amount = (minor: bigint) => Number(formatMoney(minor))
     const personalTotal = sumMinor(personalExpenses)
     const householdTotal = sumMinor(householdExpenses)

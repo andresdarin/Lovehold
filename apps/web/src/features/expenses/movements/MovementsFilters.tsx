@@ -39,26 +39,26 @@ export default function MovementsFilters({ filters, onChange, onClear }: Props) 
     <section className="flex flex-col gap-2.5" aria-label="Buscar y filtrar movimientos">
       {/* 1. Fila Principal: Buscador Pill con lupa a la derecha + Botón Calendario Redondo + Botón Filtros Redondo */}
       <div className="flex items-center gap-2">
-        {/* Barra de Búsqueda Estilo Pill con Lupa a la Derecha */}
+        {/* Barra de Búsqueda Estilo Pill con Lupa Redonda Navy a la Derecha */}
         <div className="relative flex-1">
           <input
             type="text"
             value={filters.q}
             onChange={(e) => onChange('q', e.target.value)}
             placeholder="Buscar por comercio, concepto, cuenta..."
-            className="h-11 w-full rounded-full border border-border/80 bg-surface pl-4 pr-11 text-xs sm:text-sm text-foreground shadow-xs outline-none placeholder:text-muted-foreground transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="h-11 w-full rounded-full border border-border/80 bg-surface pl-4 pr-12 text-xs sm:text-sm text-foreground shadow-xs outline-none placeholder:text-muted-foreground transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
           {filters.q ? (
             <button
               type="button"
               onClick={() => onChange('q', '')}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:bg-surface-soft hover:text-foreground transition-colors"
+              className="absolute right-2 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-full bg-surface-soft text-muted-foreground hover:bg-border/60 hover:text-foreground transition-colors"
             >
               <X className="h-3.5 w-3.5" />
             </button>
           ) : (
-            <div className="pointer-events-none absolute right-3.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground">
-              <Search className="h-4 w-4 stroke-[2]" />
+            <div className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-[#083A4F] dark:bg-[#407E8C] text-[#F5F2EE] shadow-xs">
+              <Search className="h-3.5 w-3.5 stroke-[2.2]" />
             </div>
           )}
         </div>

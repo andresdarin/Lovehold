@@ -38,11 +38,6 @@ export function useMovements() {
       if (filters.scope) params.set('scope', filters.scope)
       if (filters.category) params.set('category', filters.category)
       if (filters.paymentMethod) params.set('paymentMethod', filters.paymentMethod)
-      // The legacy endpoint currently owns expense history. The extra dimensions
-      // are sent when supported and are also applied below for older responses.
-      if (filters.account) params.set('account', filters.account)
-      if (filters.currency) params.set('currency', filters.currency)
-      if (filters.financialType) params.set('type', filters.financialType)
       const data = await apiFetch<ExpenseListResponse>(`/api/expenses?${params}`, {}, token)
       const filtered = data.items.filter((item) => {
         const type = item.financialType ?? 'EXPENSE'

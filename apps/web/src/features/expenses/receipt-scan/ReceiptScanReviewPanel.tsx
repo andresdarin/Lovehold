@@ -22,10 +22,16 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
 
 function EmptyState() {
   return (
-    <div className="py-8 text-center bg-transparent">
-      <p className="text-xs text-muted-foreground leading-relaxed">
-        Subí una imagen y analizá el ticket para ver el resumen antes de aplicar los datos.
-      </p>
+    <div className="py-6 flex flex-col items-center justify-center text-center bg-transparent gap-2.5">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#407E8C]/30 bg-[#C0D5D6]/20 text-primary shadow-2xs">
+        <FileText className="h-4 w-4 stroke-[2.2]" />
+      </div>
+      <div>
+        <p className="text-xs font-bold text-foreground">Sin datos leídos aún</p>
+        <p className="text-[11px] text-muted-foreground max-w-[260px] mt-0.5 leading-relaxed">
+          Subí una imagen y analizá el comprobante para ver el desglose antes de aplicar.
+        </p>
+      </div>
     </div>
   )
 }
@@ -42,39 +48,51 @@ export default function ReceiptScanReviewPanel({
   const isLowConfidence = result ? result.confidence < 0.75 : false
 
   return (
-    <section className="rounded-3xl border border-border bg-surface p-5 shadow-xs transition-all select-none">
-      {/* Header */}
-      <div className="pb-3 border-b border-border/70 flex flex-col gap-1">
+    <section className="rounded-3xl border border-border/80 bg-surface p-4 sm:p-5 shadow-xs transition-all select-none flex flex-col gap-3.5">
+      {/* Header con Badge de Estado */}
+      <div className="pb-3 border-b border-border/60 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <FileText className="h-[18px] w-[18px] text-primary" />
-          <h2 className="text-sm font-bold text-foreground">Resumen del escaneo</h2>
+          <div className="flex h-7 w-7 items-center justify-center rounded-full border border-primary/20 bg-primary/5 text-primary">
+            <FileText className="h-3.5 w-3.5 stroke-[2]" />
+          </div>
+          <div>
+            <h2 className="text-xs sm:text-sm font-bold text-foreground">Revisión del escaneo</h2>
+            <p className="text-[11px] text-muted-foreground">Datos detectados por inteligencia artificial.</p>
+          </div>
         </div>
-        <p className="text-xs text-muted-foreground">Compará los datos con el ticket.</p>
+        {result && (
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-primary bg-primary/10 border border-primary/20 px-2.5 py-0.5 rounded-full">
+            <CheckCircle2 className="h-3 w-3" />
+            Detectado
+          </span>
+        )}
       </div>
 
       {!result ? <EmptyState /> : (
-        <div className="mt-3 flex flex-col gap-3">
-          <div className="border-b border-border/70">
+        <div className="flex flex-col gap-3">
+          <div className="rounded-2xl border border-border/60 bg-surface-soft/40 p-3 flex flex-col">
             <SummaryRow label="Comercio" value={textValue(result.merchant)} />
             <SummaryRow label="Fecha" value={textValue(result.receiptDate)} />
-            <SummaryRow label="Total pagado" value={moneyValue(result.total, result.currency)} />
-            <SummaryRow label="Suma de ítems" value={money(itemsTotal, result.currency)} />
-            <SummaryRow label="Descuentos" value={result.discounts === null ? 'No detectado' : `-${money(result.discounts, result.currency)}`} />
+            <SummaryRow label="Total detectado" value={moneyValue(result.total, result.currency)} />
+            <SummaryRow label="Suma de productos" value={money(itemsTotal, result.currency)} />
+            {result.discounts !== null && result.discounts > 0 && (
+              <SummaryRow label="Descuentos" value={`-${money(result.discounts, result.currency)}`} />
+            )}
             <SummaryRow label="Medio de pago" value={textValue(result.paymentMethod)} />
-            <SummaryRow label="Productos" value={String(result.items.length)} />
+            <SummaryRow label="Productos leídos" value={String(result.items.length)} />
           </div>
 
           {result.items.length > 0 && <ReceiptScanProductList items={result.items} />}
 
           {isLowConfidence && (
-            <div className="flex items-start gap-2.5 rounded-2xl border border-warning/30 bg-warning/5 p-3.5 text-xs text-warning font-medium">
+            <div className="flex items-start gap-2.5 rounded-2xl border border-warning/30 bg-warning/5 p-3 text-xs text-warning font-medium">
               <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
-              <span>La confianza del escaneo es baja. Revisá y corregí los datos manualmente.</span>
+              <span>Confianza moderada. Revisá los montos antes de aplicar.</span>
             </div>
           )}
 
           {result.warnings.length > 0 && (
-            <div className="flex items-start gap-2.5 rounded-2xl border border-border bg-surface-soft p-3.5 text-xs text-muted-foreground">
+            <div className="flex items-start gap-2.5 rounded-2xl border border-border/80 bg-surface-soft p-3 text-xs text-muted-foreground">
               <Info className="h-4 w-4 shrink-0 mt-0.5" />
               <ul className="list-inside list-disc space-y-0.5">
                 {result.warnings.map((warning, index) => <li key={index}>{warning}</li>)}
@@ -83,12 +101,12 @@ export default function ReceiptScanReviewPanel({
           )}
 
           {/* Botones de acción */}
-          <div className="grid grid-cols-2 gap-2 mt-2">
+          <div className="grid grid-cols-2 gap-2 pt-1">
             <button 
               type="button" 
               onClick={onClear} 
               disabled={scanning}
-              className="flex items-center justify-center gap-1.5 rounded-2xl border border-border bg-surface-soft py-2.5 text-xs font-bold text-foreground hover:bg-surface-alt transition-colors focus:outline-none disabled:opacity-50"
+              className="flex items-center justify-center gap-1.5 rounded-2xl border border-border/80 bg-surface-soft py-2.5 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-surface transition-colors focus:outline-none disabled:opacity-50"
             >
               <RefreshCw className="h-3.5 w-3.5" />
               Limpiar
@@ -100,7 +118,7 @@ export default function ReceiptScanReviewPanel({
               className="flex items-center justify-center gap-1.5 rounded-2xl bg-primary py-2.5 text-xs font-bold text-primary-foreground shadow-xs hover:bg-primary-hover transition-all focus:outline-none disabled:opacity-50 active:scale-95"
             >
               <CheckCircle2 className="h-3.5 w-3.5" />
-              Aplicar datos
+              Aplicar al gasto
             </button>
           </div>
         </div>
