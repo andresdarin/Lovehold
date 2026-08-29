@@ -22,6 +22,10 @@ export function money(value: number, currency: 'UYU' | 'USD') {
     : `US$ ${value.toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
-export function accountType(type: FinanceAccount['type']) {
-  return type === 'BANK' ? 'Banco' : type === 'CREDIT' ? 'Crédito' : 'Efectivo'
+export function accountType(type: FinanceAccount['type'] | string) {
+  if (type === 'BANK') return 'Banco'
+  if (type === 'CREDIT') return 'Crédito'
+  if (type === 'CASH') return 'Efectivo'
+  if (type === 'SAVINGS') return 'Ahorro'
+  return 'Cuenta'
 }

@@ -1,16 +1,24 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Camera, Upload, ScanLine, X, Loader2 } from 'lucide-react'
 
 export default function ReceiptScanUploader({
-  preview, scanning, onFileSelect, onScan, onClear,
+  preview, scanning, onFileSelect, onScan, onClear, autoCamera,
 }: {
   preview: string | null
   scanning: boolean
   onFileSelect: (file: File | null) => void
   onScan: () => void
   onClear: () => void
+  autoCamera?: boolean
 }) {
   const [isDragging, setIsDragging] = useState(false)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (autoCamera && !preview && cameraInputRef.current) {
+      cameraInputRef.current.click()
+    }
+  }, [autoCamera, preview])
 
   useEffect(() => {
     const handlePaste = (e: ClipboardEvent) => {
@@ -115,6 +123,7 @@ export default function ReceiptScanUploader({
               <Camera className="h-5 w-5 text-muted-foreground" />
               <span className="text-xs text-foreground font-semibold">Sacar foto</span>
               <input
+                ref={cameraInputRef}
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 capture="environment"

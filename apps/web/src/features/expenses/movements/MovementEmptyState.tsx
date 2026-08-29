@@ -1,40 +1,6 @@
 'use client'
-
 import { Inbox } from 'lucide-react'
-import Link from 'next/link'
-
-interface Props {
-  hasFilters?: boolean
-  onClearFilters?: () => void
-}
-
+interface Props { hasFilters?: boolean; onClearFilters?: () => void }
 export default function MovementEmptyState({ hasFilters, onClearFilters }: Props) {
-  return (
-    <div className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-surface p-12 text-center shadow-sm">
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-soft">
-        <Inbox className="h-6 w-6 text-muted-foreground" />
-      </div>
-      <div>
-        <h3 className="text-lg font-bold text-foreground">
-          {hasFilters ? 'Sin resultados' : 'Todavía no hay movimientos'}
-        </h3>
-        <p className="mt-1 text-sm text-muted-foreground max-w-sm">
-          {hasFilters
-            ? 'No hay movimientos con estos filtros.'
-            : 'Cargá tu primer gasto para empezar tu historial.'}
-        </p>
-      </div>
-      {hasFilters ? (
-        <button type="button" onClick={onClearFilters}
-          className="rounded-xl border border-border bg-surface-soft px-5 py-2.5 text-sm font-semibold text-muted-foreground transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30">
-          Limpiar filtros
-        </button>
-      ) : (
-        <Link href="/expenses/new"
-          className="rounded-2xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-xs transition hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
-          Nuevo gasto
-        </Link>
-      )}
-    </div>
-  )
+  return <div className="flex flex-col items-center px-6 py-16 text-center"><div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-soft"><Inbox className="h-6 w-6 text-muted-foreground" /></div><h3 className="mt-4 text-base font-bold text-foreground">{hasFilters ? 'Sin resultados' : 'No hay movimientos todavía'}</h3><p className="mt-1 max-w-sm text-sm text-muted-foreground">{hasFilters ? 'No hay movimientos con estos filtros.' : 'Tus ingresos, egresos y transferencias aparecerán acá.'}</p>{hasFilters && <button type="button" onClick={onClearFilters} className="mt-5 rounded-xl border border-border px-4 py-2 text-sm font-semibold text-muted-foreground hover:bg-surface-soft">Limpiar filtros</button>}</div>
 }

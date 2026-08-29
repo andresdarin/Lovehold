@@ -10,7 +10,7 @@ import MovementDetailDrawer from './MovementDetailDrawer'
 import type { Movement } from './types'
 
 export default function MovementsPageClient() {
-  const { movements, summary, pagination, loading, error, filters, setFilter, clearFilters, refresh, loadMore } = useMovements()
+  const { movements, pagination, loading, error, filters, setFilter, clearFilters, refresh, loadMore } = useMovements()
   const [selectedMovement, setSelectedMovement] = useState<Movement | null>(null)
 
   const hasFilters = !!(filters.q || filters.kind || filters.scope || filters.category || filters.paymentMethod || filters.financialType || filters.account || filters.currency)

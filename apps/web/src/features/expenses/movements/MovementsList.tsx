@@ -35,10 +35,10 @@ export default function MovementsList({
     <div className="space-y-6">
       {Object.entries(groups).map(([dateKey, items]) => (
         <div key={dateKey}>
-          <h3 className="mb-2.5 px-1 text-xs font-semibold text-muted-foreground">
+          <h3 className="mb-2.5 px-1 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/70">
             {formatDateGroup(items[0]!.date)}
           </h3>
-          <div className="space-y-1">
+          <div className="overflow-hidden rounded-3xl border border-border/80 bg-surface px-4 shadow-xs sm:px-5">
             {items.map((m) => (
               <MovementCard key={m.id} movement={m} onClick={onMovementClick} />
             ))}

@@ -8,7 +8,7 @@ import ReceiptScanUploader from './ReceiptScanUploader'
 import type { ScanReceiptResponse } from './types'
 
 export default function ReceiptScanSection({
-  preview, scanning, error, result, onFileSelect, onScan, onClear, onApply,
+  preview, scanning, error, result, onFileSelect, onScan, onClear, onApply, autoCamera,
 }: {
   preview: string | null
   scanning: boolean
@@ -18,6 +18,7 @@ export default function ReceiptScanSection({
   onScan: () => void
   onClear: () => void
   onApply: () => void
+  autoCamera?: boolean
 }) {
   const [collapsed, setCollapsed] = useState(false)
   const [imageOpen, setImageOpen] = useState(false)
@@ -60,6 +61,7 @@ export default function ReceiptScanSection({
           onFileSelect={onFileSelect}
           onScan={onScan}
           onClear={handleClear}
+          autoCamera={autoCamera}
         />
         {error && (
           <div className="rounded-2xl border border-danger/40 bg-danger/10 p-4 text-sm text-danger">

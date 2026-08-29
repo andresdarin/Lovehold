@@ -1,5 +1,6 @@
 'use client'
 
+import { useSearchParams } from 'next/navigation'
 import { useProfile } from '@/features/auth/ProfileProvider'
 import ExpenseItemList from '@/features/expenses/ExpenseItemList'
 import NewExpenseFormGrid from '@/features/expenses/NewExpenseFormGrid'
@@ -10,6 +11,9 @@ import { useReceiptScan } from '@/features/expenses/receipt-scan/hooks'
 import { scanResultToFormItems } from '@/features/expenses/receipt-scan/utils'
 
 export default function NewExpensePage() {
+  const searchParams = useSearchParams()
+  const autoCamera = searchParams.get('scan') === 'camera' || searchParams.get('camera') === '1' || searchParams.get('tab') === 'scan'
+
   const { profile } = useProfile()
   const profileName = profile?.displayName || profile?.email || 'Tu perfil'
   const form = useExpenseForm(profileName)
@@ -45,6 +49,7 @@ export default function NewExpensePage() {
         onScan={scan.submitScan}
         onClear={scan.clear}
         onApply={applyScan}
+        autoCamera={autoCamera}
       />
 
       <NewExpenseFormGrid form={form} profileName={profileName} discounts={scan.result?.discounts ?? 0}>

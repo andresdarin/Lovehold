@@ -48,7 +48,8 @@ export function useMovements() {
         const type = item.financialType ?? 'EXPENSE'
         return (!filters.financialType || type === filters.financialType) &&
           (!filters.currency || item.currency === filters.currency) &&
-          (!filters.account || item.accountName === filters.account)
+          (!filters.account || item.accountName === filters.account) &&
+          (!filters.period || item.date.slice(0, 10) === filters.period)
       })
       if (append) {
         setMovements(prev => [...prev, ...data.items])
