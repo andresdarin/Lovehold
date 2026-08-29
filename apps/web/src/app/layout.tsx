@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Lovehold',
-  description: 'Gastos compartidos para parejas',
+  title: 'Finnic',
+  description: 'Tu copiloto financiero personal y en pareja',
   manifest: '/manifest.json',
   icons: {
     icon: '/icons/favicon.png',
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   other: {
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
-    'apple-mobile-web-app-title': 'Lovehold',
+    'apple-mobile-web-app-title': 'Finnic',
   },
 }
 

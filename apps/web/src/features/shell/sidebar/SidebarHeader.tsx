@@ -32,7 +32,7 @@ export default function SidebarHeader({ collapsed, onToggle }: SidebarHeaderProp
             className="h-8 w-8 shrink-0 drop-shadow-sm"
           />
           <span className="text-base font-bold tracking-tight text-foreground">
-            Lovehold
+            Finnic
           </span>
           <button
             onClick={onToggle}

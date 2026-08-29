@@ -1,5 +1,3 @@
-
-
 interface TopbarProps {
   profile: {
     displayName: string | null
@@ -26,7 +24,7 @@ export default function Topbar({ profile }: TopbarProps) {
       <div className="flex items-center gap-2 select-none">
         <span className="h-2.5 w-2.5 rounded-full bg-primary" />
         <span className="text-base font-bold tracking-tight text-foreground">
-          Lovehold
+          Finnic
         </span>
       </div>
 

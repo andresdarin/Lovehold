@@ -1,4 +1,4 @@
-import { Heart, User, Receipt, ChevronDown } from 'lucide-react'
+import { Users, User, Receipt, ChevronDown } from 'lucide-react'
 import CustomDatePicker from '@/components/ui/CustomDatePicker'
 import type { ExpenseForm } from './types'
 
@@ -22,7 +22,7 @@ export default function ExpenseFormFields({
         <p className="text-xs text-muted-foreground">
           {isPersonal
             ? 'Gasto personal, no se divide con nadie.'
-            : 'El ticket se guarda como gasto compartido 50/50.'}
+            : 'El ticket se guarda como gasto compartido en pareja (50/50).'}
         </p>
       </div>
 
@@ -49,8 +49,8 @@ export default function ExpenseFormFields({
               : 'text-muted-foreground hover:text-foreground bg-transparent border border-transparent'
           }`}
         >
-          <Heart className="h-3.5 w-3.5 text-primary" />
-          Lovehold
+          <Users className="h-3.5 w-3.5 text-primary" />
+          En pareja
         </button>
       </div>
 
@@ -83,7 +83,7 @@ export default function ExpenseFormFields({
         
         <TextField
           label="División"
-          value={isPersonal ? 'Solo para vos' : '50/50 por ahora'}
+          value={isPersonal ? 'Solo para vos' : '50/50 en pareja'}
           onChange={() => undefined}
           disabled
         />

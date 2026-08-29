@@ -19,8 +19,8 @@ import {
 import { useProfile } from '@/features/auth/ProfileProvider'
 
 /**
- * Dashboard principal de Lovehold.
- * Estética fintech moderna, minimalista y amigable con soporte nativo de Light y Dark themes.
+ * Dashboard principal de Finnic.
+ * Estética fintech moderna, minimalista y orientada a finanzas personales y en pareja.
  */
 export default function DashboardPage() {
   const { profile } = useProfile()
@@ -59,7 +59,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 shadow-xs">
             <span className="h-2 w-2 rounded-full bg-primary" />
             <span className="text-xs font-semibold text-foreground">
-              Hogar Lovehold
+              Finnic Hogar
             </span>
             <span className="rounded-full bg-surface-soft px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
               Pendiente Ale
@@ -221,7 +221,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <h2 className="text-sm font-bold text-foreground">Últimos movimientos</h2>
-                  <p className="text-xs text-muted-foreground">Gastos recientes de la pareja</p>
+                  <p className="text-xs text-muted-foreground">Tus gastos y los compartidos en pareja</p>
                 </div>
               </div>
               <Link
@@ -239,7 +239,7 @@ export default function DashboardPage() {
               </div>
               <p className="mt-3 text-sm font-semibold text-foreground">Todavía no hay gastos este mes</p>
               <p className="mt-1 text-xs text-muted-foreground max-w-[240px]">
-                Registren su primera compra para ver el detalle y balance automático acá.
+                Registrá tu primera compra para ver el detalle y balance financiero.
               </p>
             </div>
           </div>
@@ -278,9 +278,9 @@ export default function DashboardPage() {
 
           <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
             <StepBadge label="Cuenta creada" done />
-            <StepBadge label="Crear Lovehold" done={false} />
-            <StepBadge label="Invitar a Ale" done={false} />
-            <StepBadge label="Primer gasto" done={false} />
+            <StepBadge label="Primer gasto personal" done={false} />
+            <StepBadge label="Invitar a tu pareja" done={false} />
+            <StepBadge label="Presupuesto mensual" done={false} />
           </div>
         </section>
       )}
@@ -289,7 +289,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between rounded-2xl border border-border/60 bg-surface px-4 py-3 text-xs text-muted-foreground">
         <div className="flex items-center gap-2">
           <HelpCircle className="h-4 w-4 text-muted-foreground" />
-          <span>¿Cómo divide Lovehold los gastos?</span>
+          <span>¿Cómo gestiona Finnic los gastos personales y en pareja?</span>
         </div>
         <button
           onClick={() => setShowHelper((v) => !v)}
@@ -301,8 +301,8 @@ export default function DashboardPage() {
 
       {showHelper && (
         <div className="rounded-2xl border border-border bg-surface p-4 text-xs text-muted-foreground leading-relaxed animate-in fade-in duration-200">
-          <p className="font-semibold text-foreground mb-1">Cálculo automático 50/50</p>
-          Cuando uno de los dos registra un gasto compartido, Lovehold calcula automáticamente cuánto le corresponde a cada uno y actualiza el saldo neto en tiempo real sin cálculos manuales.
+          <p className="font-semibold text-foreground mb-1">Finanzas personales con sincronización en pareja</p>
+          Llevá el control total de tus gastos individuales y, cuando compartas un gasto del hogar o en pareja, Finnic calculará automáticamente la división 50/50 manteniendo tu balance actualizado.
         </div>
       )}
     </div>

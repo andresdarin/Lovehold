@@ -110,7 +110,7 @@ export default function MovementDetailDrawer({ movement, onClose }: Props) {
 
           {movement.scope === 'household' && (
             <div className="mt-5 rounded-2xl border border-border bg-surface-soft p-4 text-xs text-muted-foreground leading-relaxed">
-              Este gasto es compartido 50/50 dentro de tu Lovehold.
+              Este gasto es compartido 50/50 en pareja dentro de Finnic.
             </div>
           )}
         </div>
