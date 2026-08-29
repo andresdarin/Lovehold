@@ -10,6 +10,7 @@ model Profile {
   id             String           @id @default(cuid())
   authUserId     String           @unique
   email          String           @unique
+  whatsappPhone  String?          @unique
   displayName    String?
   avatarUrl      String?
   color          String           @default("#6366f1")
@@ -21,13 +22,13 @@ model Profile {
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
 
-  createdHouseholds   Household[]         @relation("householdCreator")
-  paidExpenses        Expense[]           @relation("paidBy")
-  createdExpenses     Expense[]           @relation("createdBy")
+  createdHouseholds   Household[]              @relation("householdCreator")
+  paidExpenses        Expense[]                @relation("paidBy")
+  createdExpenses     Expense[]                @relation("createdBy")
   householdMembers    HouseholdMember[]
   expenseSplits       ExpenseSplit[]
-  settlementsSent     Settlement[]        @relation("settlementSender")
-  settlementsReceived Settlement[]        @relation("settlementReceiver")
+  settlementsSent     Settlement[]             @relation("settlementSender")
+  settlementsReceived Settlement[]             @relation("settlementReceiver")
   financeAccounts     FinanceAccount[]
   scheduledCashFlows  ScheduledCashFlow[]
   personalExpenses    PersonalExpense[]
@@ -35,6 +36,7 @@ model Profile {
   aiConversations     AiConversation[]
   aiPendingActions    AiPendingAction[]
   aiRuns              AiRun[]
+  inboundMessages     WhatsAppInboundMessage[]
 }
 
 enum FinanceCurrency {
@@ -387,15 +389,42 @@ model AiConversation {
   id        String   @id @default(cuid())
   profileId String
   title     String?
+  channel   String?  @default("web")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  profile        Profile           @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  messages       AiMessage[]
-  pendingActions AiPendingAction[]
-  runs           AiRun[]
+  profile          Profile                  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  messages         AiMessage[]
+  pendingActions   AiPendingAction[]
+  runs             AiRun[]
+  whatsappMessages WhatsAppInboundMessage[]
 
   @@index([profileId, updatedAt])
+}
+
+model WhatsAppInboundMessage {
+  id                  String    @id @default(cuid())
+  wamid               String    @unique
+  from                String
+  phoneNumberId       String?
+  profileId           String?
+  conversationId      String?
+  type                String // text
+  body                String?   @db.Text
+  receivedAt          DateTime  @default(now())
+  status              String    @default("received") // received|processing|completed|failed
+  processingStartedAt DateTime?
+  completedAt         DateTime?
+  error               String?   @db.Text
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  profile      Profile?        @relation(fields: [profileId], references: [id], onDelete: SetNull)
+  conversation AiConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+
+  @@index([from, createdAt])
+  @@index([status])
+  @@index([phoneNumberId])
 }
 
 model AiMessage {
