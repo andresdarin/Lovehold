@@ -38,7 +38,7 @@ export class AgentOrchestrator {
     const prompt = { systemPrompt: effective.prompt.content, generationConfig: { temperature: effective.model.temperature, maxOutputTokens: effective.model.maxTokens, responseMimeType: effective.model.responseMimeType } }
     const enabledTools = new Set(effective.tools.filter(tool => tool.enabled).map(tool => tool.name))
     const declarations = this.registry.getDeclarations().filter(tool => enabledTools.has(tool.name))
-    const run = await this.observability.startRun({ ...this.runMeta(req), conversationId: req.conversationId })
+    const run = await this.observability.startRun({ ...this.runMeta(req, effective.model.model), conversationId: req.conversationId })
     try {
       await this.context.assertConversationOwnership(req.profileId, req.conversationId)
       const window = await this.conversations.getRecentWindow(req.conversationId, 20)
@@ -78,7 +78,7 @@ export class AgentOrchestrator {
     const action = await this.pending.getForConfirm(req.profileId, req.pendingActionId)
     if (action.status === 'completed' || action.status === 'failed') return { text: this.resultText(action.result), conversationId: action.conversationId }
     if (action.status === 'cancelled' || action.status === 'expired') return { text: 'La operación ya no está disponible.', conversationId: action.conversationId }
-    const run = await this.observability.startRun({ ...this.runMeta(req), conversationId: action.conversationId })
+    const run = await this.observability.startRun({ ...this.runMeta(req, effective.model.model), conversationId: action.conversationId })
     try {
       const confirmed = await this.pending.confirm(req.profileId, req.pendingActionId, effective.policy.limits)
       if (!confirmed.claimed && confirmed.leaseActive) return { text: 'La operación ya está siendo procesada.', conversationId: confirmed.conversationId, pendingActionId: confirmed.id }
@@ -105,7 +105,7 @@ export class AgentOrchestrator {
     } catch (error) { await this.observability.endRun(run.id, { status: 'failed', error: error instanceof Error ? error.message : 'Confirmation failed' }).catch(() => undefined); return { text: 'No pude confirmar la operación.', conversationId: action.conversationId } }
   }
 
-  private runMeta(req: { profileId: string }) { return { profileId: req.profileId, model: this.config?.get('GEMINI_API_MODEL') || 'gemini-2.5-flash', promptId: FINNIC_PROMPT_ID } }
+  private runMeta(req: { profileId: string }, model?: string) { return { profileId: req.profileId, model: model || this.config?.get('GEMINI_API_MODEL') || 'gemini-2.5-flash', promptId: FINNIC_PROMPT_ID } }
   private resolveConfig(): Promise<EffectiveAiConfig> { return this.resolver?.resolve('finnic', this.config?.get('AI_ENV') || process.env.AI_ENV || 'PROD') || Promise.resolve({ agent: { id: 'finnic', slug: 'finnic', name: 'Finnic' }, prompt: { id: FINNIC_PROMPT_ID, key: 'finnic-system', content: this.prompts.get(FINNIC_PROMPT_ID).systemPrompt, version: 1 }, model: { model: this.config?.get('GEMINI_API_MODEL') || 'gemini-2.5-flash', temperature: .5, maxTokens: 1024, responseMimeType: 'text/plain' }, tools: this.registry.listNames().map(name => ({ name, enabled: true, requireConfirmation: name === 'create_expense', maxAttempts: 3 })), policy: { confirmationPolicy: 'writes', limits: { maxIterations: MAX_ITERATIONS, leaseMs: 120000, maxAttempts: 3 } } }) }
   private async complete(id: string, req: AgentRequest, text: string, toolCalls: AgentResponse['toolCalls']) { await this.conversations.createMessage({ conversationId: req.conversationId, role: AiMessageRole.ASSISTANT, content: text }); await this.observability.endRun(id, { status: 'completed' }); await this.conversations.touch(req.conversationId); return { text, conversationId: req.conversationId, toolCalls } }
   private async log(runId: string, call: FunctionCall, risk: string, success: boolean, error?: string, durationMs?: number) { await this.observability.logToolCall({ runId, toolName: call.name, risk, input: call.args, success, error, durationMs }) }

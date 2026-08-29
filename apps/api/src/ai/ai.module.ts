@@ -14,11 +14,13 @@ import { AiContextService } from './context/ai-context.service'
 import { AiConversationService } from './conversation/ai-conversation.service'
 import { AiPendingActionService } from './pending/ai-pending-action.service'
 import { AiObservabilityService } from './observability/ai-observability.service'
+import { AiConfigService } from './config/ai-config.service'
+import { AiConfigResolver } from './config/ai-config.resolver'
 
 @Module({
   imports: [ConfigModule, FinanceModule, PrismaModule],
   controllers: [AiChatController, AiController],
-  providers: [aiConfigProvider, GeminiClient, PromptRegistry, ToolRegistry, ToolExecutor, AiChatService, AiContextService, AiConversationService, AiPendingActionService, AiObservabilityService, AgentOrchestrator],
-  exports: [GeminiClient, PromptRegistry, ToolRegistry, ToolExecutor, AiChatService, AiContextService, AiConversationService, AiPendingActionService, AiObservabilityService, AgentOrchestrator],
+  providers: [aiConfigProvider, GeminiClient, PromptRegistry, AiConfigService, AiConfigResolver, ToolRegistry, ToolExecutor, AiChatService, AiContextService, AiConversationService, AiPendingActionService, AiObservabilityService, AgentOrchestrator],
+  exports: [GeminiClient, PromptRegistry, AiConfigService, AiConfigResolver, ToolRegistry, ToolExecutor, AiChatService, AiContextService, AiConversationService, AiPendingActionService, AiObservabilityService, AgentOrchestrator],
 })
 export class AiModule {}
