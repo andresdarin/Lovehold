@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import Sidebar from './sidebar/Sidebar'
 import Topbar from './Topbar'
 import MobileNav from './MobileNav'
@@ -21,6 +22,8 @@ interface AppShellProps {
  */
 export default function AppShell({ children, profile, onLogout }: AppShellProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const pathname = usePathname()
+  const isDashboard = pathname === '/dashboard' || pathname === '/'
 
   return (
     <div className="app-backdrop min-h-screen text-foreground overflow-x-hidden relative">
@@ -32,8 +35,8 @@ export default function AppShell({ children, profile, onLogout }: AppShellProps)
         onToggle={() => setSidebarCollapsed((prev) => !prev)}
       />
 
-      {/* Topbar (Mobile) */}
-      <Topbar profile={profile} />
+      {/* Topbar (Mobile) - Se omite en Dashboard para integrar el hero full-bleed */}
+      {!isDashboard && <Topbar profile={profile} />}
 
       {/* Contenido Principal */}
       <main
@@ -41,7 +44,7 @@ export default function AppShell({ children, profile, onLogout }: AppShellProps)
           sidebarCollapsed ? 'lg:pl-[124px]' : 'lg:pl-[292px]'
         }`}
       >
-        <div className="p-4 md:p-6 lg:p-8">
+        <div className={isDashboard ? '' : 'p-4 md:p-6 lg:p-8'}>
           {children}
         </div>
       </main>
