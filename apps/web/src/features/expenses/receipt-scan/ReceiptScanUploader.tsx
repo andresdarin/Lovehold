@@ -1,8 +1,5 @@
-'use client'
-
 import { useState, useEffect } from 'react'
-import { Camera, ImageUp, ScanLine, X, Loader2 } from 'lucide-react'
-import LiquidGlass from '@/components/ui/LiquidGlass'
+import { Camera, Upload, ScanLine, X, Loader2 } from 'lucide-react'
 
 export default function ReceiptScanUploader({
   preview, scanning, onFileSelect, onScan, onClear,
@@ -63,27 +60,27 @@ export default function ReceiptScanUploader({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className="relative flex h-full flex-col rounded-[20px] border border-white/[0.08] bg-gradient-to-b from-white/[0.055] to-white/[0.025] p-4 shadow-[0_14px_40px_rgba(0,0,0,0.28)] transition-all duration-200 mb-4"
+      className="relative flex flex-col rounded-xl border-[0.5px] border-white/[0.08] bg-[#121214]/60 backdrop-blur-[20px] p-4 transition-all duration-200 select-none"
     >
       {isDragging && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-[20px] border-2 border-dashed border-primary bg-background/85 backdrop-blur-md transition-all duration-200">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-primary bg-background/85 backdrop-blur-md transition-all duration-200">
           <ScanLine className="h-10 w-10 animate-pulse text-primary mb-2" />
-          <p className="text-xs font-bold text-foreground">Soltá la imagen del ticket acá</p>
+          <p className="text-xs font-medium text-foreground">Soltá la imagen del ticket acá</p>
         </div>
       )}
-      <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10" aria-hidden="true">
-          <ScanLine className="h-4 w-4 text-primary" />
+      
+      {/* Header plano */}
+      <div className="pb-3 border-b-[0.5px] border-white/[0.08]">
+        <div className="flex items-center gap-2">
+          <ScanLine className="h-[18px] w-[18px] text-foreground" />
+          <h2 className="text-[15px] font-medium text-foreground">Escanear ticket</h2>
         </div>
-        <div>
-          <h2 className="text-sm font-bold text-foreground">Escanear ticket</h2>
-          <p className="text-xs text-muted-foreground">Sacá una foto o subí una imagen del ticket.</p>
-        </div>
+        <p className="text-xs text-muted-foreground mt-1">Sacá una foto o subí una imagen del ticket.</p>
       </div>
 
       <div className="mt-4 flex min-h-0 flex-1 flex-col gap-3">
         {preview ? (
-          <div className="relative min-h-64 flex-1 overflow-hidden rounded-xl bg-black/10">
+          <div className="relative min-h-64 flex-1 overflow-hidden rounded-lg bg-black/10">
             <img
               src={preview}
               alt="Vista previa del ticket"
@@ -93,17 +90,17 @@ export default function ReceiptScanUploader({
               type="button"
               onClick={onClear}
               disabled={scanning}
-              className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white transition hover:bg-black/75 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white transition hover:bg-black/75 disabled:opacity-50 focus:outline-none"
               aria-label="Quitar imagen"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
         ) : (
-          <div className="flex gap-2">
-            <label className="flex h-24 flex-1 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-white/[0.08] bg-white/[0.02] px-2 py-4 text-center transition hover:border-primary/40 hover:bg-white/[0.04]">
-              <ImageUp className="h-[22px] w-[22px] text-muted-foreground" />
-              <span className="text-xs font-medium text-muted-foreground">Subir imagen</span>
+          <div className="grid grid-cols-2 gap-2.5">
+            <label className="flex h-[80px] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border-[1px] border-dashed border-white/10 bg-transparent text-center hover:border-primary/45 hover:bg-white/[0.02] transition-all">
+              <Upload className="h-5 w-5 text-muted-foreground" />
+              <span className="text-[13px] text-muted-foreground font-normal">Subir imagen</span>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
@@ -114,9 +111,9 @@ export default function ReceiptScanUploader({
                 }}
               />
             </label>
-            <label className="flex h-24 flex-1 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-white/[0.08] bg-white/[0.02] px-2 py-4 text-center transition hover:border-primary/40 hover:bg-white/[0.04]">
-              <Camera className="h-[22px] w-[22px] text-muted-foreground" />
-              <span className="text-xs font-medium text-muted-foreground">Sacar foto</span>
+            <label className="flex h-[80px] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border-[1px] border-dashed border-white/10 bg-transparent text-center hover:border-primary/45 hover:bg-white/[0.02] transition-all">
+              <Camera className="h-5 w-5 text-muted-foreground" />
+              <span className="text-[13px] text-muted-foreground font-normal">Sacar foto</span>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
@@ -132,20 +129,18 @@ export default function ReceiptScanUploader({
         )}
 
         {preview && !scanning && (
-          <LiquidGlass variant="button" intensity="medium" className="mt-auto block w-full">
-            <button
-              type="button"
-              onClick={onScan}
-              className="flex w-full items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold text-foreground focus-visible:outline-none"
-            >
-              <ScanLine className="h-4 w-4 text-primary" />
-              Analizar ticket
-            </button>
-          </LiquidGlass>
+          <button
+            type="button"
+            onClick={onScan}
+            className="flex w-full items-center justify-center gap-1.5 py-2.5 text-xs font-medium rounded-lg border border-white/10 bg-white/[0.02] text-foreground hover:bg-white/[0.06] transition-colors focus:outline-none"
+          >
+            <ScanLine className="h-4 w-4 text-foreground/70" />
+            Analizar ticket
+          </button>
         )}
 
         {scanning && (
-          <div className="mt-auto flex items-center justify-center gap-2.5 rounded-xl bg-white/[0.04] py-3">
+          <div className="flex items-center justify-center gap-2 py-3 rounded-lg bg-white/[0.03]">
             <Loader2 className="h-4 w-4 animate-spin text-primary" />
             <span className="text-xs font-medium text-muted-foreground">Analizando ticket con IA…</span>
           </div>

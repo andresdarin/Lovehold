@@ -1,6 +1,4 @@
-'use client'
-
-import { ShoppingBasket, Heart, User } from 'lucide-react'
+import { Heart, User, Receipt, ChevronDown, Calendar } from 'lucide-react'
 import CustomDatePicker from '@/components/ui/CustomDatePicker'
 import type { ExpenseForm } from './types'
 
@@ -14,97 +12,117 @@ export default function ExpenseFormFields({
   const isPersonal = form.scope === 'personal'
 
   return (
-    <div className="rounded-[20px] border border-white/[0.08] bg-gradient-to-b from-white/[0.055] to-white/[0.025] p-4 shadow-sm">
-      <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-          <ShoppingBasket className="h-4 w-4 text-primary" />
+    <div className="rounded-xl border-[0.5px] border-white/[0.08] bg-[#121214]/60 backdrop-blur-[20px] p-4 transition-all duration-200 select-none flex flex-col gap-3">
+      {/* Header plano */}
+      <div className="pb-3 border-b-[0.5px] border-white/[0.08] flex flex-col gap-1">
+        <div className="flex items-center gap-2">
+          <Receipt className="h-[18px] w-[18px] text-foreground" />
+          <h2 className="text-[15px] font-medium text-foreground">Datos generales</h2>
         </div>
-        <div>
-          <h2 className="text-sm font-bold text-foreground">Datos generales</h2>
-          <p className="text-xs text-muted-foreground">
-            {isPersonal
-              ? 'Gasto personal, no se divide con nadie.'
-              : 'El ticket se guarda como gasto compartido 50/50.'}
-          </p>
-        </div>
+        <p className="text-xs text-muted-foreground">
+          {isPersonal
+            ? 'Gasto personal, no se divide con nadie.'
+            : 'El ticket se guarda como gasto compartido 50/50.'}
+        </p>
       </div>
 
-      <div className="mt-4 flex h-10 gap-1 rounded-xl border border-white/[0.08] bg-white/[0.04] p-1">
+      {/* Toggle de Tipo de Gasto */}
+      <div className="flex h-10 gap-1 rounded-lg border border-white/[0.08] bg-black/35 p-1">
         <button
           type="button"
           onClick={() => onUpdate('scope', 'personal')}
-          className={`flex flex-1 items-center justify-center gap-2 rounded-lg text-xs font-semibold transition ${
-            isPersonal ? 'bg-white/[0.08] text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.2)] border border-white/[0.04]' : 'text-muted-foreground hover:text-foreground'
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-md text-xs font-semibold transition-all ${
+            isPersonal 
+              ? 'bg-white/[0.08] border border-white/[0.08] text-foreground shadow-[0_1px_2px_rgba(0,0,0,0.05)]' 
+              : 'text-muted-foreground hover:text-foreground bg-transparent border border-transparent'
           }`}
         >
-          <User className="h-3.5 w-3.5" />
+          <User className="h-4 w-4" />
           Personal
         </button>
         <button
           type="button"
           onClick={() => onUpdate('scope', 'household')}
-          className={`flex flex-1 items-center justify-center gap-2 rounded-lg text-xs font-semibold transition ${
-            !isPersonal ? 'bg-white/[0.08] text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.2)] border border-white/[0.04]' : 'text-muted-foreground hover:text-foreground'
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-md text-xs font-semibold transition-all ${
+            !isPersonal 
+              ? 'bg-white/[0.08] border border-white/[0.08] text-foreground shadow-[0_1px_2px_rgba(0,0,0,0.05)]' 
+              : 'text-muted-foreground hover:text-foreground bg-transparent border border-transparent'
           }`}
         >
-          <Heart className="h-3.5 w-3.5" />
+          <Heart className="h-4 w-4" />
           Lovehold
         </button>
       </div>
 
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
+      {/* Campos de Formulario */}
+      <div className="flex flex-col gap-4">
         <TextField label="Título" value={form.title} onChange={(v) => onUpdate('title', v)} placeholder="Compra Tata" required />
         <TextField label="Comercio" value={form.merchant} onChange={(v) => onUpdate('merchant', v)} placeholder="Tata" />
-        <TextField label="Categoría general" value={form.category} onChange={(v) => onUpdate('category', v)} placeholder="Compras de súper" required />
+        <TextField label="Categoría general" value={form.category} onChange={(v) => onUpdate('category', v)} placeholder="Compras de súper" required isSelect />
+        
         <div className="block">
-          <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Fecha</span>
-          <CustomDatePicker
-            className="mt-1.5 w-full text-xs font-semibold"
-            value={form.date}
-            onChange={(v) => onUpdate('date', v)}
-            required
-          />
+          <span className="text-[11px] font-normal uppercase tracking-[0.05em] text-muted-foreground">Fecha</span>
+          <div className="relative mt-1">
+            <CustomDatePicker
+              className="w-full text-sm font-normal h-11 rounded-md border border-white/[0.08] bg-black/35 px-3 text-foreground focus:border-primary/45 focus:outline-none transition-colors"
+              value={form.date}
+              onChange={(v) => onUpdate('date', v)}
+              required
+            />
+            <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          </div>
         </div>
-        <TextField label="Método de pago" value={form.paymentMethod} onChange={(v) => onUpdate('paymentMethod', v)} placeholder="Débito VISA" />
+
+        <TextField label="Método de pago" value={form.paymentMethod} onChange={(v) => onUpdate('paymentMethod', v)} placeholder="Débito VISA" isSelect />
         <TextField label="Total declarado" type="number" min="0" step="0.01" value={form.amount} onChange={(v) => onUpdate('amount', v)} placeholder="0.00" required />
+        
         {isPersonal ? (
           <TextField label="Pagado por" value="Vos" onChange={() => undefined} disabled />
         ) : (
-          <TextField label="Pagó" value={profileName} onChange={() => undefined} disabled />
+          <TextField label="Pagado por" value={profileName} onChange={() => undefined} disabled />
         )}
+        
         <TextField
           label="División"
           value={isPersonal ? 'Solo para vos' : '50/50 por ahora'}
           onChange={() => undefined}
           disabled
         />
-      </div>
 
-      <label className="mt-3 block">
-        <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Notas</span>
-        <textarea
-          value={form.notes} onChange={(e) => onUpdate('notes', e.target.value)}
-          placeholder="Algo útil para recordar esta compra"
-          className="mt-1.5 min-h-[72px] max-h-[88px] w-full resize-none rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs font-semibold text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
-        />
-      </label>
+        {/* Notas */}
+        <label className="block">
+          <span className="text-[11px] font-normal uppercase tracking-[0.05em] text-muted-foreground">Notas</span>
+          <textarea
+            value={form.notes} 
+            onChange={(e) => onUpdate('notes', e.target.value)}
+            placeholder="Algo útil para recordar esta compra"
+            className="mt-1 min-h-[80px] w-full resize-none rounded-md border border-white/[0.08] bg-black/35 px-3 py-2 text-sm font-normal text-foreground placeholder:text-muted-foreground focus:border-primary/45 focus:outline-none transition-colors"
+          />
+        </label>
+      </div>
     </div>
   )
 }
 
-function TextField({ label, value, onChange, placeholder, type = 'text', disabled = false, required = false, min, step }: {
+function TextField({ label, value, onChange, placeholder, type = 'text', disabled = false, required = false, min, step, isSelect = false }: {
   label: string; value: string; onChange: (value: string) => void
   placeholder?: string; type?: string; disabled?: boolean; required?: boolean; min?: string; step?: string
+  isSelect?: boolean
 }) {
   return (
     <label className="block">
-      <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{label}</span>
-      <input
-        type={type} value={value} min={min} step={step} required={required} disabled={disabled}
-        placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
-        className="mt-1.5 h-11 w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 text-xs font-semibold text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:bg-white/[0.02] disabled:text-muted-foreground/60 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
-      />
+      <span className="text-[11px] font-normal uppercase tracking-[0.05em] text-muted-foreground">{label}</span>
+      <div className="relative mt-1">
+        <input
+          type={type} value={value} min={min} step={step} required={required} disabled={disabled}
+          placeholder={placeholder}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-11 w-full rounded-md border border-white/[0.08] bg-black/35 px-3 pr-10 text-sm font-normal text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-60 focus:border-primary/45 focus:outline-none transition-colors"
+        />
+        {isSelect && (
+          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+        )}
+      </div>
     </label>
   )
 }

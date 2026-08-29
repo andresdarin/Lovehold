@@ -30,7 +30,10 @@ export default function NewExpensePage() {
   }
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit() }} className="space-y-6">
+    <form 
+      onSubmit={(e) => { e.preventDefault(); form.handleSubmit() }} 
+      className="max-w-[390px] mx-auto w-full px-4 py-6 space-y-3"
+    >
       <NewExpenseHeader />
 
       <ReceiptScanSection
@@ -49,7 +52,6 @@ export default function NewExpensePage() {
           items={form.items}
           onAddItem={form.addItem}
           onRemoveItem={form.removeItem}
-          onClearItems={form.clearItems}
           onUpdateItem={form.updateItem}
           onUseItemsTotal={form.useItemsTotalAsAmount}
         />

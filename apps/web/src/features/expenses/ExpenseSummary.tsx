@@ -1,7 +1,4 @@
-'use client'
-
-import { AlertTriangle, CheckCircle2, Calculator, Save, ArrowRight } from 'lucide-react'
-import LiquidGlass from '@/components/ui/LiquidGlass'
+import { AlertTriangle, CheckCircle2, ReceiptText, Save, ArrowRight } from 'lucide-react'
 import { money } from './constants'
 
 export default function ExpenseSummary({
@@ -27,72 +24,84 @@ export default function ExpenseSummary({
         : 'Podés guardar el gasto general sin productos.'
 
   return (
-    <aside className="rounded-[20px] border border-white/[0.08] bg-gradient-to-b from-white/[0.055] to-white/[0.025] p-4 shadow-sm xl:sticky xl:top-6">
-      <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent/10">
-          <Calculator className="h-4 w-4 text-accent" />
+    <aside className="rounded-xl border-[0.5px] border-white/[0.08] bg-[#121214]/60 backdrop-blur-[20px] p-4 transition-all duration-200 select-none flex flex-col gap-3">
+      {/* Header plano */}
+      <div className="pb-3 border-b-[0.5px] border-white/[0.08] flex flex-col gap-1">
+        <div className="flex items-center gap-2">
+          <ReceiptText className="h-[18px] w-[18px] text-foreground" />
+          <h2 className="text-[15px] font-medium text-foreground">Resumen</h2>
         </div>
-        <div>
-          <h2 className="text-sm font-bold text-foreground">Resumen</h2>
-          <p className="text-xs text-muted-foreground">La diferencia por redondeo es $0.05.</p>
-        </div>
+        <p className="text-xs text-muted-foreground">La diferencia por redondeo es $0.05.</p>
       </div>
 
-      <div className="mt-4 divide-y divide-white/[0.08] border-y border-white/[0.08]">
+      {/* Lista de filas */}
+      <div className="border-b border-white/[0.08] pb-1">
         <SummaryRow label="Total declarado" value={money(declaredTotal)} />
         <SummaryRow label="Suma de ítems" value={money(itemsTotal)} />
         <SummaryRow label="Descuentos" value={discounts > 0 ? `-${money(discounts)}` : money(0)} />
         <SummaryRow label="Diferencia" value={money(difference)} danger={hasBlockingDifference} />
       </div>
 
-      <div className={`mt-3 flex gap-3 rounded-xl border p-3 text-xs ${hasBlockingDifference ? 'border-danger/40 bg-danger/10 text-danger' : 'border-white/[0.08] bg-white/[0.02] text-muted-foreground'}`}>
-        {hasBlockingDifference ? <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" /> : <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-success" />}
-        <span>{statusText}</span>
+      {/* Mensaje de estado en una línea */}
+      <div className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
+        {hasBlockingDifference ? (
+          <AlertTriangle className="h-4 w-4 text-danger shrink-0 mt-0.5" />
+        ) : (
+          <CheckCircle2 className="h-4 w-4 text-success shrink-0 mt-0.5" />
+        )}
+        <span className="truncate">{statusText}</span>
       </div>
 
+      {/* Nota informativa sin borde ni fondo */}
       {isSupermarketExpense && itemsCount === 0 && (
-        <div className="mt-3 rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 text-xs text-muted-foreground">
-          Para compras de súper conviene cargar productos: después esto alimenta las categorías mensuales.
+        <div className="text-xs text-muted-foreground p-3 select-none leading-relaxed">
+          Para compras de súper conviene cargar productos; después esto alimenta las categorías mensuales.
         </div>
       )}
 
       {error && (
-        <div className="mt-3 flex gap-3 rounded-xl border border-danger/40 bg-danger/10 p-3 text-xs text-danger">
-          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+        <div className="flex gap-2.5 rounded-lg border border-danger/30 bg-danger/5 p-3 text-xs text-danger">
+          <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>
       )}
 
       {success && (
-        <div className="mt-3 space-y-2">
-          <div className="flex gap-3 rounded-xl border border-success/40 bg-success/10 p-3 text-xs text-success">
-            <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+        <div className="space-y-2">
+          <div className="flex gap-2.5 rounded-lg border border-success/30 bg-success/5 p-3 text-xs text-success">
+            <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" />
             <span>{success}</span>
           </div>
-          <button type="button" onClick={onGoToMovements}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-primary/25 transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
+          <button 
+            type="button" 
+            onClick={onGoToMovements}
+            className="flex w-full items-center justify-center gap-1.5 h-11 rounded-lg border border-white/10 bg-white/[0.02] text-sm font-medium text-foreground hover:bg-white/[0.06] transition-colors focus:outline-none"
+          >
             Ver en movimientos
             <ArrowRight className="h-3.5 w-3.5" />
           </button>
         </div>
       )}
 
-      <LiquidGlass variant="button" intensity="medium" disabled={!canSubmit} className="mt-4 block overflow-hidden rounded-full">
-        <button type="submit" disabled={!canSubmit} onClick={onSubmit}
-          className="flex w-full items-center justify-center gap-2 px-5 py-3 text-xs font-bold text-foreground disabled:cursor-not-allowed focus-visible:outline-none">
-          <Save className="h-3.5 w-3.5 text-primary" />
-          {isSubmitting ? 'Guardando…' : 'Guardar gasto'}
-        </button>
-      </LiquidGlass>
+      {/* Botón Guardar gasto en estilo secundario (outline) */}
+      <button 
+        type="submit" 
+        disabled={!canSubmit || isSubmitting} 
+        onClick={onSubmit}
+        className="w-full flex items-center justify-center gap-1.5 h-11 rounded-lg border border-white/10 bg-white/[0.02] text-sm font-medium text-foreground hover:bg-white/[0.06] transition-colors focus:outline-none disabled:opacity-50"
+      >
+        <Save className="h-4 w-4 text-muted-foreground" />
+        {isSubmitting ? 'Guardando…' : 'Guardar gasto'}
+      </button>
     </aside>
   )
 }
 
 function SummaryRow({ label, value, danger = false }: { label: string; value: string; danger?: boolean }) {
   return (
-    <div className="flex items-center justify-between gap-4 py-2">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span className={`text-xs font-bold ${danger ? 'text-danger' : 'text-foreground'}`}>{value}</span>
+    <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] py-2.5 last:border-b-0">
+      <span className="text-[13px] text-muted-foreground">{label}</span>
+      <span className={`text-sm font-medium ${danger ? 'text-danger' : 'text-foreground'}`}>{value}</span>
     </div>
   )
 }
