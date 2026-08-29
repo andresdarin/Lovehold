@@ -1,7 +1,16 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ShoppingCart, Zap, Home, Tag, Receipt } from 'lucide-react'
+import {
+  ShoppingCart,
+  Zap,
+  Home,
+  Tag,
+  Receipt,
+  ArrowUp,
+  ArrowLeftRight,
+  CreditCard,
+} from 'lucide-react'
 import { formatCurrency, formatDate, CATEGORY_LABELS } from './constants'
 import type { PersonalExpense } from './types'
 
@@ -9,12 +18,26 @@ interface RecentExpensesListProps {
   expenses: PersonalExpense[]
 }
 
-function getCategoryIcon(category: string) {
-  const cat = category.toLowerCase()
+function getMovementIcon(exp: PersonalExpense) {
+  if (exp.movementType === 'INCOME') {
+    return <ArrowUp className="h-4 w-4 text-emerald-400" />
+  }
+  if (exp.movementType === 'TRANSFER') {
+    return <ArrowLeftRight className="h-4 w-4 text-primary" />
+  }
+  if (exp.financeAccount?.type === 'CREDIT') {
+    return <CreditCard className="h-4 w-4 text-amber-400" />
+  }
+
+  const cat = exp.category.toLowerCase()
   if (cat === 'supermercado' || cat === 'supermarket') {
     return <ShoppingCart className="h-4 w-4" />
   }
-  if (['ute', 'ose', 'antel', 'internet', 'gastos_comunes', 'servicios', 'services', 'salud'].includes(cat)) {
+  if (
+    ['ute', 'ose', 'antel', 'internet', 'gastos_comunes', 'servicios', 'services', 'salud'].includes(
+      cat,
+    )
+  ) {
     return <Zap className="h-4 w-4" />
   }
   if (cat === 'alquiler' || cat === 'rental') {
@@ -30,7 +53,7 @@ export default function RecentExpensesList({ expenses }: RecentExpensesListProps
     return (
       <div className="flex flex-col items-center gap-2 py-8 text-center bg-transparent">
         <Receipt className="h-8 w-8 text-muted-foreground/45" />
-        <p className="text-xs text-muted-foreground">No hay gastos este mes</p>
+        <p className="text-xs text-muted-foreground">No hay movimientos este mes</p>
       </div>
     )
   }
@@ -39,32 +62,66 @@ export default function RecentExpensesList({ expenses }: RecentExpensesListProps
 
   return (
     <div className="flex flex-col gap-3">
-      {displayedExpenses.map((exp) => (
-        <div 
-          key={exp.id} 
-          className="flex items-center gap-3 bg-transparent pb-3 border-b-[0.5px] border-border/50 last:border-b-0 last:pb-0"
-        >
-          {/* Círculo pequeño de 32px */}
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-surface-soft text-foreground/80">
-            {getCategoryIcon(exp.category)}
-          </div>
+      {displayedExpenses.map((exp) => {
+        const isIncome = exp.movementType === 'INCOME'
+        const isTransfer = exp.movementType === 'TRANSFER'
+        const accountName =
+          isTransfer && exp.financeAccount && exp.destinationAccount
+            ? `${exp.financeAccount.name} → ${exp.destinationAccount.name}`
+            : exp.financeAccount?.name
 
-          {/* Columna central */}
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-foreground">
-              {exp.merchant || exp.title}
-            </p>
-            <p className="truncate text-xs text-muted-foreground mt-0.5">
-              {CATEGORY_LABELS[exp.category] ?? exp.category} · {formatDate(exp.date)}
+        return (
+          <div
+            key={exp.id}
+            className="flex items-center gap-3 bg-transparent pb-3 border-b-[0.5px] border-border/50 last:border-b-0 last:pb-0"
+          >
+            {/* Ícono contextual */}
+            <div
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border ${
+                isIncome
+                  ? 'border-emerald-500/30 bg-emerald-500/10'
+                  : isTransfer
+                  ? 'border-primary/30 bg-primary/10'
+                  : exp.financeAccount?.type === 'CREDIT'
+                  ? 'border-amber-500/30 bg-amber-500/10'
+                  : 'border-border bg-surface-soft text-foreground/80'
+              }`}
+            >
+              {getMovementIcon(exp)}
+            </div>
+
+            {/* Columna central */}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <p className="truncate text-sm font-medium text-foreground">
+                  {exp.merchant || exp.title}
+                </p>
+                {accountName && (
+                  <span className="shrink-0 rounded-md bg-surface-soft px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                    {accountName}
+                  </span>
+                )}
+              </div>
+              <p className="truncate text-xs text-muted-foreground mt-0.5">
+                {CATEGORY_LABELS[exp.category] ?? exp.category} · {formatDate(exp.date)}
+              </p>
+            </div>
+
+            {/* Monto a la derecha */}
+            <p
+              className={`shrink-0 text-sm font-bold ${
+                isIncome
+                  ? 'text-emerald-400'
+                  : isTransfer
+                  ? 'text-foreground'
+                  : 'text-primary'
+              }`}
+            >
+              {isIncome ? `+${formatCurrency(exp.amount)}` : isTransfer ? formatCurrency(exp.amount) : `-${formatCurrency(exp.amount)}`}
             </p>
           </div>
-
-          {/* Monto a la derecha */}
-          <p className="shrink-0 text-sm font-medium text-primary">
-            {formatCurrency(exp.amount)}
-          </p>
-        </div>
-      ))}
+        )
+      })}
 
       {expenses.length > 10 && !showAll && (
         <button

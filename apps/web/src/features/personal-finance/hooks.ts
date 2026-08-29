@@ -4,7 +4,12 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { apiFetch } from '@/lib/api'
 import { currentMonthKey } from './constants'
-import type { PersonalExpense } from './types'
+import type {
+  PersonalExpense,
+  FinanceAccount,
+  CreateTransferData,
+  RegisterIncomeData,
+} from './types'
 
 export function usePersonalFinance(monthKey?: string) {
   const key = monthKey ?? currentMonthKey()
@@ -19,7 +24,11 @@ export function usePersonalFinance(monthKey?: string) {
       const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('No session')
-      const data = await apiFetch<PersonalExpense[]>(`/api/personal-finance?monthKey=${key}`, {}, session.access_token)
+      const data = await apiFetch<PersonalExpense[]>(
+        `/api/personal-finance?monthKey=${key}`,
+        {},
+        session.access_token,
+      )
       setExpenses(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar gastos')
@@ -35,6 +44,38 @@ export function usePersonalFinance(monthKey?: string) {
   return { expenses, loading, error, refetch: fetchExpenses }
 }
 
+export function useFinanceAccounts() {
+  const [accounts, setAccounts] = useState<FinanceAccount[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchAccounts = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('No session')
+      const data = await apiFetch<FinanceAccount[]>(
+        '/api/finance/accounts',
+        {},
+        session.access_token,
+      )
+      setAccounts(data)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al cargar cuentas')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchAccounts()
+  }, [fetchAccounts])
+
+  return { accounts, loading, error, refetch: fetchAccounts }
+}
+
 export function useCreateExpense() {
   const [submitting, setSubmitting] = useState(false)
 
@@ -44,14 +85,68 @@ export function useCreateExpense() {
       const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('No session')
-      return await apiFetch<PersonalExpense>('/api/personal-finance', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      }, session.access_token)
+      return await apiFetch<PersonalExpense>(
+        '/api/personal-finance',
+        {
+          method: 'POST',
+          body: JSON.stringify(data),
+        },
+        session.access_token,
+      )
     } finally {
       setSubmitting(false)
     }
   }, [])
 
   return { create, submitting }
+}
+
+export function useCreateTransfer() {
+  const [submitting, setSubmitting] = useState(false)
+
+  const transfer = useCallback(async (data: CreateTransferData) => {
+    setSubmitting(true)
+    try {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('No session')
+      return await apiFetch<PersonalExpense>(
+        '/api/finance/transfers',
+        {
+          method: 'POST',
+          body: JSON.stringify(data),
+        },
+        session.access_token,
+      )
+    } finally {
+      setSubmitting(false)
+    }
+  }, [])
+
+  return { transfer, submitting }
+}
+
+export function useRegisterIncome() {
+  const [submitting, setSubmitting] = useState(false)
+
+  const income = useCallback(async (data: RegisterIncomeData) => {
+    setSubmitting(true)
+    try {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('No session')
+      return await apiFetch<any>(
+        '/api/finance/incomes',
+        {
+          method: 'POST',
+          body: JSON.stringify(data),
+        },
+        session.access_token,
+      )
+    } finally {
+      setSubmitting(false)
+    }
+  }, [])
+
+  return { income, submitting }
 }

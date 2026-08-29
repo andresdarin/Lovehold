@@ -7,9 +7,11 @@ export function computeSummary(expenses: PersonalExpense[]): MonthlySummary {
   let supermarket = 0
   const byCategory: Record<string, number> = {}
 
-  for (const e of expenses) {
+  const onlyExpenses = expenses.filter((e) => !e.movementType || e.movementType === 'EXPENSE')
+
+  for (const e of onlyExpenses) {
     total += e.amount
-    
+
     // Normalizar y unificar categorías equivalentes de supermercado
     let categoryKey = e.category.toLowerCase().trim()
     if (categoryKey === 'compras de súper' || categoryKey === 'compras de super' || categoryKey === 'supermercado') {
@@ -22,7 +24,7 @@ export function computeSummary(expenses: PersonalExpense[]): MonthlySummary {
     else variable += e.amount
   }
 
-  return { total, fixed, variable, supermarket, count: expenses.length, byCategory }
+  return { total, fixed, variable, supermarket, count: onlyExpenses.length, byCategory }
 }
 
 export function computeProductRanking(items: PersonalExpense['items']): ProductRankingItem[] {
