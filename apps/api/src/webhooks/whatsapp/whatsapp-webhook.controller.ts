@@ -36,6 +36,7 @@ export class WhatsAppWebhookController {
 
   @Post()
   receive(@Body() payload: unknown, @Res() response: WebhookResponse) {
+    this.logger.log({ event: 'whatsapp_webhook_received_raw', payload: JSON.stringify(payload) })
     // Meta requires a quick acknowledgement; processing continues asynchronously.
     response.status(200).send({ status: 'ok' })
     void Promise.resolve().then(() => this.processPayload(payload))
@@ -44,10 +45,11 @@ export class WhatsAppWebhookController {
   private async processPayload(payload: unknown): Promise<void> {
     const message = this.webhookService.parseMetaPayload(payload)
     if (!message) {
-      this.logger.debug({ event: 'whatsapp_webhook_ignored', reason: 'unsupported_or_invalid_message' })
+      this.logger.warn({ event: 'whatsapp_webhook_ignored', reason: 'unsupported_or_invalid_message', payload })
       return
     }
 
+    this.logger.log({ event: 'whatsapp_message_parsed', from: message.from, text: message.text })
     await this.inboundService.process(message)
   }
 }
