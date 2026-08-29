@@ -58,9 +58,13 @@ export interface PersonalExpenseItem {
 
 export interface MonthlySummary {
   total: number
+  totalExpense: number
+  totalIncome: number
+  netBalance: number
   fixed: number
   variable: number
   supermarket: number
+  creditCommitted: number
   count: number
   byCategory: Record<string, number>
 }

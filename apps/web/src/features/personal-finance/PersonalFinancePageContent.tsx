@@ -9,11 +9,12 @@ import {
   ScanLine,
 } from 'lucide-react'
 import { useProfile } from '@/features/auth/ProfileProvider'
-import { usePersonalFinance, useCreateExpense } from './hooks'
+import { usePersonalFinance, useFinanceAccounts, useCreateExpense } from './hooks'
 import { currentMonthKey } from './constants'
 import { computeSummary } from './utils'
 import FinanzasHero from './FinanzasHero'
 import MonthlySummaryCards from './MonthlySummaryCards'
+import FinanzasAccountsCard from './FinanzasAccountsCard'
 import ExpenseForm from './ExpenseForm'
 import ReceiptPasteForm from './ReceiptPasteForm'
 import RecentExpensesList from './RecentExpensesList'
@@ -32,6 +33,7 @@ export default function PersonalFinancePageContent() {
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
 
   const { expenses, loading, error, refetch } = usePersonalFinance(monthKey)
+  const { accounts, loading: loadingAccounts, refetch: refetchAccounts } = useFinanceAccounts()
   const { create, submitting } = useCreateExpense()
 
   const allItems = useMemo(() => expenses.flatMap((e) => e.items ?? []), [expenses])
@@ -48,6 +50,7 @@ export default function PersonalFinancePageContent() {
   async function handleCreate(data: Parameters<typeof ExpenseForm.prototype.props.onSubmit>[0]) {
     await create(data)
     refetch()
+    refetchAccounts()
     setView('overview')
   }
 
@@ -88,7 +91,7 @@ export default function PersonalFinancePageContent() {
         profile={profile}
         monthKey={monthKey}
         onShiftMonth={shiftMonth}
-        totalSpent={summary.total}
+        summary={summary}
       />
 
       {/* 2. Cuerpo Modular Claro (Sand / Surface) */}
@@ -135,10 +138,15 @@ export default function PersonalFinancePageContent() {
           <p className="rounded-xl border border-danger/30 bg-danger/5 p-4 text-sm text-danger">{error}</p>
         ) : (
           <div className="flex flex-col gap-6">
-            {/* 3. Tarjetas de desglose mensual */}
+            {/* 3. Tarjeta de Resumen del mes */}
             <MonthlySummaryCards summary={summary} />
 
-            {/* 4. Categorías & Movimientos en Grid responsivo */}
+            {/* 4. Cuentas y Liquidez (si existen cuentas configuradas) */}
+            {accounts.length > 0 && (
+              <FinanzasAccountsCard accounts={accounts} loading={loadingAccounts} />
+            )}
+
+            {/* 5. Categorías & Movimientos en Grid responsivo */}
             <section className="grid gap-6 md:grid-cols-2">
               <div className="rounded-3xl border border-border/80 bg-surface p-5 sm:p-6 shadow-xs">
                 <div className="flex items-center justify-between pb-3.5 border-b border-border/50 mb-3.5">
@@ -171,7 +179,7 @@ export default function PersonalFinancePageContent() {
               </div>
             </section>
 
-            {/* 5. Ranking de productos */}
+            {/* 6. Ranking de productos */}
             {allItems.length > 0 && (
               <section className="rounded-3xl border border-border/80 bg-surface p-5 sm:p-6 shadow-xs">
                 <div className="pb-3.5 border-b border-border/50 mb-3.5">

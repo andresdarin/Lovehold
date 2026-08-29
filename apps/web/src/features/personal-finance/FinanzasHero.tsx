@@ -2,7 +2,8 @@
 
 import React from 'react'
 import { ChevronLeft, ChevronRight, Bell } from 'lucide-react'
-import { monthLabel } from './constants'
+import { monthLabel, formatCurrency } from './constants'
+import type { MonthlySummary } from './types'
 
 interface FinanzasHeroProps {
   profile: {
@@ -13,14 +14,51 @@ interface FinanzasHeroProps {
   } | null
   monthKey: string
   onShiftMonth: (delta: number) => void
-  totalSpent: number
+  summary: MonthlySummary
+}
+
+interface StatMetricProps {
+  label: string
+  value: string
+  dotColor: string
+  highlighted?: boolean
+}
+
+function StatMetric({ label, value, dotColor, highlighted = false }: StatMetricProps) {
+  return (
+    <div
+      className={`flex flex-col gap-1 rounded-xl p-2.5 sm:p-3 transition-all ${
+        highlighted
+          ? 'bg-white/[0.08] border border-white/[0.18] shadow-[0_4px_16px_rgba(0,0,0,0.15)] ring-1 ring-white/[0.08]'
+          : 'bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.05]'
+      }`}
+    >
+      <div className="flex items-center justify-between">
+        <span
+          className={`text-[10px] sm:text-[11px] font-medium truncate ${
+            highlighted ? 'text-[#F5F2EE] font-semibold' : 'text-[#C0D5D6]/70'
+          }`}
+        >
+          {label}
+        </span>
+        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${dotColor}`} />
+      </div>
+      <span
+        className={`text-base sm:text-lg md:text-xl font-bold tracking-tight tabular-nums truncate ${
+          highlighted ? 'text-[#F5F2EE]' : 'text-[#F5F2EE]/90'
+        }`}
+      >
+        {value}
+      </span>
+    </div>
+  )
 }
 
 export default function FinanzasHero({
   profile,
   monthKey,
   onShiftMonth,
-  totalSpent,
+  summary,
 }: FinanzasHeroProps) {
   const userInitial = (profile?.displayName?.[0] ?? profile?.email[0] ?? '?').toUpperCase()
   const initials = profile?.displayName
@@ -31,6 +69,8 @@ export default function FinanzasHero({
         .substring(0, 2)
         .toUpperCase()
     : userInitial
+
+  const isNetPositive = summary.netBalance >= 0
 
   return (
     <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#062433] via-[#083A4F] to-[#072F40] dark:from-[#04141D] dark:via-[#061D27] dark:to-[#051720] pt-[calc(0.5rem+env(safe-area-inset-top))] pb-7 sm:pb-9 px-4 sm:px-6 md:px-8 rounded-b-[2rem] sm:rounded-b-[2.5rem] border-b border-black/10 dark:border-white/[0.06] shadow-[0_12px_30px_rgba(8,58,79,0.12)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.4)]">
@@ -86,14 +126,14 @@ export default function FinanzasHero({
           </div>
         </div>
 
-        {/* 2. Selector de Período y Título */}
+        {/* 2. Selector de Período y Eyebrow */}
         <div className="flex flex-col gap-1 pt-1">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold uppercase tracking-widest text-[#A58D66] dark:text-[#BCA47B]">
               Finanzas Personales
             </span>
 
-            {/* Navegador de mes con estilo glass */}
+            {/* Navegador de mes flotante estilo glass */}
             <div className="flex items-center gap-1 rounded-full bg-white/[0.06] border border-white/[0.08] px-2 py-0.5 backdrop-blur-sm">
               <button
                 onClick={() => onShiftMonth(-1)}
@@ -115,16 +155,49 @@ export default function FinanzasHero({
             </div>
           </div>
 
+          {/* Cifra Principal: Balance Neto del Mes */}
           <div className="mt-3 flex flex-col items-center justify-center text-center">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#C0D5D6]/75">
-              Gasto total registrado
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#C0D5D6]/70">
+              Balance neto del mes
             </span>
-            <div className="mt-1 flex items-baseline justify-center">
+            <div className="mt-1 flex items-baseline justify-center gap-2">
               <span className="text-4xl font-extrabold tracking-tight text-[#F5F2EE] sm:text-5xl tabular-nums">
-                ${totalSpent.toLocaleString('es-UY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {formatCurrency(summary.netBalance)}
+              </span>
+            </div>
+            <div className="mt-1.5 inline-flex items-center gap-1.5 rounded-full border border-white/[0.1] bg-white/[0.05] px-2.5 py-0.5 text-[10px] font-semibold">
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  isNetPositive
+                    ? 'bg-[#4BE3B5] shadow-[0_0_4px_rgba(75,227,181,0.8)]'
+                    : 'bg-[#FF7373] shadow-[0_0_4px_rgba(255,115,115,0.8)]'
+                }`}
+              />
+              <span className={isNetPositive ? 'text-[#4BE3B5]' : 'text-[#FF9E9E]'}>
+                {isNetPositive ? 'Superávit mensual' : 'Déficit mensual'}
               </span>
             </div>
           </div>
+        </div>
+
+        {/* 3. Tres Métricas Clave en una sola fila (Ingresos, Egresos, Tarjetas/Comprometido) */}
+        <div className="grid grid-cols-3 gap-2 border-t border-white/[0.08] pt-3.5 sm:gap-3">
+          <StatMetric
+            label="Ingresos"
+            value={formatCurrency(summary.totalIncome)}
+            dotColor="bg-[#4BE3B5] shadow-[0_0_6px_rgba(75,227,181,0.6)]"
+            highlighted={summary.totalIncome > 0}
+          />
+          <StatMetric
+            label="Egresos"
+            value={formatCurrency(summary.totalExpense)}
+            dotColor="bg-[#72B1BE] shadow-[0_0_6px_rgba(114,177,190,0.6)]"
+          />
+          <StatMetric
+            label="Tarjetas"
+            value={formatCurrency(summary.creditCommitted)}
+            dotColor="bg-[#CCA46D] shadow-[0_0_6px_rgba(204,164,109,0.6)]"
+          />
         </div>
       </div>
     </section>

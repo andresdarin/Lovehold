@@ -1,30 +1,51 @@
 import type { PersonalExpense, MonthlySummary, ProductRankingItem } from './types'
 
 export function computeSummary(expenses: PersonalExpense[]): MonthlySummary {
-  let total = 0
+  let totalExpense = 0
+  let totalIncome = 0
   let fixed = 0
   let variable = 0
   let supermarket = 0
+  let creditCommitted = 0
   const byCategory: Record<string, number> = {}
 
-  const onlyExpenses = expenses.filter((e) => !e.movementType || e.movementType === 'EXPENSE')
+  for (const e of expenses) {
+    if (e.movementType === 'INCOME') {
+      totalIncome += e.amount
+    } else if (!e.movementType || e.movementType === 'EXPENSE') {
+      totalExpense += e.amount
 
-  for (const e of onlyExpenses) {
-    total += e.amount
+      // Normalizar y unificar categorías equivalentes de supermercado
+      let categoryKey = e.category.toLowerCase().trim()
+      if (categoryKey === 'compras de súper' || categoryKey === 'compras de super' || categoryKey === 'supermercado') {
+        categoryKey = 'supermercado'
+      }
 
-    // Normalizar y unificar categorías equivalentes de supermercado
-    let categoryKey = e.category.toLowerCase().trim()
-    if (categoryKey === 'compras de súper' || categoryKey === 'compras de super' || categoryKey === 'supermercado') {
-      categoryKey = 'supermercado'
+      byCategory[categoryKey] = (byCategory[categoryKey] ?? 0) + e.amount
+      if (e.type === 'fixed') fixed += e.amount
+      else if (e.type === 'supermarket') supermarket += e.amount
+      else variable += e.amount
+
+      if (e.financeAccount?.type === 'CREDIT') {
+        creditCommitted += e.amount
+      }
     }
-
-    byCategory[categoryKey] = (byCategory[categoryKey] ?? 0) + e.amount
-    if (e.type === 'fixed') fixed += e.amount
-    else if (e.type === 'supermarket') supermarket += e.amount
-    else variable += e.amount
   }
 
-  return { total, fixed, variable, supermarket, count: onlyExpenses.length, byCategory }
+  const netBalance = totalIncome - totalExpense
+
+  return {
+    total: totalExpense,
+    totalExpense,
+    totalIncome,
+    netBalance,
+    fixed,
+    variable,
+    supermarket,
+    creditCommitted,
+    count: expenses.length,
+    byCategory,
+  }
 }
 
 export function computeProductRanking(items: PersonalExpense['items']): ProductRankingItem[] {
