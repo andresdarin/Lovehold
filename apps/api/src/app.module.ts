@@ -8,6 +8,7 @@ import { GamificationModule } from './gamification/gamification.module'
 import { HealthModule } from './health/health.module'
 import { FinanceModule } from './finance/finance.module'
 import { AiModule } from './ai/ai.module'
+import { WebhooksModule } from './webhooks/webhooks.module'
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AiModule } from './ai/ai.module'
     HealthModule,
     FinanceModule,
     AiModule,
+    WebhooksModule,
   ],
 })
 export class AppModule {}

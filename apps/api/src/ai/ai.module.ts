@@ -21,11 +21,12 @@ import { AiAdminService } from './admin/ai-admin.service'
 import { AdminGuard } from '../common/guards/admin.guard'
 import { AiPlaygroundController } from './playground/ai-playground.controller'
 import { AiPlaygroundService } from './playground/ai-playground.service'
+import { WhatsAppChannelService } from './whatsapp/whatsapp-channel.service'
 
 @Module({
   imports: [ConfigModule, FinanceModule, PrismaModule],
   controllers: [AiChatController, AiController, AiAdminController, AiPlaygroundController],
-  providers: [aiConfigProvider, GeminiClient, PromptRegistry, AiConfigService, AiConfigResolver, AiAdminService, AiPlaygroundService, AdminGuard, ToolRegistry, ToolExecutor, AiChatService, AiContextService, AiConversationService, AiPendingActionService, AiObservabilityService, AgentOrchestrator],
-  exports: [GeminiClient, PromptRegistry, AiConfigService, AiConfigResolver, ToolRegistry, ToolExecutor, AiChatService, AiContextService, AiConversationService, AiPendingActionService, AiObservabilityService, AgentOrchestrator],
+  providers: [aiConfigProvider, GeminiClient, PromptRegistry, AiConfigService, AiConfigResolver, AiAdminService, AiPlaygroundService, AdminGuard, ToolRegistry, ToolExecutor, AiChatService, AiContextService, AiConversationService, AiPendingActionService, AiObservabilityService, AgentOrchestrator, WhatsAppChannelService],
+  exports: [GeminiClient, PromptRegistry, AiConfigService, AiConfigResolver, ToolRegistry, ToolExecutor, AiChatService, AiContextService, AiConversationService, AiPendingActionService, AiObservabilityService, AgentOrchestrator, WhatsAppChannelService],
 })
 export class AiModule {}

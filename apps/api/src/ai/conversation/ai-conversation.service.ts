@@ -17,6 +17,17 @@ export class AiConversationService {
     })
   }
 
+  async ensureConversation(
+    profileId: string,
+    conversationId?: string,
+    initialMessage?: string,
+  ): Promise<AiConversation> {
+    if (conversationId) return this.requireConversation(conversationId, profileId)
+
+    const title = initialMessage?.trim().slice(0, 60) || 'Nueva conversación'
+    return this.prisma.aiConversation.create({ data: { profileId, title } })
+  }
+
   async getById(
     profileId: string,
     conversationId: string,
