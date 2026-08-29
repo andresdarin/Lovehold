@@ -27,7 +27,7 @@ export function ProfileAvatar({ avatarUrl, displayName, email, color, size = 80 
         width: size,
         height: size,
         fontSize: size * 0.4,
-        backgroundColor: color ?? '#FF6B6B',
+        backgroundColor: color ?? '#083A4F',
       }}
     >
       {getInitial(displayName, email)}

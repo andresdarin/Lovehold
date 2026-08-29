@@ -12,7 +12,7 @@ const TIER_COLORS: Record<string, { fill: string; stroke: string; accent: string
   pearl: { fill: '#78716c', stroke: '#e5e7eb', accent: '#6b7280' },
   ruby: { fill: '#b91c1c', stroke: '#ef4444', accent: '#7f1d1d' },
   imperial: { fill: '#5b21b6', stroke: '#c084fc', accent: '#9333ea' },
-  prism: { fill: '#be185d', stroke: '#fb7185', accent: '#e11d48' },
+  prism: { fill: '#083a4f', stroke: '#c0d5d6', accent: '#a58d66' },
 }
 
 interface RankShieldProps {

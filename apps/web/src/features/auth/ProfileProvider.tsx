@@ -14,6 +14,8 @@ interface Profile {
   avatarUrl: string | null
   color: string
   createdAt: string
+  role?: string | null
+  isAdmin?: boolean
 }
 
 interface ProfileContextType {
@@ -22,6 +24,8 @@ interface ProfileContextType {
   error: string | null
   logout: () => Promise<void>
   refreshProfile: () => Promise<void>
+  role: string | null
+  isAdmin: boolean
 }
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined)
@@ -37,10 +41,14 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [role, setRole] = useState<string | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   async function fetchProfile(token: string) {
     const me = await apiFetch<Profile>('/api/me', {}, token)
     setProfile(me)
+    if (me.role) setRole(me.role)
+    if (me.isAdmin === true || me.role?.toUpperCase() === 'ADMIN') setIsAdmin(true)
   }
 
   useEffect(() => {
@@ -52,9 +60,19 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
+      const claims = session.user.app_metadata ?? {}
+      const jwtRole = typeof claims.role === 'string' ? claims.role : null
+      setRole(jwtRole)
+      setIsAdmin(claims.isAdmin === true || claims.admin === true || jwtRole?.toUpperCase() === 'ADMIN')
+
       try {
         await fetchProfile(session.access_token)
       } catch (err) {
+        if (err instanceof ApiError && err.status === 401) {
+          await supabase.auth.signOut()
+          router.push('/login')
+          return
+        }
         if (err instanceof ApiError && err.status === 404) {
           setError('Perfil no encontrado. Por favor, volvé a iniciar sesión.')
         } else {
@@ -110,7 +128,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ProfileContext.Provider value={{ profile, loading, error, logout, refreshProfile }}>
+    <ProfileContext.Provider value={{ profile, loading, error, logout, refreshProfile, role, isAdmin }}>
       <AppShell profile={profile} onLogout={logout}>
         {children}
       </AppShell>

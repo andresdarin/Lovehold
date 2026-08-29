@@ -12,6 +12,8 @@ interface SidebarProps {
     displayName: string | null
     email: string
     color: string
+    isAdmin?: boolean
+    role?: string | null
   } | null
   onLogout: () => void
   collapsed: boolean
@@ -20,12 +22,13 @@ interface SidebarProps {
 
 export default function Sidebar({ profile, onLogout, collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname()
-  const activeHref = NAV_ITEMS.find((item) => pathname === item.href)?.href ?? '/dashboard'
+  const activeHref = NAV_ITEMS.filter((item) => item.href !== '/ai' || profile?.isAdmin === true)
+    .find((item) => pathname === item.href)?.href ?? '/dashboard'
   const { navRef, itemRefs, indicator, hoveredHref, setHoveredHref } = useAnimatedIndicator(collapsed, activeHref)
 
   return (
     <aside
-      className={`fixed bottom-5 left-5 top-5 z-30 hidden flex-col overflow-hidden rounded-[2rem] border border-white/70 bg-white/55 p-3 text-[#2D255F] shadow-[0_24px_70px_rgba(45,37,95,0.14)] backdrop-blur-2xl transition-all duration-300 ease-in-out dark:border-white/10 dark:bg-[#050505]/76 dark:text-white dark:shadow-[0_28px_80px_rgba(0,0,0,0.45)] lg:flex ${
+      className={`fixed bottom-5 left-5 top-5 z-30 hidden flex-col overflow-hidden rounded-[2rem] border border-border bg-surface/85 p-3 text-foreground shadow-[0_12px_40px_rgba(0,0,0,0.06)] backdrop-blur-2xl transition-all duration-300 ease-in-out dark:bg-surface/90 dark:shadow-[0_20px_50px_rgba(0,0,0,0.35)] lg:flex ${
         collapsed ? 'w-[84px]' : 'w-[248px]'
       }`}
     >

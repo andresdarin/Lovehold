@@ -190,49 +190,31 @@ describe('validateAndNormalize', () => {
 })
 
 describe('ReceiptScanService', () => {
+  const responseText = '{"merchant":"ADENDA","receiptDate":"12/06/2026","currency":"UYU","total":813.21,"subtotal":841.21,"discounts":28,"paymentMethod":"MASTER","items":[],"confidence":0.9,"warnings":[]}'
+
   it('parses the first balanced JSON object from a Gemini response with extra explanation', async () => {
-    const service = new ReceiptScanService({
-      get: (key: string) => key === 'GEMINI_API_KEY' ? 'test-key' : undefined,
-    } as never)
-    const originalFetch = globalThis.fetch
-    globalThis.fetch = async () => new Response(JSON.stringify({
-      candidates: [{
-        content: {
-          parts: [{
-            text: [
-              '```json',
-              '{"merchant":"ADENDA","receiptDate":"12/06/2026","currency":"UYU","total":813.21,"subtotal":841.21,"discounts":28,"paymentMethod":"MASTER","items":[],"confidence":0.9,"warnings":[]}',
-              '```',
-              'The discount calculation is ambiguous. Extra note: {not JSON}.',
-            ].join('\n'),
-          }],
-        },
-      }],
-    }))
-
-    try {
-      const result = await service.scan(Buffer.from('fake-image'), 'image/jpeg')
-
-      expect(result.merchant).toBe('ADENDA')
-      expect(result.total).toBe(813.21)
-    } finally {
-      globalThis.fetch = originalFetch
-    }
+    const gemini = { generateContent: async () => `\`\`\`json\n${responseText}\n\`\`\`\nExtra note: {not JSON}.` }
+    const prompts = { get: () => ({ systemPrompt: 'Uruguay prompt', generationConfig: { responseMimeType: 'application/json' } }) }
+    const result = await new ReceiptScanService(gemini as never, prompts as never).scan(Buffer.from('fake-image'), 'image/jpeg')
+    expect(result.merchant).toBe('ADENDA')
+    expect(result.total).toBe(813.21)
   })
 
   it('throws a friendly error when Gemini returns no parseable JSON', async () => {
-    const service = new ReceiptScanService({
-      get: (key: string) => key === 'GEMINI_API_KEY' ? 'test-key' : undefined,
-    } as never)
-    const originalFetch = globalThis.fetch
-    globalThis.fetch = async () => new Response(JSON.stringify({
-      candidates: [{ content: { parts: [{ text: 'No JSON here.' }] } }],
-    }))
+    const gemini = { generateContent: async () => 'No JSON here.' }
+    const prompts = { get: () => ({ systemPrompt: 'prompt', generationConfig: {} }) }
+    await expect(new ReceiptScanService(gemini as never, prompts as never).scan(Buffer.from('fake-image'), 'image/jpeg')).rejects.toThrow(BadRequestException)
+  })
 
-    try {
-      await expect(service.scan(Buffer.from('fake-image'), 'image/jpeg')).rejects.toThrow(BadRequestException)
-    } finally {
-      globalThis.fetch = originalFetch
+  it('uses GeminiClient with the prompt from PromptRegistry', async () => {
+    const generateContent = async (options: { systemPrompt: string; inlineData: { data: string }; generationConfig?: object }) => {
+      expect(options.systemPrompt).toBe('registered')
+      expect(options.inlineData.data).toBe(Buffer.from('fake-image').toString('base64'))
+      expect(options.generationConfig).toEqual({ responseMimeType: 'application/json' })
+      return responseText
     }
+    const prompts = { get: () => ({ systemPrompt: 'registered', generationConfig: { responseMimeType: 'application/json' } }) }
+    const result = await new ReceiptScanService({ generateContent } as never, prompts as never).scan(Buffer.from('fake-image'), 'image/jpeg')
+    expect(result.currency).toBe('UYU')
   })
 })

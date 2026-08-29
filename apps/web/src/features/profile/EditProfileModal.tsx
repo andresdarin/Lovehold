@@ -106,7 +106,7 @@ export function EditProfileModal({ open, currentName, onClose, onSaved }: EditPr
             <button
               type="submit"
               disabled={!canSave}
-              className="flex-1 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex-1 rounded-2xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground shadow-xs transition hover:bg-primary-hover disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {saving ? (
                 <span className="flex items-center justify-center gap-2">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useLayoutEffect, useRef, useState, type RefObject } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 
 const HIDDEN: React.CSSProperties = {
   position: 'fixed',
@@ -23,13 +23,16 @@ export function useFloatingPopover(
   const onCloseRef = useRef(onClose)
   onCloseRef.current = onClose
 
-  useLayoutEffect(() => {
+  useEffect(() => {
+    let mounted = true
+
     if (!open) {
-      if (style.visibility !== 'hidden') setStyle(HIDDEN)
+      setStyle((prev) => (prev.visibility !== 'hidden' ? HIDDEN : prev))
       return
     }
 
     function position() {
+      if (!mounted) return
       const el = triggerRef.current
       if (!el) return
       const r = el.getBoundingClientRect()
@@ -63,12 +66,13 @@ export function useFloatingPopover(
     document.addEventListener('mousedown', onDown)
     document.addEventListener('keydown', onKey)
     return () => {
+      mounted = false
       window.removeEventListener('scroll', position, true)
       window.removeEventListener('resize', position)
       document.removeEventListener('mousedown', onDown)
       document.removeEventListener('keydown', onKey)
     }
-  }, [open, triggerRef])
+  }, [open, triggerRef, width, estimatedHeight, popoverAttr])
 
   return style
 }

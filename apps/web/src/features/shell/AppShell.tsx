@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import Sidebar from './sidebar/Sidebar'
 import Topbar from './Topbar'
 import MobileNav from './MobileNav'
@@ -11,6 +12,8 @@ interface AppShellProps {
     displayName: string | null
     email: string
     color: string
+    isAdmin?: boolean
+    role?: string | null
   } | null
   onLogout: () => void
 }
@@ -21,6 +24,10 @@ interface AppShellProps {
  */
 export default function AppShell({ children, profile, onLogout }: AppShellProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const pathname = usePathname()
+  const isFullBleedHero = pathname === '/dashboard' || pathname === '/' || pathname === '/finanzas' || pathname === '/balance' || pathname === '/expenses' || pathname === '/expenses/new' || pathname === '/chat'
+
+  const isChat = pathname === '/chat'
 
   return (
     <div className="app-backdrop min-h-screen text-foreground overflow-x-hidden relative">
@@ -32,22 +39,24 @@ export default function AppShell({ children, profile, onLogout }: AppShellProps)
         onToggle={() => setSidebarCollapsed((prev) => !prev)}
       />
 
-      {/* Topbar (Mobile) */}
-      <Topbar profile={profile} />
+      {/* Topbar (Mobile) - Se omite en vistas con Hero full-bleed invertido */}
+      {!isFullBleedHero && <Topbar profile={profile} />}
 
       {/* Contenido Principal */}
       <main
-        className={`min-h-[calc(100dvh-4rem)] lg:min-h-screen pb-[calc(104px+env(safe-area-inset-bottom))] lg:pb-0 transition-all duration-300 ease-in-out ${
-          sidebarCollapsed ? 'lg:pl-[124px]' : 'lg:pl-[292px]'
-        }`}
+        className={`transition-all duration-300 ease-in-out ${
+          isChat
+            ? 'h-[100dvh] overflow-hidden p-0'
+            : 'min-h-[calc(100dvh-4rem)] lg:min-h-screen pb-[calc(104px+env(safe-area-inset-bottom))] lg:pb-0'
+        } ${sidebarCollapsed ? 'lg:pl-[124px]' : 'lg:pl-[292px]'}`}
       >
-        <div className="p-4 md:p-6 lg:p-8">
+        <div className={isFullBleedHero ? 'h-full' : 'p-4 md:p-6 lg:p-8'}>
           {children}
         </div>
       </main>
 
-      {/* Bottom Nav (Mobile) */}
-      <MobileNav profile={profile} />
+      {/* Bottom Nav (Mobile) - Oculto en el chat para input fixed */}
+      {!isChat && <MobileNav profile={profile} />}
     </div>
   )
 }

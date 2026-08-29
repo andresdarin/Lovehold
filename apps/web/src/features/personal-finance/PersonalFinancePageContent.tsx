@@ -1,23 +1,40 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
-import { usePersonalFinance, useCreateExpense } from './hooks'
-import { monthLabel, currentMonthKey } from './constants'
+import Link from 'next/link'
+import {
+  ChevronLeft,
+  ArrowDown,
+  ArrowUp,
+  Receipt,
+  ScanLine,
+} from 'lucide-react'
+import { useProfile } from '@/features/auth/ProfileProvider'
+import { usePersonalFinance, useFinanceAccounts, useCreateExpense } from './hooks'
+import { currentMonthKey } from './constants'
 import { computeSummary } from './utils'
+import FinanzasHero from './FinanzasHero'
 import MonthlySummaryCards from './MonthlySummaryCards'
+import FinanzasAccountsCard from './FinanzasAccountsCard'
 import ExpenseForm from './ExpenseForm'
 import ReceiptPasteForm from './ReceiptPasteForm'
 import RecentExpensesList from './RecentExpensesList'
 import CategoryBreakdown from './CategoryBreakdown'
 import ProductMonthlyRanking from './ProductMonthlyRanking'
+import IncomeFormModal from './IncomeFormModal'
+import TransferFormModal from './TransferFormModal'
 
 type ViewMode = 'overview' | 'new-expense' | 'paste-ticket'
 
 export default function PersonalFinancePageContent() {
+  const { profile } = useProfile()
   const [monthKey, setMonthKey] = useState(currentMonthKey)
   const [view, setView] = useState<ViewMode>('overview')
+  const [isIncomeModalOpen, setIsIncomeModalOpen] = useState(false)
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
+
   const { expenses, loading, error, refetch } = usePersonalFinance(monthKey)
+  const { accounts, loading: loadingAccounts, refetch: refetchAccounts } = useFinanceAccounts()
   const { create, submitting } = useCreateExpense()
 
   const allItems = useMemo(() => expenses.flatMap((e) => e.items ?? []), [expenses])
@@ -34,16 +51,20 @@ export default function PersonalFinancePageContent() {
   async function handleCreate(data: Parameters<typeof ExpenseForm.prototype.props.onSubmit>[0]) {
     await create(data)
     refetch()
+    refetchAccounts()
     setView('overview')
   }
 
   if (view === 'new-expense') {
     return (
-      <div className="space-y-5">
-        <button onClick={() => setView('overview')} className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary/45 rounded-lg px-2 py-1">
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
+        <button
+          onClick={() => setView('overview')}
+          className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground focus:outline-none rounded-lg px-2 py-1"
+        >
           <ChevronLeft className="h-4 w-4" /> Volver
         </button>
-        <h2 className="text-lg font-bold text-foreground">Nuevo gasto</h2>
+        <h2 className="text-lg font-bold text-foreground">Nuevo egreso</h2>
         <ExpenseForm onSubmit={handleCreate} onCancel={() => setView('overview')} submitting={submitting} />
       </div>
     )
@@ -51,8 +72,11 @@ export default function PersonalFinancePageContent() {
 
   if (view === 'paste-ticket') {
     return (
-      <div className="space-y-5">
-        <button onClick={() => setView('overview')} className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary/45 rounded-lg px-2 py-1">
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
+        <button
+          onClick={() => setView('overview')}
+          className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground focus:outline-none rounded-lg px-2 py-1"
+        >
           <ChevronLeft className="h-4 w-4" /> Volver
         </button>
         <h2 className="text-lg font-bold text-foreground">Pegar ticket</h2>
@@ -62,82 +86,129 @@ export default function PersonalFinancePageContent() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* 1. Header */}
-      <header className="space-y-3">
-        <div>
-          <h1 className="text-[15px] font-medium text-primary uppercase tracking-wide">Finanzas Personales</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">Controlá tus finanzas personales y llevá un registro detallado</p>
-        </div>
+    <div className="flex flex-col gap-6 pb-12 sm:pb-6">
+      {/* 1. Franja Superior / Hero Negativo Full-Bleed (Azul Navy como el Dashboard) */}
+      <FinanzasHero
+        profile={profile}
+        monthKey={monthKey}
+        onShiftMonth={shiftMonth}
+        summary={summary}
+      />
 
-        {/* Navegación del mes */}
-        <div className="flex items-center justify-between border-t border-b border-border/40 py-2">
-          <button 
-            onClick={() => shiftMonth(-1)} 
-            className="text-muted-foreground hover:text-foreground p-1 transition-colors focus:outline-none"
-            aria-label="Mes anterior"
+      {/* 2. Cuerpo Modular Claro (Sand / Surface) */}
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-8 flex flex-col gap-6">
+        {/* Acciones Rápidas (3 Botones con el mismo criterio que el Dashboard) */}
+        <section className="flex items-center gap-2.5 sm:hidden" aria-label="Acciones rápidas">
+          {/* Ingreso */}
+          <button
+            type="button"
+            onClick={() => setIsIncomeModalOpen(true)}
+            className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-border/80 bg-surface py-3.5 px-3.5 text-sm font-semibold text-primary shadow-xs transition-all hover:bg-surface-soft hover:border-primary/30 active:scale-95 text-center"
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ArrowDown className="h-4 w-4 stroke-[2.5] text-primary" />
+            <span>Ingreso</span>
           </button>
-          <span className="text-sm font-medium text-foreground">{monthLabel(monthKey)}</span>
-          <button 
-            onClick={() => shiftMonth(1)} 
-            className="text-muted-foreground hover:text-foreground p-1 transition-colors focus:outline-none"
-            aria-label="Siguiente mes"
+
+          {/* Egreso */}
+          <button
+            type="button"
+            onClick={() => setView('new-expense')}
+            className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 px-3.5 text-sm font-bold text-primary-foreground shadow-xs transition-all hover:bg-primary-hover active:scale-95 text-center"
           >
-            <ChevronRight className="h-5 w-5" />
+            <ArrowUp className="h-4 w-4 stroke-[2.5]" />
+            <span>Egreso</span>
           </button>
-        </div>
 
-        {/* Dos botones */}
-        <div className="flex gap-2">
-          <button 
-            onClick={() => setView('paste-ticket')} 
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded-lg border border-border bg-surface text-foreground hover:bg-surface-soft transition-colors focus:outline-none"
+          {/* Ticket Scan directo a cámara */}
+          <Link
+            href="/expenses/new?scan=camera"
+            aria-label="Escanear ticket con cámara"
+            title="Escanear ticket con cámara"
+            className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-2xl border border-[#407E8C]/30 bg-[#407E8C]/10 text-[#407E8C] dark:text-[#C0D5D6] shadow-xs transition-all hover:bg-[#407E8C]/20 hover:border-[#407E8C]/50 active:scale-95"
           >
-            Pagar ticket
-          </button>
-          <button 
-            onClick={() => setView('new-expense')} 
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors focus:outline-none"
-          >
-            <Plus className="h-3.5 w-3.5" /> Nuevo gasto
-          </button>
-        </div>
-      </header>
+            <ScanLine className="h-5 w-5 stroke-[2.2]" />
+          </Link>
+        </section>
 
-      {loading ? (
-        <div className="flex items-center justify-center py-16">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-        </div>
-      ) : error ? (
-        <p className="rounded-xl border border-danger/30 bg-danger/5 p-4 text-sm text-danger">{error}</p>
-      ) : (
-        <div className="space-y-6">
-          {/* 2. Tarjetas de resumen */}
-          <MonthlySummaryCards summary={summary} />
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          </div>
+        ) : error ? (
+          <p className="rounded-xl border border-danger/30 bg-danger/5 p-4 text-sm text-danger">{error}</p>
+        ) : (
+          <div className="flex flex-col gap-6">
+            {/* 3. Tarjeta de Resumen del mes */}
+            <MonthlySummaryCards summary={summary} />
 
-          {/* 3. Gastos recientes */}
-          <section className="space-y-3">
-            <h3 className="text-[15px] font-medium text-primary uppercase tracking-wide">Gastos recientes</h3>
-            <RecentExpensesList expenses={expenses} />
-          </section>
+            {/* 4. Cuentas y Liquidez con estilo Navy y Ahorro */}
+            {accounts.length > 0 && (
+              <FinanzasAccountsCard
+                accounts={accounts}
+                savings={summary.netBalance}
+                loading={loadingAccounts}
+              />
+            )}
 
-          {/* 4. Categorías del mes */}
-          <section className="space-y-3">
-            <h3 className="text-[15px] font-medium text-primary uppercase tracking-wide">Categorías del mes</h3>
-            <CategoryBreakdown byCategory={summary.byCategory} total={summary.total} />
-          </section>
+            {/* 5. Categorías & Movimientos en Grid responsivo */}
+            <section className="grid gap-6 md:grid-cols-2">
+              <div className="rounded-3xl border border-border/80 bg-surface p-5 sm:p-6 shadow-xs">
+                <div className="flex items-center justify-between pb-3.5 border-b border-border/50 mb-3.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/30 text-primary bg-transparent">
+                      <Receipt className="h-4 w-4 stroke-[2]" />
+                    </div>
+                    <div>
+                      <h2 className="text-sm font-bold text-foreground">Movimientos del mes</h2>
+                      <p className="text-[11px] text-muted-foreground">Listado cronológico</p>
+                    </div>
+                  </div>
+                </div>
+                <RecentExpensesList expenses={expenses} />
+              </div>
 
-          {/* 5. Productos más comprados */}
-          {allItems.length > 0 && (
-            <section className="space-y-3">
-              <h3 className="text-[15px] font-medium text-primary uppercase tracking-wide">Productos más comprados</h3>
-              <ProductMonthlyRanking items={allItems} />
+              <div className="rounded-3xl border border-border/80 bg-surface p-5 sm:p-6 shadow-xs">
+                <div className="flex items-center justify-between pb-3.5 border-b border-border/50 mb-3.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border border-cat-super/40 text-cat-super bg-transparent">
+                      <Receipt className="h-4 w-4 stroke-[2]" />
+                    </div>
+                    <div>
+                      <h2 className="text-sm font-bold text-foreground">Distribución por categoría</h2>
+                      <p className="text-[11px] text-muted-foreground">Desglose de egresos</p>
+                    </div>
+                  </div>
+                </div>
+                <CategoryBreakdown byCategory={summary.byCategory} total={summary.total} />
+              </div>
             </section>
-          )}
-        </div>
-      )}
+
+            {/* 6. Ranking de productos */}
+            {allItems.length > 0 && (
+              <section className="rounded-3xl border border-border/80 bg-surface p-5 sm:p-6 shadow-xs">
+                <div className="pb-3.5 border-b border-border/50 mb-3.5">
+                  <h2 className="text-sm font-bold text-foreground">Productos más comprados</h2>
+                  <p className="text-[11px] text-muted-foreground">Artículos recurrentes de tickets</p>
+                </div>
+                <ProductMonthlyRanking items={allItems} />
+              </section>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Modales */}
+      <IncomeFormModal
+        isOpen={isIncomeModalOpen}
+        onClose={() => setIsIncomeModalOpen(false)}
+        onSuccess={() => refetch()}
+      />
+
+      <TransferFormModal
+        isOpen={isTransferModalOpen}
+        onClose={() => setIsTransferModalOpen(false)}
+        onSuccess={() => refetch()}
+      />
     </div>
   )
 }

@@ -8,7 +8,7 @@ import type { Movement, MovementFilters, MonthSummary, PaginationInfo, ExpenseLi
 
 export function useMovements() {
   const [filters, setFiltersState] = useState<MovementFilters>({
-    month: getCurrentMonth(), q: '', kind: '', scope: '', category: '', paymentMethod: '',
+    month: getCurrentMonth(), q: '', kind: '', scope: '', category: '', paymentMethod: '', financialType: '', account: '', currency: '', period: '',
   })
   const [movements, setMovements] = useState<Movement[]>([])
   const [summary, setSummary] = useState<MonthSummary | null>(null)
@@ -19,7 +19,7 @@ export function useMovements() {
 
   useEffect(() => {
     load(false)
-  }, [filters.month, filters.q, filters.kind, filters.scope, filters.category, filters.paymentMethod])
+  }, [filters.month, filters.q, filters.kind, filters.scope, filters.category, filters.paymentMethod, filters.financialType, filters.account, filters.currency, filters.period])
 
   async function load(append: boolean) {
     if (fetchingRef.current) return
@@ -39,10 +39,17 @@ export function useMovements() {
       if (filters.category) params.set('category', filters.category)
       if (filters.paymentMethod) params.set('paymentMethod', filters.paymentMethod)
       const data = await apiFetch<ExpenseListResponse>(`/api/expenses?${params}`, {}, token)
+      const filtered = data.items.filter((item) => {
+        const type = item.financialType ?? 'EXPENSE'
+        return (!filters.financialType || type === filters.financialType) &&
+          (!filters.currency || item.currency === filters.currency) &&
+          (!filters.account || item.accountName === filters.account) &&
+          (!filters.period || item.date.slice(0, 10) === filters.period)
+      })
       if (append) {
         setMovements(prev => [...prev, ...data.items])
       } else {
-        setMovements(data.items)
+        setMovements(filtered)
         setSummary(data.summary)
       }
       setPagination(data.pagination)
@@ -58,7 +65,7 @@ export function useMovements() {
     setFiltersState(prev => ({ ...prev, [key]: value }))
   }
   function clearFilters() {
-    setFiltersState({ month: getCurrentMonth(), q: '', kind: '', scope: '', category: '', paymentMethod: '' })
+    setFiltersState({ month: getCurrentMonth(), q: '', kind: '', scope: '', category: '', paymentMethod: '', financialType: '', account: '', currency: '', period: '' })
   }
   function refresh() { load(false) }
   function loadMore() { if (!loading && pagination.hasMore) load(true) }

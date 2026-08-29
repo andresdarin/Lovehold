@@ -17,8 +17,7 @@ interface ProfileIdentitySidebarProps {
 }
 
 /**
- * Identity sidebar inspired by GitHub's layout but styled
- * with Lovehold's dark premium glassmorphic system.
+ * Identity sidebar with Finnic's dark premium glassmorphic system.
  */
 export function ProfileIdentitySidebar({
   displayName,
@@ -139,7 +138,7 @@ export function ProfileIdentitySidebar({
       <div>
         <h3 className="text-sm font-bold text-foreground mb-3">Organizations</h3>
         <div className="flex justify-center lg:justify-start">
-          <div className="h-9 w-9 rounded-md border border-border/50 bg-surface-soft/10 flex items-center justify-center hover:border-primary/50 transition-colors duration-200 cursor-pointer" title="Lovehold Contribuidores">
+          <div className="h-9 w-9 rounded-md border border-border/50 bg-surface-soft/10 flex items-center justify-center hover:border-primary/50 transition-colors duration-200 cursor-pointer" title="Finnic Contribuidores">
             {/* Minimal cow SVG representation */}
             <svg viewBox="0 0 24 24" className="h-5 w-5 text-primary" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zm-1.5-4c-.83 0-1.5-.67-1.5-1.5V9c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v3c0 .83-.67 1.5-1.5 1.5z" />

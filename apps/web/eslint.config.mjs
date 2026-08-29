@@ -5,7 +5,7 @@ export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    ignores: [".next/", "node_modules/"],
+    ignores: [".next/", "node_modules/", "public/", "dist/"],
   },
   {
     rules: {

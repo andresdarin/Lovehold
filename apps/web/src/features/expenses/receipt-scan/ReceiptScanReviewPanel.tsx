@@ -1,10 +1,7 @@
-'use client'
-
-import { AlertTriangle, CheckCircle2, Info, ReceiptText, RefreshCw } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Info, FileText, RefreshCw } from 'lucide-react'
 import { money } from '../constants'
 import ReceiptScanProductList from './ReceiptScanProductList'
 import type { ScanReceiptResponse } from './types'
-import { confidenceColor, confidenceLabel } from './utils'
 
 function textValue(value: string | null): string {
   return value?.trim() || 'No detectado'
@@ -16,19 +13,25 @@ function moneyValue(value: number | null, currency: string = 'UYU'): string {
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-white/[0.08] py-2 last:border-b-0">
+    <div className="flex items-center justify-between gap-4 border-b border-border/40 py-2.5 last:border-b-0">
       <span className="text-xs text-muted-foreground">{label}</span>
-      <span className="text-right text-xs font-bold text-foreground">{value}</span>
+      <span className="text-right text-sm font-bold text-foreground tabular-nums">{value}</span>
     </div>
   )
 }
 
-function EmptyState({ scanning }: { scanning: boolean }) {
+function EmptyState() {
   return (
-    <div className="mt-4 border-t border-white/[0.08] pt-4 text-xs text-muted-foreground">
-      {scanning
-        ? 'Analizando el ticket. El resumen va a aparecer acá para revisarlo antes de aplicarlo.'
-        : 'Subí una imagen y analizá el ticket para ver el resumen antes de aplicar los datos.'}
+    <div className="py-6 flex flex-col items-center justify-center text-center bg-transparent gap-2.5">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#407E8C]/30 bg-[#C0D5D6]/20 text-primary shadow-2xs">
+        <FileText className="h-4 w-4 stroke-[2.2]" />
+      </div>
+      <div>
+        <p className="text-xs font-bold text-foreground">Sin datos leídos aún</p>
+        <p className="text-[11px] text-muted-foreground max-w-[260px] mt-0.5 leading-relaxed">
+          Subí una imagen y analizá el comprobante para ver el desglose antes de aplicar.
+        </p>
+      </div>
     </div>
   )
 }
@@ -45,67 +48,80 @@ export default function ReceiptScanReviewPanel({
   const isLowConfidence = result ? result.confidence < 0.75 : false
 
   return (
-    <section className="h-full rounded-[20px] border border-white/[0.08] bg-gradient-to-b from-white/[0.055] to-white/[0.025] p-4 shadow-sm xl:sticky xl:top-6">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent/10">
-            <ReceiptText className="h-4 w-4 text-accent" />
+    <section className="rounded-3xl border border-border/80 bg-surface p-4 sm:p-5 shadow-xs transition-all select-none flex flex-col gap-3.5">
+      {/* Header con Badge de Estado */}
+      <div className="pb-3 border-b border-border/60 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full border border-primary/20 bg-primary/5 text-primary">
+            <FileText className="h-3.5 w-3.5 stroke-[2]" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-foreground">Resumen del escaneo</h2>
-            <p className="text-xs text-muted-foreground">Compará los datos con el ticket.</p>
+            <h2 className="text-xs sm:text-sm font-bold text-foreground">Revisión del escaneo</h2>
+            <p className="text-[11px] text-muted-foreground">Datos detectados por inteligencia artificial.</p>
           </div>
         </div>
         {result && (
-          <span className={`shrink-0 text-[10px] font-bold ${confidenceColor(result.confidence)}`}>
-            {confidenceLabel(result.confidence)} ({Math.round(result.confidence * 100)}%)
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-primary bg-primary/10 border border-primary/20 px-2.5 py-0.5 rounded-full">
+            <CheckCircle2 className="h-3 w-3" />
+            Detectado
           </span>
         )}
       </div>
 
-      {!result ? <EmptyState scanning={scanning} /> : (
-        <>
-          <div className="mt-4 border-y border-white/[0.08]">
+      {!result ? <EmptyState /> : (
+        <div className="flex flex-col gap-3">
+          <div className="rounded-2xl border border-border/60 bg-surface-soft/40 p-3 flex flex-col">
             <SummaryRow label="Comercio" value={textValue(result.merchant)} />
             <SummaryRow label="Fecha" value={textValue(result.receiptDate)} />
-            <SummaryRow label="Total pagado" value={moneyValue(result.total, result.currency)} />
-            <SummaryRow label="Suma de ítems" value={money(itemsTotal, result.currency)} />
-            <SummaryRow label="Descuentos" value={result.discounts === null ? 'No detectado' : `-${money(result.discounts, result.currency)}`} />
+            <SummaryRow label="Total detectado" value={moneyValue(result.total, result.currency)} />
+            <SummaryRow label="Suma de productos" value={money(itemsTotal, result.currency)} />
+            {result.discounts !== null && result.discounts > 0 && (
+              <SummaryRow label="Descuentos" value={`-${money(result.discounts, result.currency)}`} />
+            )}
             <SummaryRow label="Medio de pago" value={textValue(result.paymentMethod)} />
-            <SummaryRow label="Productos" value={String(result.items.length)} />
+            <SummaryRow label="Productos leídos" value={String(result.items.length)} />
           </div>
 
           {result.items.length > 0 && <ReceiptScanProductList items={result.items} />}
 
           {isLowConfidence && (
-            <div className="mt-4 flex items-start gap-3 border-t border-warning/40 pt-3 text-xs text-warning">
-              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-              <span>La confianza del escaneo es baja. Revisá y corregí los datos manualmente.</span>
+            <div className="flex items-start gap-2.5 rounded-2xl border border-warning/30 bg-warning/5 p-3 text-xs text-warning font-medium">
+              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+              <span>Confianza moderada. Revisá los montos antes de aplicar.</span>
             </div>
           )}
 
           {result.warnings.length > 0 && (
-            <div className="mt-4 flex items-start gap-3 border-t border-white/[0.08] pt-3 text-xs text-muted-foreground">
-              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            <div className="flex items-start gap-2.5 rounded-2xl border border-border/80 bg-surface-soft p-3 text-xs text-muted-foreground">
+              <Info className="h-4 w-4 shrink-0 mt-0.5" />
               <ul className="list-inside list-disc space-y-0.5">
                 {result.warnings.map((warning, index) => <li key={index}>{warning}</li>)}
               </ul>
             </div>
           )}
 
-          <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
-            <button type="button" onClick={onClear} disabled={scanning}
-              className="flex items-center justify-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-4 py-2.5 text-xs font-medium text-muted-foreground transition hover:bg-white/[0.08] hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
+          {/* Botones de acción */}
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            <button 
+              type="button" 
+              onClick={onClear} 
+              disabled={scanning}
+              className="flex items-center justify-center gap-1.5 rounded-2xl border border-border/80 bg-surface-soft py-2.5 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-surface transition-colors focus:outline-none disabled:opacity-50"
+            >
               <RefreshCw className="h-3.5 w-3.5" />
               Limpiar
             </button>
-            <button type="button" onClick={onApply} disabled={scanning}
-              className="flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-primary/25 transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
+            <button 
+              type="button" 
+              onClick={onApply} 
+              disabled={scanning}
+              className="flex items-center justify-center gap-1.5 rounded-2xl bg-primary py-2.5 text-xs font-bold text-primary-foreground shadow-xs hover:bg-primary-hover transition-all focus:outline-none disabled:opacity-50 active:scale-95"
+            >
               <CheckCircle2 className="h-3.5 w-3.5" />
-              Aplicar datos
+              Aplicar al gasto
             </button>
           </div>
-        </>
+        </div>
       )}
     </section>
   )

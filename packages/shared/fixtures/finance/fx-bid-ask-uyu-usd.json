@@ -1,0 +1,10 @@
+{
+  "profileId": "fixture-finance-fx-bid-ask-uyu-usd",
+  "asOf": "2026-08-29T12:00:00-03:00", "timeZone": "America/Montevideo", "baseCurrency": "UYU",
+  "minimumBuffer": { "currency": "UYU", "amount": "0.00" },
+  "accounts": [{ "id": "acc-fx", "currency": "USD", "balance": "100.00", "spendable": "100.00", "nonSpendable": "0.00", "managedByLovehold": true }],
+  "balances": { "spendableByCurrency": { "USD": "100.00" }, "nonSpendableByCurrency": { "USD": "0.00" } },
+  "schedules": [], "scheduledCashFlows": [], "goals": [], "expenses": [],
+  "fxQuotes": [{ "baseCurrency": "UYU", "quoteCurrency": "USD", "bid": "40.80", "ask": "41.20", "asOf": "2026-08-29T09:00:00-03:00", "source": "fixture" }, { "baseCurrency": "UYU", "quoteCurrency": "USD", "bid": "40.80", "ask": "41.20", "asOf": "2026-08-29T12:00:00-03:00", "source": "fixture" }],
+  "expected": { "assetUsd100ToUyuConservative": "4080.00", "obligationUyu4120ToUsdConservativeCeil": "100.98", "floor": "4080.00", "ceil": "100.98" }
+}

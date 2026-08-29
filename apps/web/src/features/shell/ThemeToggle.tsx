@@ -6,39 +6,41 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from '../theme/ThemeProvider'
 
 interface ThemeToggleProps {
-  variant?: 'surface' | 'dock'
+  variant?: 'surface' | 'dock' | 'auth'
 }
 
 /**
- * Toggle de tema animado (Sol / Luna) para alternar entre el modo claro y oscuro.
+ * Toggle de tema animado (Sol / Luna) con variantes para Shell y Auth.
  */
 export default function ThemeToggle({ variant = 'surface' }: ThemeToggleProps) {
   const { theme, toggleTheme } = useTheme()
-  const isDock = variant === 'dock'
+
+  let buttonStyles = 'rounded-xl border border-border bg-surface text-foreground hover:bg-surface-soft'
+  if (variant === 'dock') {
+    buttonStyles = 'rounded-full border border-border bg-surface text-foreground hover:bg-surface-soft'
+  } else if (variant === 'auth') {
+    buttonStyles = 'rounded-full border border-navy/15 dark:border-white/15 bg-sand/80 dark:bg-surface/85 text-navy dark:text-aqua shadow-sm backdrop-blur-md hover:bg-sand dark:hover:bg-surface-alt focus-visible:ring-2 focus-visible:ring-accent'
+  }
 
   return (
     <button
       onClick={toggleTheme}
-      className={`relative flex h-10 w-10 items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-primary/45 ${
-        isDock
-          ? 'rounded-full border border-white/60 bg-white/40 text-[#2D255F] hover:bg-white/70 dark:border-white/10 dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.12]'
-          : 'rounded-xl border border-border bg-surface text-foreground hover:bg-surface-soft'
-      }`}
+      className={`relative flex h-9 w-9 items-center justify-center transition-all focus:outline-none ${buttonStyles}`}
       aria-label="Alternar tema"
     >
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={theme}
-          initial={{ y: -10, opacity: 0, rotate: -45 }}
+          initial={{ y: -6, opacity: 0, rotate: -45 }}
           animate={{ y: 0, opacity: 1, rotate: 0 }}
-          exit={{ y: 10, opacity: 0, rotate: 45 }}
-          transition={{ duration: 0.2 }}
-          className={`flex items-center justify-center ${isDock ? 'text-primary' : 'text-primary'}`}
+          exit={{ y: 6, opacity: 0, rotate: 45 }}
+          transition={{ duration: 0.18 }}
+          className="flex items-center justify-center text-navy dark:text-aqua"
         >
           {theme === 'light' ? (
-            <Moon className="h-5 w-5" />
+            <Moon className="h-4 w-4 stroke-[2.2]" />
           ) : (
-            <Sun className="h-5 w-5" />
+            <Sun className="h-4 w-4 stroke-[2.2]" />
           )}
         </motion.div>
       </AnimatePresence>

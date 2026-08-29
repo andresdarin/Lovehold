@@ -1,0 +1,27 @@
+import { Injectable } from '@nestjs/common'
+import { PrismaService } from '../../prisma/prisma.service'
+import { AiConfigResolver } from '../config/ai-config.resolver'
+
+@Injectable()
+export class AiAdminService {
+  constructor(private readonly prisma: PrismaService, private readonly resolver: AiConfigResolver) {}
+  getEffectiveConfig(agentSlug: string, env: string) { return this.resolver.resolve(agentSlug, env) }
+  listAgents() { return (this.prisma as any).aiAgent.findMany({ orderBy: { slug: 'asc' } }) }
+  updateAgent(id: string, data: { name?: string; description?: string }) { return (this.prisma as any).aiAgent.update({ where: { id }, data: { ...(data.name === undefined ? {} : { name: data.name }), ...(data.description === undefined ? {} : { description: data.description }) } }) }
+  listPrompts(agentId: string) { return (this.prisma as any).aiPrompt.findMany({ where: { agentId }, orderBy: { key: 'asc' } }) }
+  listPromptVersions(promptId: string) { return (this.prisma as any).aiPromptVersion.findMany({ where: { promptId }, orderBy: { version: 'desc' } }) }
+  async createDraft(promptId: string, content: string) { const last = await (this.prisma as any).aiPromptVersion.findFirst({ where: { promptId }, orderBy: { version: 'desc' } }); return (this.prisma as any).aiPromptVersion.create({ data: { promptId, content, version: (last?.version || 0) + 1, status: 'draft' } }) }
+  async publishVersion(id: string) { const v = await (this.prisma as any).aiPromptVersion.findUnique({ where: { id } }); if (!v) throw new Error('Prompt version not found'); await (this.prisma as any).$transaction([ (this.prisma as any).aiPromptVersion.updateMany({ where: { promptId: v.promptId, status: { in: ['published', 'active'] } }, data: { status: 'archived' } }), (this.prisma as any).aiPromptVersion.update({ where: { id }, data: { status: 'published' } }) ]); return (this.prisma as any).aiPromptVersion.findUnique({ where: { id } }) }
+  listModelConfigs(agentId?: string) { return (this.prisma as any).aiModelConfig.findMany({ where: agentId ? { agentId } : {}, orderBy: { updatedAt: 'desc' } }) }
+  createModelConfig(agentId: string, data: object) { return (this.prisma as any).aiModelConfig.create({ data: { ...data, agentId, status: 'active' } }) }
+  async activateModelConfig(id: string) { const c = await (this.prisma as any).aiModelConfig.findUnique({ where: { id } }); if (!c) throw new Error('Model config not found'); await (this.prisma as any).$transaction([ (this.prisma as any).aiModelConfig.updateMany({ where: { agentId: c.agentId }, data: { status: 'draft' } }), (this.prisma as any).aiModelConfig.update({ where: { id }, data: { status: 'active' } }) ]); return c }
+  listToolConfigs(agentId?: string) { return (this.prisma as any).aiToolConfig.findMany({ where: agentId ? { agentId } : {}, orderBy: { toolName: 'asc' } }) }
+  updateToolConfig(id: string, data: { enabled?: boolean; requireConfirmation?: boolean; maxAttempts?: number }) { return (this.prisma as any).aiToolConfig.update({ where: { id }, data: { ...(data.enabled === undefined ? {} : { enabled: data.enabled }), ...(data.requireConfirmation === undefined ? {} : { requireConfirmation: data.requireConfirmation }), ...(data.maxAttempts === undefined ? {} : { maxAttempts: data.maxAttempts }) } }) }
+  listDeployments(agentId: string, environment: string) { return (this.prisma as any).aiDeployment.findMany({ where: { agentId, environment }, orderBy: { deployedAt: 'desc' }, include: { promptVersion: true, modelConfig: true } }) }
+  getActiveDeployment(agentId: string, environment: string) { return (this.prisma as any).aiDeployment.findFirst({ where: { agentId, environment, isActive: true }, include: { promptVersion: true, modelConfig: true } }) }
+  async deploy(input: { agentId: string; environment: string; promptVersionId?: string; modelConfigId?: string }) { for (let attempt = 0; attempt < 3; attempt++) try { const result = await (this.prisma as any).$transaction(async (tx: any) => { await tx.$executeRaw`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE`; await tx.aiDeployment.updateMany({ where: { agentId: input.agentId, environment: input.environment, isActive: true }, data: { isActive: false } }); return tx.aiDeployment.create({ data: { ...input, isActive: true } }) }); this.resolver.invalidate(); return result } catch (e) { if (attempt === 2) throw e } throw new Error('Deployment failed') }
+  async promote(id: string) { const deployment = await (this.prisma as any).aiDeployment.findUnique({ where: { id } }); if (!deployment) throw new Error('Deployment not found'); return this.deploy({ agentId: deployment.agentId, environment: deployment.environment, promptVersionId: deployment.promptVersionId, modelConfigId: deployment.modelConfigId }) }
+  async rollback(id: string) { const current = await (this.prisma as any).aiDeployment.findUnique({ where: { id } }); if (!current) throw new Error('Deployment not found'); const previous = await (this.prisma as any).aiDeployment.findFirst({ where: { agentId: current.agentId, environment: current.environment, id: { not: id } }, orderBy: { deployedAt: 'desc' } }); if (!previous) throw new Error('No previous deployment'); return this.promote(previous.id) }
+  getRuns(profileId?: string) { return (this.prisma as any).aiRun.findMany({ where: profileId ? { profileId } : {}, orderBy: { createdAt: 'desc' }, take: 100 }) }
+  getToolCalls(runId: string) { return (this.prisma as any).aiToolCall.findMany({ where: { runId }, orderBy: { createdAt: 'asc' }, take: 100 }) }
+}
