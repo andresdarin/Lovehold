@@ -412,18 +412,23 @@ model AiMessage {
 }
 
 model AiPendingAction {
-  id             String    @id @default(cuid())
-  conversationId String
-  profileId      String
-  toolName       String
-  args           Json
-  risk           String // 'write' (por ahora solo writes)
-  status         String    @default("pending") // pending|confirmed|cancelled|expired|failed
-  expiresAt      DateTime
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  executedAt     DateTime?
-  result         Json?
+  // Máquina durable: pending -> executing (lease de 2 minutos) -> completed|failed.
+  // Si el lease vence, se puede reclaimear atómicamente hasta 3 intentos.
+  id                  String    @id @default(cuid())
+  conversationId      String
+  profileId           String
+  toolName            String
+  args                Json
+  risk                String // 'write' (por ahora solo writes)
+  status              String    @default("pending") // pending|executing|completed|cancelled|expired|failed
+  attempts            Int       @default(0)
+  expiresAt           DateTime
+  executionLeaseUntil DateTime?
+  executionStartedAt  DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  executedAt          DateTime?
+  result              Json?
 
   conversation AiConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   profile      Profile        @relation(fields: [profileId], references: [id], onDelete: Cascade)
@@ -431,6 +436,7 @@ model AiPendingAction {
   @@index([profileId, status])
   @@index([conversationId, status])
   @@index([expiresAt])
+  @@index([executionLeaseUntil])
 }
 
 model AiRun {
@@ -470,4 +476,99 @@ model AiToolCall {
 
   @@index([runId])
   @@index([toolName])
+}
+
+model AiAgent {
+  id           String          @id @default(cuid())
+  slug         String          @unique
+  name         String
+  description  String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  prompts      AiPrompt[]
+  deployments  AiDeployment[]
+  modelConfigs AiModelConfig[]
+  toolConfigs  AiToolConfig[]
+
+  @@index([slug])
+}
+
+model AiPrompt {
+  id          String            @id @default(cuid())
+  agentId     String
+  key         String
+  description String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  agent       AiAgent           @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  versions    AiPromptVersion[]
+
+  @@unique([agentId, key])
+  @@index([agentId])
+}
+
+model AiPromptVersion {
+  id          String         @id @default(cuid())
+  promptId    String
+  version     Int
+  content     String         @db.Text
+  status      String         @default("draft")
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  prompt      AiPrompt       @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  deployments AiDeployment[]
+
+  @@unique([promptId, version])
+  @@index([promptId, status])
+  @@index([status])
+}
+
+model AiDeployment {
+  id              String           @id @default(cuid())
+  agentId         String
+  environment     String
+  promptVersionId String?
+  promptVersion   AiPromptVersion? @relation(fields: [promptVersionId], references: [id])
+  modelConfigId   String?
+  modelConfig     AiModelConfig?   @relation(fields: [modelConfigId], references: [id])
+  isActive        Boolean          @default(true)
+  deployedAt      DateTime         @default(now())
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  agent           AiAgent          @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId, environment, isActive])
+  @@index([environment, isActive])
+}
+
+model AiModelConfig {
+  id               String         @id @default(cuid())
+  agentId          String
+  model            String
+  temperature      Float          @default(0.7)
+  maxTokens        Int            @default(2048)
+  responseMimeType String?        @default("text/plain")
+  status           String         @default("draft")
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  agent            AiAgent        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  deployments      AiDeployment[]
+
+  @@index([agentId, status])
+}
+
+model AiToolConfig {
+  id                  String   @id @default(cuid())
+  agentId             String
+  toolName            String
+  enabled             Boolean  @default(true)
+  requireConfirmation Boolean  @default(true)
+  maxAttempts         Int      @default(3)
+  status              String   @default("active")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  agent               AiAgent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, toolName])
+  @@index([agentId, enabled])
 }
