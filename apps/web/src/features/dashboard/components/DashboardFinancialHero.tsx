@@ -8,16 +8,33 @@ interface StatMetricProps {
   label: string
   value: string
   dotColor: string
+  highlighted?: boolean
 }
 
-function StatMetric({ label, value, dotColor }: StatMetricProps) {
+function StatMetric({ label, value, dotColor, highlighted = false }: StatMetricProps) {
   return (
-    <div className="flex flex-col gap-1 rounded-xl bg-white/[0.035] border border-white/[0.06] p-3 transition-colors hover:bg-white/[0.06]">
+    <div
+      className={`flex flex-col gap-1 rounded-xl p-2.5 sm:p-3 transition-all ${
+        highlighted
+          ? 'bg-white/[0.08] border border-white/[0.18] shadow-[0_4px_16px_rgba(0,0,0,0.15)] ring-1 ring-white/[0.08]'
+          : 'bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.05]'
+      }`}
+    >
       <div className="flex items-center justify-between">
-        <span className="text-[11px] font-medium text-[#C0D5D6]/70">{label}</span>
-        <span className={`h-1.5 w-1.5 rounded-full ${dotColor}`} />
+        <span
+          className={`text-[10px] sm:text-[11px] font-medium truncate ${
+            highlighted ? 'text-[#F5F2EE] font-semibold' : 'text-[#C0D5D6]/70'
+          }`}
+        >
+          {label}
+        </span>
+        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${dotColor}`} />
       </div>
-      <span className="text-lg sm:text-xl font-bold tracking-tight text-[#F5F2EE] tabular-nums">
+      <span
+        className={`text-base sm:text-lg md:text-xl font-bold tracking-tight tabular-nums truncate ${
+          highlighted ? 'text-[#F5F2EE]' : 'text-[#F5F2EE]/90'
+        }`}
+      >
         {value}
       </span>
     </div>
@@ -29,7 +46,7 @@ function StatMetric({ label, value, dotColor }: StatMetricProps) {
  */
 export default function DashboardFinancialHero() {
   return (
-    <div className="flex flex-col gap-5 pt-1">
+    <div className="flex flex-col gap-4 sm:gap-5 pt-1">
       {/* Monto Principal & CTA */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -58,22 +75,18 @@ export default function DashboardFinancialHero() {
         </div>
       </div>
 
-      {/* Tira de Métricas Clave (Limpia, sin ruido ni etiquetas redundantes) */}
-      <div className="grid grid-cols-2 gap-2 border-t border-white/[0.08] pt-4 sm:grid-cols-4 sm:gap-2.5">
+      {/* 3 KPIs en una sola fila: Balance actual resaltado + Top 2 Categorías */}
+      <div className="grid grid-cols-3 gap-2 border-t border-white/[0.08] pt-3.5 sm:gap-3">
         <StatMetric
           label="Balance actual"
           value="$0"
-          dotColor="bg-[#C0D5D6] shadow-[0_0_6px_rgba(192,213,214,0.6)]"
+          dotColor="bg-[#4BE3B5] shadow-[0_0_6px_rgba(75,227,181,0.6)]"
+          highlighted
         />
         <StatMetric
           label="Supermercado"
           value="$0"
           dotColor="bg-[#48B89F] shadow-[0_0_6px_rgba(72,184,159,0.6)]"
-        />
-        <StatMetric
-          label="Combustible"
-          value="$0"
-          dotColor="bg-[#CCA46D] shadow-[0_0_6px_rgba(204,164,109,0.6)]"
         />
         <StatMetric
           label="Delivery"
