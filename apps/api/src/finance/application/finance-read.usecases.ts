@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { getFinancialSnapshot, getSpendingCapacity, simulatePurchase } from '@lovehold/shared'
-import { simulatePurchaseSchema, type SimulatePurchaseInput } from './dto/schemas'
+import { simulatePurchaseSchema } from './dto/schemas'
 import { FinanceReadService } from '../finance-read.service'
 import { localDate } from '../finance.normalizer'
 

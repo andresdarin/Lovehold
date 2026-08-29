@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { NotFoundException, ForbiddenException, BadRequestException, ServiceUnavailableException } from '@nestjs/common'
+import { ForbiddenException, BadRequestException, ServiceUnavailableException } from '@nestjs/common'
 import { AiChatService } from './ai-chat.service'
 import { FINNIC_PROMPT_ID } from '../prompts/finnic.prompt'
 

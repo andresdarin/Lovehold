@@ -31,9 +31,6 @@ function parseSafeMoney(value: unknown): bigint {
   return parseMoney(num.toFixed(2))
 }
 
-const exactMoneyTotal = (values: Iterable<unknown>) =>
-  Number(formatMoney(Array.from(values).reduce<bigint>((sum, value) => sum + parseSafeMoney(value), 0n)))
-
 @Injectable()
 export class ExpensesService {
   constructor(private prisma: PrismaService, private readonly createExpenseUseCase: CreateExpenseUseCase) {}

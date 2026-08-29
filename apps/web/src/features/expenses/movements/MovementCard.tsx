@@ -53,16 +53,13 @@ export default function MovementCard({ movement, onClick }: Props) {
     : getMovementSubtitleParts(movement).join(' · ')
 
   // Formato de Monto
-  let amountDisplay = ''
-  if (isFX && movement.sourceAmount != null && movement.destinationAmount != null) {
-    amountDisplay = `${formatMovementAmount(movement.sourceAmount, movement.currency)} → ${formatMovementAmount(movement.destinationAmount, movement.currency === 'USD' ? 'UYU' : 'USD')}`
-  } else if (isIncome) {
-    amountDisplay = `+${formatMovementAmount(Math.abs(movement.total), movement.currency)}`
-  } else if (type === 'EXPENSE') {
-    amountDisplay = `-${formatMovementAmount(Math.abs(movement.total), movement.currency)}`
-  } else {
-    amountDisplay = formatMovementAmount(movement.total, movement.currency)
-  }
+  const amountDisplay = isFX && movement.sourceAmount != null && movement.destinationAmount != null
+    ? `${formatMovementAmount(movement.sourceAmount, movement.currency)} → ${formatMovementAmount(movement.destinationAmount, movement.currency === 'USD' ? 'UYU' : 'USD')}`
+    : isIncome
+    ? `+${formatMovementAmount(Math.abs(movement.total), movement.currency)}`
+    : type === 'EXPENSE'
+    ? `-${formatMovementAmount(Math.abs(movement.total), movement.currency)}`
+    : formatMovementAmount(movement.total, movement.currency)
 
   return (
     <button

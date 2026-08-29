@@ -102,17 +102,16 @@ export class CreateTransferUseCase {
       if (isFx) {
         const numSource = Number(sourceAmount)
         const numDest = Number(destinationAmount)
-        let effectiveRate = 1
 
         if (numSource > 0) {
           if (sourceCurrency === 'USD' && destCurrency === 'UYU') {
-            effectiveRate = numDest / numSource
+            const effectiveRate = numDest / numSource
             fxNotes = `Tipo de cambio: 1 USD = ${effectiveRate.toFixed(2)} UYU (Origen: ${numSource} USD → Destino: ${numDest} UYU)`
           } else if (sourceCurrency === 'UYU' && destCurrency === 'USD') {
-            effectiveRate = numSource / numDest
+            const effectiveRate = numSource / numDest
             fxNotes = `Tipo de cambio: 1 USD = ${effectiveRate.toFixed(2)} UYU (Origen: ${numSource} UYU → Destino: ${numDest} USD)`
           } else {
-            effectiveRate = numDest / numSource
+            const effectiveRate = numDest / numSource
             fxNotes = `Tipo de cambio: 1 ${sourceCurrency} = ${effectiveRate.toFixed(4)} ${destCurrency}`
           }
         }
