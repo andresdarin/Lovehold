@@ -47,7 +47,7 @@ export const WarningSchema = z.object({
 
 export const HistoricalFxWarningCode = 'MISSING_HISTORICAL_FX' as const
 
-export const ScheduledCashFlowLifecycleSchema = z.enum(['PAID', 'RECEIVED', 'SKIPPED', 'OVERDUE'])
+export const ScheduledCashFlowLifecycleSchema = z.enum(['PENDING', 'PAID', 'RECEIVED', 'SKIPPED', 'OVERDUE'])
 const ScheduledCashFlowBaseSchema = z.object({
   scheduledCashFlowId: z.string().min(1),
   scheduledDueOn: DateSchema,
@@ -56,6 +56,7 @@ const ScheduledCashFlowBaseSchema = z.object({
   lifecycle: ScheduledCashFlowLifecycleSchema,
 })
 export const ScheduledCashFlowSchema = z.union([
+  ScheduledCashFlowBaseSchema.extend({ lifecycle: z.literal('PENDING') }),
   ScheduledCashFlowBaseSchema.extend({ lifecycle: z.literal('PAID'), direction: z.literal('OUTFLOW'), personalExpenseId: z.string().min(1) }),
   ScheduledCashFlowBaseSchema.extend({ lifecycle: z.literal('RECEIVED'), direction: z.literal('INFLOW') }),
   ScheduledCashFlowBaseSchema.extend({ lifecycle: z.literal('SKIPPED') }),

@@ -8,6 +8,10 @@ export {
   FIXED_CATEGORIES,
   VARIABLE_CATEGORIES,
   SUPERMARKET_CATEGORIES,
+  EXPENSE_ITEM_CATEGORY_TO_FINANCE_CATEGORY,
+  LEGACY_CATEGORY_TO_FINANCE_CATEGORY,
+  expenseItemCategoryToFinanceCategory,
+  legacyCategoryToFinanceCategory,
 } from './personal-finance'
 export type {
   ExpenseType,

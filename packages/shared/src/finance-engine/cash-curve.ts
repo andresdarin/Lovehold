@@ -1,22 +1,52 @@
-import { parseMoney, minMinor, maxMinor } from './money'
+import { formatMoney, maxMinor, minMinor, parseMoney } from './money'
 import { convertAssetWithBidFloor, selectQuote } from './fx'
-import { futureGoalContributions } from './goals'
-export const baseSpendable = (input: any) => (input.accounts ?? []).filter((a: any) => a.managedByLovehold !== false).reduce((n: bigint, a: any) => { const v = { currency: a.currency, amount: a.spendable ?? '0.00' }; if (a.currency === input.baseCurrency) return n + parseMoney(v.amount); const q = selectQuote(input.fxQuotes ?? [], a.currency, input.baseCurrency, input.asOf); return q ? n + parseMoney(convertAssetWithBidFloor(v, input.baseCurrency, q).amount) : n }, 0n)
-export const projectedCashCurve = (input: any) => {
-  let value = baseSpendable(input)
-  const asOf = input.asOf?.slice(0, 10)
-  const rows = [{ date: asOf, value }]
-  for (const f of (input.scheduledCashFlows ?? []).slice().sort((a: any, b: any) => a.scheduledDueOn.localeCompare(b.scheduledDueOn))) {
-    if (f.direction === 'OUTFLOW' && f.lifecycle === 'OVERDUE') value -= parseMoney(f.amount.amount)
-    // RECEIVED cash is already reflected in the account balance; future/estimated
-    // income must never make today's capacity look safer.
-    rows.push({ date: f.scheduledDueOn, value })
+
+export type CurveRow = { date: string; balance: bigint }
+
+const amount = (flow: any) => parseMoney(flow.amount?.amount ?? flow.amount ?? '0.00')
+const dateOf = (value: string, timeZone = 'America/Montevideo') => {
+  const date = new Date(value)
+  if (Number.isNaN(date.valueOf())) return value.slice(0, 10)
+  return new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date)
+}
+
+export const baseSpendable = (input: any) => {
+  if (!(input.accounts ?? []).length && input.balances?.spendableByCurrency) {
+    return parseMoney(input.balances.spendableByCurrency[input.baseCurrency ?? 'UYU'] ?? '0.00')
+  }
+  return (input.accounts ?? []).reduce((sum: bigint, account: any) => {
+  if (account.managedByLovehold === false) return sum
+  const raw = parseMoney(account.spendable ?? account.balance ?? '0.00')
+  if (account.currency === (input.baseCurrency ?? 'UYU')) return sum + raw
+  const quote = selectQuote(input.fxQuotes ?? [], account.currency, input.baseCurrency ?? 'UYU', input.asOf)
+  return quote ? sum + parseMoney(convertAssetWithBidFloor({ currency: account.currency, amount: formatMoney(raw) } as any, input.baseCurrency, quote).amount) : sum
+  }, 0n)
+}
+
+/** Projects only unresolved intent. PAID/RECEIVED are already in materialized balances. */
+export const buildProjectedCashCurve = (input: any): CurveRow[] => {
+  const today = dateOf(input.asOf ?? new Date().toISOString(), input.timeZone)
+  let balance = baseSpendable(input)
+  const rows: CurveRow[] = [{ date: today, balance }]
+  const flows = (input.scheduledCashFlows ?? [])
+    .filter((flow: any) => (flow.lifecycle === 'PENDING' || flow.lifecycle === 'OVERDUE') && (flow.currency ?? flow.amount?.currency) === (input.baseCurrency ?? 'UYU'))
+    .map((flow: any, index: number) => ({ flow, index, date: String(flow.scheduledDueOn).slice(0, 10) }))
+    .filter((entry: any) => entry.flow.lifecycle === 'OVERDUE' || entry.date >= today)
+    .sort((a: any, b: any) => a.date.localeCompare(b.date) || (a.flow.direction === 'OUTFLOW' ? -1 : 1) - (b.flow.direction === 'OUTFLOW' ? -1 : 1) || a.index - b.index)
+  for (const entry of flows) {
+    balance += entry.flow.direction === 'INFLOW' ? amount(entry.flow) : -amount(entry.flow)
+    rows.push({ date: entry.date, balance })
   }
   return rows
 }
+
+export const projectedCashCurve = buildProjectedCashCurve
 export const protectedCapacity = (input: any) => {
-  const curve = projectedCashCurve(input)
-  const buffer = parseMoney(input.minimumBuffer?.amount ?? '0.00')
-  const goals = futureGoalContributions(input).reduce((n, g) => n + parseMoney(g.amount), 0n)
-  return maxMinor(curve.reduce((n: bigint, r: any) => minMinor(n, r.value), curve[0]?.value ?? 0n) - goals - buffer, 0n)
+  const curve = buildProjectedCashCurve(input)
+  const minimum = curve.reduce((lowest, row) => minMinor(lowest, row.balance), curve[0]?.balance ?? 0n)
+  const buffer = parseMoney(input.minimumBuffer?.amount ?? input.minimumBuffer ?? '0.00')
+  const goals = (input.goals ?? []).reduce((sum: bigint, goal: any) => sum + parseMoney(goal.periodContribution?.amount ?? '0.00'), 0n)
+  return maxMinor(0n, minimum - buffer - goals)
 }
+
+export const curveAsMoney = (input: any) => buildProjectedCashCurve(input).map(row => ({ date: row.date, balance: formatMoney(row.balance) }))

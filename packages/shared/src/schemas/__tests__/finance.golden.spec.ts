@@ -7,6 +7,7 @@ import violatedGoal from '../../../fixtures/finance/goal-invariant-violated.json
 import fx from '../../../fixtures/finance/fx-bid-ask-uyu-usd.json'
 import {
   FinancialSnapshotSchema,
+  FxQuoteHistoricalSchema,
   FxQuoteSchema,
   GetSpendingByCategoryOutputSchema,
   PersonalExpenseLinksSchema,
@@ -56,7 +57,15 @@ describe('FinanceEngine golden tests — break-the-engine', () => {
 
   it('07 OVERDUE remains committed and is never auto-skipped', () => {
     expect(snapshot.scheduledCashFlows[0].lifecycle).toBe('OVERDUE')
-    expect(engine.getFinancialSnapshot(snapshot)).toMatchObject({ forecast: { scheduledCashFlows: snapshot.scheduledCashFlows } })
+    expect(engine.getFinancialSnapshot(snapshot)).toMatchObject({
+      forecast: {
+        scheduledCashFlows: [expect.objectContaining({
+          scheduledCashFlowId: snapshot.scheduledCashFlows[0].scheduledCashFlowId,
+          lifecycle: 'OVERDUE',
+          direction: 'OUTFLOW',
+        })],
+      },
+    })
   })
 
   it('08 resolving the same due date twice is idempotent', () => {
@@ -142,12 +151,30 @@ describe('FinanceEngine golden tests — break-the-engine', () => {
 
   it('21 historical missing FX retains totals and emits MISSING_HISTORICAL_FX', () => {
     expect(historical.expected).toMatchObject({ totalsByCurrency: { UYU: '820.00', USD: '15.00' }, convertedTotal: null, warning: 'MISSING_HISTORICAL_FX' })
-    expect(engine.getSpendingByCategory({ ...historical, from: '2026-08-01T00:00:00-03:00', to: '2026-08-31T23:59:59-03:00' })).toMatchObject({ convertedTotal: null, warnings: expect.arrayContaining([{ code: 'MISSING_HISTORICAL_FX' }]) })
+    const historicalQuotes = historical.fxQuotes.map((quote) => FxQuoteHistoricalSchema.parse(quote))
+    expect(FxQuoteHistoricalSchema.safeParse({ ...historicalQuotes[0], transactionOn: undefined }).success).toBe(false)
+    const currentQuote = FxQuoteHistoricalSchema.parse({ ...historicalQuotes[0], transactionOn: '2026-08-29', asOf: '2026-08-29T09:00:00-03:00' })
+    const output = GetSpendingByCategoryOutputSchema.parse(engine.getSpendingByCategory({
+      ...historical,
+      fxQuotes: [...historicalQuotes, currentQuote],
+      from: '2026-08-01T00:00:00-03:00',
+      to: '2026-08-31T23:59:59-03:00',
+    }))
+    expect(output).toMatchObject({ convertedTotal: null, warnings: expect.arrayContaining([{ code: 'MISSING_HISTORICAL_FX' }]) })
   })
 
   it('22 historical analytics select FX by transactionOn, never current FX', () => {
-    expect(historical.fxQuotes.map((quote) => quote.transactionOn)).toEqual(['2026-08-01', '2026-08-10'])
-    expect(engine.getSpendingByCategory({ ...historical, from: '2026-08-01T00:00:00-03:00', to: '2026-08-31T23:59:59-03:00' })).toMatchObject({ fxQuotes: historical.fxQuotes })
+    const historicalQuotes = historical.fxQuotes.map((quote) => FxQuoteHistoricalSchema.parse(quote))
+    expect(historicalQuotes.map((quote) => quote.transactionOn)).toEqual(['2026-08-01', '2026-08-10'])
+    const output = GetSpendingByCategoryOutputSchema.parse(engine.getSpendingByCategory({
+      ...historical,
+      fxQuotes: historicalQuotes,
+      from: '2026-08-01T00:00:00-03:00',
+      to: '2026-08-31T23:59:59-03:00',
+    }))
+    expect(output.fxQuotes).toEqual(historicalQuotes)
+    expect(output.convertedTotal).toBeNull()
+    expect(output.warnings).toEqual(expect.arrayContaining([{ code: 'MISSING_HISTORICAL_FX' }]))
   })
 
   it('23 negative balances, estimated income, household shares and legacy categories are conservative', () => {

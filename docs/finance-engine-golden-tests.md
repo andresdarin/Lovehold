@@ -25,7 +25,7 @@ alteran únicamente el dato bajo prueba.
 | 16 | `fx-bid-ask-uyu-usd.json` | `simulatePurchase` | Disponible siempre floor; obligaciones siempre ceil, conservando el peor caso. |
 | 17 | `fx-bid-ask-uyu-usd.json` (derivada sin quote) | `getFinancialSnapshot` | `PARTIAL`/`INDETERMINATE`; `totalsByCurrency` conserva importes y `convertedTotal=null`. |
 | 18 | `historical-spending-uyu.json` | `getSpendingByCategory` | Quote histórico faltante ⇒ `convertedTotal=null` y warning `MISSING_HISTORICAL_FX`. |
-| 19 | `historical-spending-uyu.json` (derivada) | `getSpendingByCategory` | Transacción 2026-07-15 usa quote del 15-07; jamás el quote actual del 2026-08-29. |
+| 19 | `historical-spending-uyu.json` (derivada) | `getSpendingByCategory` | Transacción 2026-08-01 usa quote del 01-08; jamás el quote actual del 2026-08-29. |
 | 20 | `snapshot-2026-08-29-uyu.json` (derivada) | `getFinancialSnapshot` | Overdraft ⇒ `protectedCapacity=0.00` y warning `NEGATIVE_BALANCE`. |
 | 21 | `snapshot-intra-month-uyu.json` (derivada) | `getFinancialSnapshot` | Inflow `ESTIMATED` no aumenta capacidad; sólo `CONFIRMED` cuenta. |
 | 22 | `snapshot-2026-08-29-uyu.json` (derivada) | `getFinancialSnapshot` | Household total 12000 con split 6000 para el profile atribuye sólo 6000. |

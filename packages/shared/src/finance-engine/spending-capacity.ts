@@ -1,4 +1,16 @@
+import type { SpendingCapacity } from '../schemas/finance'
 import { money } from './money'
+import { windowDays, type SpendingWindow } from './calendar'
 import { protectedCapacity } from './cash-curve'
-import { windowDays } from './calendar'
-export const spendingCapacity = (input: any, window: 'today'|'weekend'|'restOfMonth') => { const p = protectedCapacity(input), total = p, days = windowDays(input.asOf ?? '', window).length; const recommended = window === 'today' ? total / 3n : window === 'weekend' ? total * 2n / 3n : total; return { recommendedSpend: money(input.baseCurrency, recommended), protectedCapacity: money(input.baseCurrency, p), reasons: days ? [] : ['Invalid window'] } }
+
+export const getSpendingCapacity = (snapshot: any, window: SpendingWindow): SpendingCapacity => {
+  const asOf = snapshot.asOf ?? new Date().toISOString()
+  const days = windowDays(asOf, window).length
+  const day = Number(asOf.slice(8, 10)), end = new Date(Date.UTC(Number(asOf.slice(0, 4)), Number(asOf.slice(5, 7)), 0)).getUTCDate()
+  const remaining = Math.max(1, end - day + 1)
+  const protectedMinor = protectedCapacity(snapshot)
+  const recommendedMinor = protectedMinor * BigInt(days) / BigInt(remaining)
+  return { recommendedSpend: money(snapshot.baseCurrency ?? 'UYU', recommendedMinor), protectedCapacity: money(snapshot.baseCurrency ?? 'UYU', protectedMinor), reasons: [] }
+}
+
+export const spendingCapacity = getSpendingCapacity

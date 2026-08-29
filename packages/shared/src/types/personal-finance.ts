@@ -9,6 +9,24 @@ export type FixedCategory = (typeof FIXED_CATEGORIES)[number]
 export type VariableCategory = (typeof VARIABLE_CATEGORIES)[number]
 export type SupermarketItemCategory = (typeof SUPERMARKET_CATEGORIES)[number]
 
+import type { FinanceCategory } from '../schemas/finance'
+
+/** Compatibility boundary for legacy receipt/item categories. */
+export const EXPENSE_ITEM_CATEGORY_TO_FINANCE_CATEGORY: Record<string, FinanceCategory> = {
+  ALIMENTOS: 'FOOD', VERDURAS: 'FOOD', FRUTAS: 'FOOD', LACTEOS: 'FOOD', CARNES_FIAMBRES: 'FOOD', PANIFICADOS: 'FOOD',
+  BEBIDAS: 'FOOD', ALCOHOL: 'FOOD', SNACKS_DULCES: 'FOOD', HIGIENE: 'OTHER', LIMPIEZA_HOGAR: 'OTHER', MASCOTAS: 'PETS', OTROS: 'OTHER',
+}
+/** Compatibility mapping for free-form legacy expense categories. */
+export const LEGACY_CATEGORY_TO_FINANCE_CATEGORY: Record<string, FinanceCategory> = {
+  groceries: 'FOOD', supermarket: 'FOOD', alimentos: 'FOOD', transportation: 'TRANSPORT', transporte: 'TRANSPORT',
+  housing: 'HOUSING', utilities: 'UTILITIES', health: 'HEALTH', leisure: 'LEISURE', pets: 'PETS', shopping: 'SHOPPING',
+  education: 'EDUCATION', debt: 'DEBT', taxes: 'TAXES', food: 'FOOD',
+}
+export const expenseItemCategoryToFinanceCategory = (value?: string | null): FinanceCategory =>
+  EXPENSE_ITEM_CATEGORY_TO_FINANCE_CATEGORY[String(value ?? '').trim().toUpperCase()] ?? 'OTHER'
+export const legacyCategoryToFinanceCategory = (value?: string | null): FinanceCategory | undefined =>
+  LEGACY_CATEGORY_TO_FINANCE_CATEGORY[String(value ?? '').trim().toLowerCase()]
+
 export interface PersonalExpense {
   id: string
   profileId: string
