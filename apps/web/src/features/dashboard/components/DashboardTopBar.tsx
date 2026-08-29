@@ -1,7 +1,8 @@
 'use client'
 
 import React from 'react'
-import { Bell } from 'lucide-react'
+import Link from 'next/link'
+import { Bell, Sparkles } from 'lucide-react'
 
 interface DashboardTopBarProps {
   profile: {
@@ -43,6 +44,16 @@ export default function DashboardTopBar({ profile }: DashboardTopBarProps) {
 
       {/* Action controls / Profile Avatar */}
       <div className="flex items-center gap-2">
+        {/* Chat con Finnic */}
+        <Link
+          href="/chat"
+          aria-label="Chat con Finnic"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.06] text-[#C0D5D6] border border-white/8 backdrop-blur-md transition-all hover:bg-white/[0.12] hover:text-[#F5F2EE] active:scale-95 focus:outline-none"
+          title="Copiloto Finnic"
+        >
+          <Sparkles className="h-3.5 w-3.5 stroke-[2]" />
+        </Link>
+
         {/* Notificaciones */}
         <button
           type="button"
