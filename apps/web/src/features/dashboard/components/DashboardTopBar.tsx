@@ -30,8 +30,12 @@ export default function DashboardTopBar({ profile }: DashboardTopBarProps) {
   return (
     <div className="flex items-center justify-between pb-3 pt-1 select-none">
       {/* Brand logo & name */}
-      <div className="flex items-center gap-2">
-        <span className="h-2 w-2 rounded-full bg-[#C0D5D6] shadow-[0_0_8px_rgba(192,213,214,0.6)]" />
+      <div className="flex items-center gap-2.5">
+        <img
+          src="/brand/finnic-symbol-cream.png"
+          alt="Finnic logo"
+          className="h-6 w-6 object-contain drop-shadow-[0_2px_8px_rgba(192,213,214,0.3)]"
+        />
         <span className="text-base font-bold tracking-tight text-[#F5F2EE]">
           Finnic
         </span>

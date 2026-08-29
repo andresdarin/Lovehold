@@ -21,8 +21,12 @@ export default function Topbar({ profile }: TopbarProps) {
   return (
     <header className="sticky top-0 left-0 right-0 flex h-[calc(3.5rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] items-center justify-between bg-surface/85 backdrop-blur-xl border-b border-border px-6 lg:hidden z-20 transition-colors">
       {/* Identidad de Marca */}
-      <div className="flex items-center gap-2 select-none">
-        <span className="h-2.5 w-2.5 rounded-full bg-primary" />
+      <div className="flex items-center gap-2.5 select-none">
+        <img
+          src="/brand/finnic-symbol-navy.png"
+          alt="Finnic logo"
+          className="h-6 w-6 object-contain"
+        />
         <span className="text-base font-bold tracking-tight text-foreground">
           Finnic
         </span>

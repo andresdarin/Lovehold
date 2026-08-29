@@ -19,17 +19,17 @@ export default function SidebarHeader({ collapsed, onToggle }: SidebarHeaderProp
           aria-label="Expandir menú"
         >
           <img
-            src="/icons/favicon.png"
-            alt=""
-            className="h-8 w-8 drop-shadow-sm"
+            src="/brand/finnic-symbol-navy.png"
+            alt="Finnic logo"
+            className="h-7 w-7 object-contain"
           />
         </button>
       ) : (
         <>
           <img
-            src="/icons/favicon.png"
-            alt=""
-            className="h-8 w-8 shrink-0 drop-shadow-sm"
+            src="/brand/finnic-symbol-navy.png"
+            alt="Finnic logo"
+            className="h-7 w-7 shrink-0 object-contain"
           />
           <span className="text-base font-bold tracking-tight text-foreground">
             Finnic
