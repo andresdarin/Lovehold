@@ -36,11 +36,11 @@ export default function MessageList({ messages, sending, onSelectSuggestion, pro
       <div className="flex flex-1 flex-col items-center justify-center p-4 sm:p-6 text-center select-none space-y-4">
         {/* Mascota Finnic y Saludo Inicial */}
         <div className="flex flex-col items-center gap-2.5">
-          <div className="relative">
+          <div className="relative flex items-center justify-center">
             <img
               src="/brand/finnic-mascot.png"
               alt="Finnic el búho financiero"
-              className="h-32 w-32 sm:h-36 sm:w-36 object-contain rounded-3xl drop-shadow-md transition-transform hover:scale-105"
+              className="h-36 w-36 sm:h-40 sm:w-40 object-contain drop-shadow-sm transition-transform hover:scale-105 pointer-events-none select-none"
             />
           </div>
           <div>
