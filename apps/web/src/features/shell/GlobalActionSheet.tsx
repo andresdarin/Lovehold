@@ -45,7 +45,7 @@ export default function GlobalActionSheet({ isOpen, onClose }: GlobalActionSheet
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={onClose}
-              className="fixed inset-0 bg-black/60 backdrop-blur-xs"
+              className="fixed inset-0 bg-black/60"
             />
 
             {/* Bottom / Center Sheet */}
@@ -54,7 +54,7 @@ export default function GlobalActionSheet({ isOpen, onClose }: GlobalActionSheet
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '100%', opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="relative w-full max-w-md rounded-t-[2rem] sm:rounded-3xl border border-border bg-surface p-6 shadow-2xl z-10 select-none pb-[calc(24px+env(safe-area-inset-bottom))]"
+              className="relative w-full max-w-md rounded-t-[2rem] sm:rounded-3xl bg-surface p-6 z-10 select-none pb-[calc(24px+env(safe-area-inset-bottom))]"
             >
               {/* Header */}
               <div className="flex items-center justify-between pb-3.5 border-b border-border/50">

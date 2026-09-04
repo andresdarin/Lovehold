@@ -25,7 +25,7 @@ export default function SidebarFooter({ collapsed, profile, onLogout }: SidebarF
         <ThemeToggle variant="dock" />
         <button
           onClick={onLogout}
-          className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-muted-foreground transition-colors hover:bg-danger/10 hover:text-danger focus:outline-none focus:ring-2 focus:ring-primary/45"
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-surface text-muted-foreground transition-colors hover:bg-danger/10 hover:text-danger focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/45"
           title="Cerrar sesión"
         >
           <LogOut className="h-4 w-4" />
@@ -39,7 +39,7 @@ export default function SidebarFooter({ collapsed, profile, onLogout }: SidebarF
           aria-label="Ir al perfil"
         >
           <div
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white overflow-hidden ring-1 ring-border"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white overflow-hidden"
             style={{ 
               background: `linear-gradient(135deg, ${profile.color ?? '#083A4F'}ee, ${profile.color ?? '#083A4F'})` 
             }}
@@ -52,7 +52,7 @@ export default function SidebarFooter({ collapsed, profile, onLogout }: SidebarF
                 className="h-full w-full rounded-full object-cover block shrink-0"
               />
             ) : (
-              <span className="drop-shadow-sm text-xs">{userInitial}</span>
+              <span className="text-xs">{userInitial}</span>
             )}
           </div>
           {!collapsed && (

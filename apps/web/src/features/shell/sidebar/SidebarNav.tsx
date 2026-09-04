@@ -4,7 +4,6 @@ import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
-import LiquidGlass from '@/components/ui/LiquidGlass'
 import { NAV_ITEMS } from './hooks'
 import type { MutableRefObject } from 'react'
 
@@ -46,11 +45,7 @@ export default function SidebarNav({ collapsed, profile, navRef, itemRefs, indic
         transition={{ type: 'spring', stiffness: 420, damping: 36, mass: 0.55 }}
         aria-hidden="true"
       >
-        <LiquidGlass
-          variant="nav"
-          intensity={collapsed ? 'subtle' : 'medium'}
-          className="h-full w-full"
-        />
+        <div className="h-full w-full rounded-full bg-surface-soft/70" />
       </motion.div>
 
       {visibleItems.map((item) => {
@@ -77,7 +72,7 @@ export default function SidebarNav({ collapsed, profile, navRef, itemRefs, indic
             <span
               className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${
                 isActive || isTarget 
-                  ? 'bg-primary text-primary-foreground shadow-xs' 
+                  ? 'bg-primary text-primary-foreground'
                   : 'bg-surface-soft group-hover:bg-surface-alt text-muted-foreground group-hover:text-foreground'
               }`}
             >
