@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Mail, LockKeyhole, Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { apiFetch, ApiError } from '@/lib/api'
+import { apiFetch } from '@/lib/api'
 import { AuthBrand, AuthField, AuthSubmitButton } from '@/features/auth/AuthComponents'
 
 /**
@@ -47,22 +47,15 @@ export default function LoginPage() {
       return
     }
 
-    try {
-      await apiFetch('/api/profiles/ensure', {
-        method: 'POST',
-        body: JSON.stringify({}),
-      }, session.access_token)
+    // Sincronizar perfil en background (no bloquea el acceso de la sesión autenticada)
+    apiFetch('/api/profiles/ensure', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    }, session.access_token).catch(() => {
+      // Background catch silencioso
+    })
 
-      router.push('/dashboard')
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 401) {
-        await supabase.auth.signOut()
-        setError(err.message || 'Sesión no válida. Tu token no fue aceptado por el servidor.')
-      } else {
-        setError(err instanceof Error ? err.message : 'Error al conectar con el servidor')
-      }
-      setLoading(false)
-    }
+    router.push('/dashboard')
   }
 
   const isFormValid = Boolean(email && password)

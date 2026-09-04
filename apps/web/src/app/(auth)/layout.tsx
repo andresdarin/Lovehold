@@ -4,7 +4,7 @@ import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import { ThemeProvider } from '@/features/theme/ThemeProvider'
-import { AuthBackground } from '@/features/auth/AuthComponents'
+import { AuthBackground } from '@/features/auth/AuthBackground'
 import ThemeToggle from '@/features/shell/ThemeToggle'
 
 /**
