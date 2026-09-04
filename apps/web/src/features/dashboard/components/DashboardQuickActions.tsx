@@ -22,7 +22,7 @@ export default function DashboardQuickActions() {
         <button
           type="button"
           onClick={() => setIsIncomeModalOpen(true)}
-          className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-border/80 bg-surface py-3.5 px-3.5 text-sm font-semibold text-primary shadow-xs transition-all hover:bg-surface-soft hover:border-primary/30 active:scale-95 text-center"
+          className="neu-interactive flex flex-1 items-center justify-center gap-2 rounded-2xl border border-border/50 py-3.5 px-3.5 text-sm font-semibold text-primary text-center"
         >
           <ArrowDown className="h-4 w-4 stroke-[2.5] text-primary" />
           <span>Ingreso</span>
@@ -31,7 +31,7 @@ export default function DashboardQuickActions() {
         {/* 2. Egreso (Principal / Navy #083A4F con texto claro) */}
         <Link
           href="/expenses/new"
-          className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 px-3.5 text-sm font-bold text-primary-foreground shadow-xs transition-all hover:bg-primary-hover active:scale-95 text-center"
+          className="neu-interactive flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 px-3.5 text-sm font-bold text-primary-foreground text-center"
         >
           <ArrowUp className="h-4 w-4 stroke-[2.5]" />
           <span>Egreso</span>

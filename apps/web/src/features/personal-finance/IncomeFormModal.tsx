@@ -13,7 +13,12 @@ interface IncomeFormModalProps {
 }
 
 const inputCls =
-  'w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/45'
+  'neu-inset h-11 w-full rounded-xl border border-border bg-surface px-3.5 text-sm font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors'
+
+const CURRENCY_OPTIONS = [
+  { value: 'UYU', label: 'UYU ($)' },
+  { value: 'USD', label: 'USD (U$S)' },
+]
 
 const INCOME_CATEGORIES = [
   { value: 'sueldo', label: 'Sueldo / Salario' },
@@ -69,8 +74,8 @@ export default function IncomeFormModal({ isOpen, onClose, onSuccess }: IncomeFo
         accountId: accountId || undefined,
         category,
       })
-      onClose()
       onSuccess?.()
+      onClose()
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Error al registrar ingreso')
     }
@@ -80,7 +85,7 @@ export default function IncomeFormModal({ isOpen, onClose, onSuccess }: IncomeFo
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="fixed inset-0 bg-black/60 backdrop-blur-xs" onClick={onClose} />
 
-      <div className="relative w-full max-w-md rounded-3xl border border-border bg-surface p-6 shadow-2xl z-10 animate-in fade-in zoom-in-95 duration-200">
+      <div className="neu-raised relative w-full max-w-md rounded-3xl border border-border/50 bg-surface p-6 z-10 animate-in fade-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between pb-4 border-b border-border/60">
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
@@ -133,14 +138,12 @@ export default function IncomeFormModal({ isOpen, onClose, onSuccess }: IncomeFo
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold text-foreground">Moneda</label>
-              <select
+              <CustomSelect
+                className="w-full"
                 value={currency}
-                onChange={(e) => setCurrency(e.target.value as 'UYU' | 'USD')}
-                className={inputCls}
-              >
-                <option value="UYU">UYU ($)</option>
-                <option value="USD">USD (U$S)</option>
-              </select>
+                options={CURRENCY_OPTIONS}
+                onChange={(val) => setCurrency(val as 'UYU' | 'USD')}
+              />
             </div>
           </div>
 

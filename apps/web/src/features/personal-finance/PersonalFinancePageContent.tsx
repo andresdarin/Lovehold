@@ -103,7 +103,7 @@ export default function PersonalFinancePageContent() {
           <button
             type="button"
             onClick={() => setIsIncomeModalOpen(true)}
-            className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-border/80 bg-surface py-3.5 px-3.5 text-sm font-semibold text-primary shadow-xs transition-all hover:bg-surface-soft hover:border-primary/30 active:scale-95 text-center"
+            className="neu-interactive flex flex-1 items-center justify-center gap-2 rounded-2xl border border-border/50 bg-surface py-3.5 px-3.5 text-sm font-semibold text-primary text-center"
           >
             <ArrowDown className="h-4 w-4 stroke-[2.5] text-primary" />
             <span>Ingreso</span>
@@ -113,7 +113,7 @@ export default function PersonalFinancePageContent() {
           <button
             type="button"
             onClick={() => setView('new-expense')}
-            className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 px-3.5 text-sm font-bold text-primary-foreground shadow-xs transition-all hover:bg-primary-hover active:scale-95 text-center"
+            className="neu-interactive flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 px-3.5 text-sm font-bold text-primary-foreground text-center"
           >
             <ArrowUp className="h-4 w-4 stroke-[2.5]" />
             <span>Egreso</span>
@@ -152,7 +152,7 @@ export default function PersonalFinancePageContent() {
 
             {/* 5. Categorías & Movimientos en Grid responsivo */}
             <section className="grid gap-6 md:grid-cols-2">
-              <div className="rounded-3xl border border-border/80 bg-surface p-5 sm:p-6 shadow-xs">
+              <div className="neu-raised rounded-3xl border border-border/50 bg-surface p-5 sm:p-6">
                 <div className="flex items-center justify-between pb-3.5 border-b border-border/50 mb-3.5">
                   <div className="flex items-center gap-2.5">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/30 text-primary bg-transparent">
@@ -167,7 +167,7 @@ export default function PersonalFinancePageContent() {
                 <RecentExpensesList expenses={expenses} />
               </div>
 
-              <div className="rounded-3xl border border-border/80 bg-surface p-5 sm:p-6 shadow-xs">
+              <div className="neu-raised rounded-3xl border border-border/50 bg-surface p-5 sm:p-6">
                 <div className="flex items-center justify-between pb-3.5 border-b border-border/50 mb-3.5">
                   <div className="flex items-center gap-2.5">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full border border-cat-super/40 text-cat-super bg-transparent">
@@ -185,7 +185,7 @@ export default function PersonalFinancePageContent() {
 
             {/* 6. Ranking de productos */}
             {allItems.length > 0 && (
-              <section className="rounded-3xl border border-border/80 bg-surface p-5 sm:p-6 shadow-xs">
+              <section className="neu-raised rounded-3xl border border-border/50 bg-surface p-5 sm:p-6">
                 <div className="pb-3.5 border-b border-border/50 mb-3.5">
                   <h2 className="text-sm font-bold text-foreground">Productos más comprados</h2>
                   <p className="text-[11px] text-muted-foreground">Artículos recurrentes de tickets</p>

@@ -17,9 +17,9 @@ export default function ThemeToggle({ variant = 'surface' }: ThemeToggleProps) {
 
   let buttonStyles = 'rounded-xl border border-border bg-surface text-foreground hover:bg-surface-soft'
   if (variant === 'dock') {
-    buttonStyles = 'rounded-full border border-border bg-surface text-foreground hover:bg-surface-soft'
+    buttonStyles = 'rounded-full bg-surface text-foreground hover:bg-surface-soft'
   } else if (variant === 'auth') {
-    buttonStyles = 'rounded-full border border-navy/15 dark:border-white/15 bg-sand/80 dark:bg-surface/85 text-navy dark:text-aqua shadow-sm backdrop-blur-md hover:bg-sand dark:hover:bg-surface-alt focus-visible:ring-2 focus-visible:ring-accent'
+    buttonStyles = 'rounded-full bg-sand/80 dark:bg-surface/85 text-navy dark:text-aqua hover:bg-sand dark:hover:bg-surface-alt focus-visible:ring-2 focus-visible:ring-accent'
   }
 
   return (

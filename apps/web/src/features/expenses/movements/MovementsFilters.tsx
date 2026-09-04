@@ -46,7 +46,7 @@ export default function MovementsFilters({ filters, onChange, onClear }: Props) 
             value={filters.q}
             onChange={(e) => onChange('q', e.target.value)}
             placeholder="Buscar por comercio, concepto, cuenta..."
-            className="h-11 w-full rounded-full border border-border/80 bg-surface pl-4 pr-12 text-xs sm:text-sm text-foreground shadow-xs outline-none placeholder:text-muted-foreground transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+            className="neu-inset h-11 w-full rounded-full border border-border/80 bg-surface-soft pl-4 pr-12 text-xs sm:text-sm text-foreground outline-none placeholder:text-muted-foreground transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
           {filters.q ? (
             <button
@@ -76,7 +76,7 @@ export default function MovementsFilters({ filters, onChange, onClear }: Props) 
           onClick={() => setOpen(true)}
           aria-label="Abrir filtros"
           title="Filtros de movimientos"
-          className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-all shadow-xs active:scale-95 ${
+          className={`neu-interactive relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-all active:scale-95 ${
             activeCount > 0
               ? 'border-primary/40 bg-primary text-primary-foreground'
               : 'border-border/80 bg-surface text-foreground hover:bg-surface-soft hover:border-primary/30'
@@ -150,7 +150,7 @@ function FilterSheet({ filters, onChange, onClear, onClose }: Props & { onClose:
         aria-modal="true"
         aria-label="Filtros de movimientos"
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg rounded-t-3xl border border-border bg-surface p-6 shadow-2xl sm:rounded-3xl flex flex-col gap-5 max-h-[90vh] overflow-y-auto"
+        className="neu-raised w-full max-w-lg rounded-t-3xl border border-border bg-surface p-6 sm:rounded-3xl flex flex-col gap-5 max-h-[90vh] overflow-y-auto"
       >
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-border/60">

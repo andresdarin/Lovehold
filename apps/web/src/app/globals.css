@@ -36,6 +36,18 @@
     --surface-tint: #EEF3F3;
     --elevated: #FCFCFD;
 
+    /* Luxury-minimal neumorphism tokens. Both themes derive depth from the
+       active surface, so dark mode never produces a white halo. */
+    --neu-bg: var(--background);
+    --neu-surface: var(--surface);
+    --neu-surface-soft: var(--surface-soft);
+    --neu-highlight: rgba(255, 255, 255, 0.72);
+    --neu-shadow: rgba(8, 58, 79, 0.14);
+    --neu-raised: 8px 8px 18px var(--neu-shadow), -7px -7px 16px var(--neu-highlight);
+    --neu-raised-sm: 4px 4px 10px var(--neu-shadow), -4px -4px 10px var(--neu-highlight);
+    --neu-inset: inset 4px 4px 9px var(--neu-shadow), inset -4px -4px 9px var(--neu-highlight);
+    --neu-hover: 5px 5px 12px var(--neu-shadow), -4px -4px 10px var(--neu-highlight);
+
     /* Typography */
     --foreground: #102D38;
     --text-primary: #102D38;
@@ -110,6 +122,16 @@
     --surface-tint: #103642;
     --elevated: #153E4A;
 
+    --neu-bg: var(--background);
+    --neu-surface: var(--surface);
+    --neu-surface-soft: var(--surface-soft);
+    --neu-highlight: rgba(42, 70, 78, 0.28);
+    --neu-shadow: rgba(0, 8, 12, 0.58);
+    --neu-raised: 8px 8px 18px var(--neu-shadow), -7px -7px 16px var(--neu-highlight);
+    --neu-raised-sm: 4px 4px 10px var(--neu-shadow), -4px -4px 10px var(--neu-highlight);
+    --neu-inset: inset 4px 4px 9px var(--neu-shadow), inset -4px -4px 9px var(--neu-highlight);
+    --neu-hover: 5px 5px 12px var(--neu-shadow), -4px -4px 10px var(--neu-highlight);
+
     /* Typography Dark */
     --foreground: #F3F1ED;
     --text-primary: #F3F1ED;
@@ -155,13 +177,32 @@
     transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
   }
 
+  html,
   body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    min-height: 100dvh;
     background-color: var(--background);
     color: var(--foreground);
   }
 
   html {
     scrollbar-gutter: stable;
+  }
+
+  /*
+   * iOS standalone renders the document behind the translucent status bar.
+   * This is deliberately a system/entry surface, not the reading surface:
+   * normal layouts paint their own background on top of it.
+   */
+  body {
+    background-color: #083A4F;
+  }
+
+  .dark body {
+    background-color: #071D27;
   }
 }
 
@@ -173,10 +214,10 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-text-fill-color: #083A4F !important;
-  caret-color: #083A4F !important;
-  -webkit-box-shadow: 0 0 0 1000px #EDE9E3 inset !important;
-  box-shadow: 0 0 0 1000px #EDE9E3 inset !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  caret-color: var(--foreground) !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--neu-surface-soft) inset !important;
+  box-shadow: 0 0 0 1000px var(--neu-surface-soft) inset !important;
   transition: background-color 500000s ease-in-out 0s !important;
 }
 
@@ -184,10 +225,10 @@ input:-webkit-autofill:active {
 .dark input:-webkit-autofill:hover,
 .dark input:-webkit-autofill:focus,
 .dark input:-webkit-autofill:active {
-  -webkit-text-fill-color: #F3F1ED !important;
-  caret-color: #F3F1ED !important;
-  -webkit-box-shadow: 0 0 0 1000px #0B2935 inset !important;
-  box-shadow: 0 0 0 1000px #0B2935 inset !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  caret-color: var(--foreground) !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--neu-surface-soft) inset !important;
+  box-shadow: 0 0 0 1000px var(--neu-surface-soft) inset !important;
   transition: background-color 500000s ease-in-out 0s !important;
 }
 
@@ -214,19 +255,63 @@ input:-webkit-autofill:active {
     border-radius: 999px;
   }
 
-  /* Liquid Glass refined for minimal fintech look */
+  /* Shared depth primitives. Use depth for hierarchy, not decoration. */
+  .neu-raised,
+  .neu-raised-sm,
+  .neu-inset,
+  .neu-flat,
+  .neu-interactive {
+    position: relative;
+    border-color: transparent;
+  }
+
+  /* Raised surfaces use shadow for their edge; local border utilities must not
+     turn that edge into a permanent outline. Focus styles remain opt-in. */
+  .neu-raised[class*="border-"],
+  .neu-raised-sm[class*="border-"],
+  .neu-inset[class*="border-"],
+  .neu-interactive[class*="border-"],
+  .liquid-glass[class*="border-"] {
+    border-color: transparent;
+  }
+
+  .neu-raised { box-shadow: var(--neu-raised); }
+  .neu-raised-sm { box-shadow: var(--neu-raised-sm); }
+  .neu-inset {
+    box-shadow: var(--neu-inset);
+  }
+  .neu-flat { box-shadow: none; }
+  .neu-interactive {
+    box-shadow: var(--neu-raised-sm);
+    transition: box-shadow 200ms ease, transform 200ms ease, background-color 200ms ease;
+  }
+  .neu-interactive:hover { box-shadow: var(--neu-hover); transform: translateY(-1px); }
+  .neu-interactive:active { box-shadow: var(--neu-inset); transform: translateY(0); }
+  .neu-interactive:focus-visible,
+  .neu-raised:focus-visible,
+  .neu-inset:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--primary) 70%, transparent);
+    outline-offset: 2px;
+  }
+  .neu-interactive:disabled,
+  .neu-interactive[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.5;
+    box-shadow: none;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .neu-interactive { transition: none; }
+    .neu-interactive:hover, .neu-interactive:active { transform: none; }
+  }
+
+  /* LiquidGlass is retained as a compatibility wrapper, not a second visual primitive. */
   .liquid-glass {
     position: relative;
     border-radius: 1.25rem;
-    border: 1px solid var(--border);
+    border-color: transparent;
     background-color: var(--surface);
-    box-shadow: 0 2px 12px -2px rgba(8, 58, 79, 0.04);
-  }
-
-  .dark .liquid-glass {
-    border-color: var(--border);
-    background-color: var(--surface);
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+    box-shadow: var(--neu-raised-sm);
   }
 
   .liquid-glass[data-variant="card"] {
@@ -236,10 +321,19 @@ input:-webkit-autofill:active {
   .liquid-glass[data-variant="button"],
   .liquid-glass[data-variant="nav"] {
     border-radius: 999px;
+    box-shadow: var(--neu-raised-sm);
   }
 
   .liquid-glass[data-variant="badge"] {
     border-radius: 0.75rem;
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  .liquid-glass[data-variant="button"]:hover,
+  .liquid-glass[data-variant="nav"]:hover {
+    box-shadow: var(--neu-hover);
+    transform: translateY(-1px);
   }
 
   .liquid-glass[data-disabled="true"] {

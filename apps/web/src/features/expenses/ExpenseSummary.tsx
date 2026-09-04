@@ -24,7 +24,7 @@ export default function ExpenseSummary({
         : 'Podés guardar el egreso general sin discriminar productos.'
 
   return (
-    <aside className="rounded-3xl border border-border/80 bg-surface p-4 sm:p-5 shadow-xs transition-all flex flex-col gap-4 select-none">
+    <aside className="neu-raised rounded-3xl border border-border/50 bg-surface p-4 sm:p-5 transition-all flex flex-col gap-4 select-none">
       {/* Header */}
       <div className="pb-3 border-b border-border/60 flex items-center justify-between">
         <div className="flex items-center gap-2">

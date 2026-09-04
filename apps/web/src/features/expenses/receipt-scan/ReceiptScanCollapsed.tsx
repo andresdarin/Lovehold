@@ -33,7 +33,7 @@ export default function ReceiptScanCollapsed({
   const confidence = Math.round(result.confidence * 100)
 
   return (
-    <section className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+    <section className="neu-raised rounded-2xl border border-border/50 bg-surface p-5">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <div className="flex items-center gap-3">

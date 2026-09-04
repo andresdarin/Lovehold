@@ -10,7 +10,7 @@ interface Props {
 
 export default function MovementEmptyState({ hasFilters, onClearFilters }: Props) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-3xl border border-border/80 bg-surface px-6 py-16 text-center shadow-xs">
+    <div className="neu-flat flex flex-col items-center justify-center rounded-3xl border border-border/50 bg-surface px-6 py-16 text-center">
       <div className="flex h-12 w-12 items-center justify-center rounded-full border border-primary/30 text-primary bg-transparent">
         <Inbox className="h-5 w-5 stroke-[1.8]" />
       </div>

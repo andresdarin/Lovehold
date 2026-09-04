@@ -95,8 +95,8 @@ export default function SignUpPage() {
 
       {/* Formulario monolítico en bloque de cristal cálido (Sand/Navy) */}
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div className="overflow-hidden rounded-3xl border border-navy/10 dark:border-white/10 bg-[#F5F2EE]/85 dark:bg-surface/80 shadow-xl shadow-navy/5 dark:shadow-black/30 backdrop-blur-md transition-all">
-          <div className="flex flex-col divide-y divide-navy/10 dark:divide-white/10">
+        <div className="neu-raised overflow-hidden rounded-3xl border border-border/60 bg-surface/90 transition-all">
+          <div className="flex flex-col divide-y divide-border/60">
             {/* 1. Nombre completo */}
             <AuthField
               id="displayName"
@@ -138,7 +138,7 @@ export default function SignUpPage() {
 
             {/* 4 & 5. Contraseña y Repetir Contraseña con el Botón CTA a la derecha en el medio */}
             <div className="relative flex items-center justify-between">
-              <div className="flex flex-1 flex-col divide-y divide-navy/10 dark:divide-white/10">
+              <div className="flex flex-1 flex-col divide-y divide-border/60">
                 <AuthField
                   id="password"
                   label="Contraseña"

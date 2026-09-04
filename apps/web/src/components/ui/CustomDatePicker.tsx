@@ -14,7 +14,7 @@ interface Props {
   disabled?: boolean
 }
 
-const triggerBase = 'h-11 rounded-xl border border-border bg-surface px-4 text-sm font-medium text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:bg-surface-soft disabled:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'
+const triggerBase = 'neu-inset h-11 rounded-xl border border-border bg-surface-soft px-4 text-sm font-medium text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:bg-surface-soft disabled:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'
 
 const MONTHS = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -189,7 +189,7 @@ export default function CustomDatePicker({
       {open && createPortal(
         <div data-dp role="dialog" aria-modal="true" aria-label="Seleccionar fecha" style={popoverStyle}>
           <div
-            className="w-[280px] liquid-glass p-4 shadow-2xl"
+            className="w-[280px] liquid-glass p-4"
             data-intensity="medium"
             data-variant="card"
             style={{

@@ -10,13 +10,13 @@ function LoadingSkeleton() {
   return (
     <div className="space-y-6">
       <header className="flex items-center gap-3">
-        <div className="h-10 w-10 animate-pulse rounded-2xl bg-white/10" />
+        <div className="h-10 w-10 animate-pulse rounded-2xl bg-surface-soft" />
         <div className="space-y-1">
-          <div className="h-5 w-24 animate-pulse rounded bg-white/10" />
-          <div className="h-3 w-44 animate-pulse rounded bg-white/5" />
+          <div className="h-5 w-24 animate-pulse rounded bg-surface-soft" />
+          <div className="h-3 w-44 animate-pulse rounded bg-surface-soft/70" />
         </div>
       </header>
-      <div className="h-32 animate-pulse rounded-2xl bg-white/5" />
+      <div className="h-32 animate-pulse rounded-2xl bg-surface-soft/70" />
     </div>
   )
 }

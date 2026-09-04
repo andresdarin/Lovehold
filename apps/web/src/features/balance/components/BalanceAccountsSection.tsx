@@ -43,7 +43,7 @@ export default function BalanceAccountsSection({ accounts, loading }: BalancePro
 
   return (
     <>
-      <section className="rounded-3xl border border-border/80 bg-surface p-5 shadow-xs sm:p-6">
+      <section className="neu-raised rounded-3xl bg-surface p-5 sm:p-6">
         <header className="mb-3.5 flex items-center justify-between border-b border-border/50 pb-3.5">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/30 text-primary bg-transparent">

@@ -12,7 +12,7 @@ interface Props {
   iconOnly?: boolean
 }
 
-const inputBase = 'h-11 rounded-xl border border-border bg-surface-soft text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'
+const inputBase = 'neu-inset h-11 rounded-xl border border-border bg-surface-soft text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'
 
 export default function MovementsMonthPicker({ value, onChange, iconOnly = false }: Props) {
   const [open, setOpen] = useState(false)
@@ -45,7 +45,7 @@ export default function MovementsMonthPicker({ value, onChange, iconOnly = false
         title={value ? formatMonthLabel(value) : 'Seleccionar mes'}
         className={
           iconOnly
-            ? `flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border/80 bg-surface text-foreground hover:bg-surface-soft hover:border-primary/30 transition-all shadow-xs active:scale-95 ${
+            ? `neu-interactive flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border/80 bg-surface text-foreground hover:bg-surface-soft hover:border-primary/30 transition-all ${
                 value ? 'border-primary/40 text-primary' : ''
               }`
             : `${inputBase} flex w-40 items-center gap-2 px-4 font-medium`
@@ -59,7 +59,7 @@ export default function MovementsMonthPicker({ value, onChange, iconOnly = false
 
       {open && createPortal(
         <div data-mp role="dialog" aria-modal="true" aria-label="Seleccionar mes" style={popoverStyle}>
-          <div className="max-h-[min(400px,calc(100vh-24px))] overflow-y-auto rounded-2xl border border-border bg-surface p-4 shadow-2xl" onClick={e => e.stopPropagation()}>
+          <div className="neu-raised max-h-[min(400px,calc(100vh-24px))] overflow-y-auto rounded-2xl border border-border bg-surface p-4" onClick={e => e.stopPropagation()}>
             <div className="mb-3 flex items-center justify-between">
               <button type="button" onClick={() => setYear(y => y - 1)}
                 className="flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground transition hover:bg-surface-soft hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"

@@ -21,7 +21,7 @@ export function FeaturedAchievements() {
   const sorted = [...unlocked, ...locked]
 
   return (
-    <LiquidGlass variant="card" intensity="medium" className="p-6 border border-white/5">
+    <LiquidGlass variant="card" intensity="medium" className="neu-raised p-6 border border-border/50">
       {/* Header */}
       <div className="flex items-end justify-between mb-5">
         <div>

@@ -36,14 +36,15 @@ export function useFloatingPopover(
       const el = triggerRef.current
       if (!el) return
       const r = el.getBoundingClientRect()
+      const popoverWidth = width > 0 ? width : Math.max(r.width, 140)
       const fitsBelow = window.innerHeight - r.bottom >= estimatedHeight + 8
       const top = fitsBelow ? r.bottom + 6 : Math.max(8, r.top - estimatedHeight - 6)
-      const left = Math.max(8, Math.min(r.left, window.innerWidth - width - 8))
+      const left = Math.max(8, Math.min(r.left, window.innerWidth - popoverWidth - 8))
       setStyle({
         position: 'fixed',
         top: `${top}px`,
         left: `${left}px`,
-        width: `${width}px`,
+        width: `${popoverWidth}px`,
         zIndex: 100,
         visibility: 'visible',
         pointerEvents: 'auto',

@@ -14,7 +14,7 @@ export default function SidebarHeader({ collapsed, onToggle }: SidebarHeaderProp
       {collapsed ? (
         <button
           onClick={onToggle}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary/45"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/45"
           title="Expandir menú"
           aria-label="Expandir menú"
         >
@@ -36,7 +36,7 @@ export default function SidebarHeader({ collapsed, onToggle }: SidebarHeaderProp
           </span>
           <button
             onClick={onToggle}
-            className="ml-auto flex h-8 w-8 items-center justify-center rounded-full border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-soft hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary/45"
+            className="ml-auto flex h-8 w-8 items-center justify-center rounded-full border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-soft hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/45"
             title="Colapsar menú"
             aria-label="Colapsar menú"
           >

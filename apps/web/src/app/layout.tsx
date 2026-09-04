@@ -1,11 +1,28 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { SwDevCleanup } from './SwDevCleanup'
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: [
+    // The installed shell is translucent on iOS. Keep the browser chrome in
+    // the same deep surface used by every full-bleed entry point.
+    { media: '(prefers-color-scheme: light)', color: '#083A4F' },
+    { media: '(prefers-color-scheme: dark)', color: '#071D27' },
+  ],
+}
 
 export const metadata: Metadata = {
   title: 'Finnic',
   description: 'Tu copiloto financiero personal y en pareja',
   manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Finnic',
+  },
   icons: {
     icon: '/icons/favicon.png',
     apple: [
@@ -14,12 +31,6 @@ export const metadata: Metadata = {
       { url: '/icons/apple-icon-167x167.png', sizes: '167x167', type: 'image/png' },
       { url: '/icons/apple-icon-180x180.png', sizes: '180x180', type: 'image/png' },
     ],
-  },
-  other: {
-    'mobile-web-app-capable': 'yes',
-    'apple-mobile-web-app-capable': 'yes',
-    'apple-mobile-web-app-status-bar-style': 'black-translucent',
-    'apple-mobile-web-app-title': 'Finnic',
   },
 }
 
@@ -31,7 +42,6 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
-        <meta name="theme-color" content="#083A4F" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -52,7 +62,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-screen bg-background text-foreground font-sans antialiased">
+      <body className="min-h-[100dvh] bg-[#083A4F] text-foreground font-sans antialiased dark:bg-[#071D27]">
         <SwDevCleanup />
         {children}
       </body>

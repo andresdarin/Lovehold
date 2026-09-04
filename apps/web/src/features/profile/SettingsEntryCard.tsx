@@ -19,7 +19,7 @@ export function SettingsEntryCard({ email, onLogout }: SettingsEntryCardProps) {
   const { theme } = useTheme()
 
   return (
-    <LiquidGlass variant="card" intensity="medium" className="p-5 border border-white/5">
+    <LiquidGlass variant="card" intensity="medium" className="neu-raised p-5 border border-border/50">
       {/* Collapsed summary header */}
       <button
         onClick={() => setExpanded((v) => !v)}

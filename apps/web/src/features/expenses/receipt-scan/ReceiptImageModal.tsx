@@ -17,7 +17,7 @@ export default function ReceiptImageModal({
         role="dialog"
         aria-modal="true"
         aria-label="Imagen del ticket"
-        className="relative flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl"
+        className="neu-raised relative flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-border/50"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
