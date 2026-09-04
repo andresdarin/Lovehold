@@ -19,7 +19,7 @@ export default function Topbar({ profile }: TopbarProps) {
     : userInitial
 
   return (
-    <header className="sticky top-0 left-0 right-0 flex h-[calc(3.5rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] items-center justify-between bg-surface/85 backdrop-blur-xl border-b border-border px-6 lg:hidden z-20 transition-colors">
+    <header className="sticky top-0 left-0 right-0 flex h-[calc(3.5rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] items-center justify-between bg-surface border-b border-border px-6 lg:hidden z-20 transition-colors">
       {/* Identidad de Marca */}
       <div className="flex items-center gap-2.5 select-none">
         <img

@@ -6,7 +6,7 @@ import FinnicOwlIcon from '@/components/ui/FinnicOwlIcon'
 
 export default function ChatHeader() {
   return (
-    <header className="relative w-full bg-primary text-primary-foreground pt-4 pb-5 px-4 sm:px-6 rounded-b-[2rem] sm:rounded-b-[2.2rem] shadow-md select-none overflow-hidden shrink-0">
+    <header className="relative w-full bg-primary text-primary-foreground pt-[calc(1rem+env(safe-area-inset-top))] pb-5 px-4 sm:px-6 rounded-b-[2rem] sm:rounded-b-[2.2rem] shadow-md select-none overflow-hidden shrink-0">
       {/* Luz ambiental sutil */}
       <div className="pointer-events-none absolute -top-12 -right-12 h-36 w-36 rounded-full bg-[#A58D66]/20 blur-2xl" />
       <div className="pointer-events-none absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-[#C0D5D6]/15 blur-xl" />

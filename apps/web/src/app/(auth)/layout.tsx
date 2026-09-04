@@ -26,12 +26,12 @@ export default function AuthLayout({
         <AuthBackground />
 
         {/* Botón superior de ThemeToggle accesible y alineado */}
-        <div className="absolute top-[max(1rem,calc(env(safe-area-inset-top)+0.5rem))] right-4 sm:right-6 z-20">
+        <div className="absolute top-[max(1rem,calc(env(safe-area-inset-top)+0.5rem))] right-[max(1rem,calc(env(safe-area-inset-right)+1rem))] z-20">
           <ThemeToggle variant="auth" />
         </div>
 
         {/* Contenedor central con soporte para Safe Areas y Teclado Mobile */}
-        <main className="relative z-10 flex min-h-[100dvh] w-full flex-col justify-center px-4 py-6 sm:px-6 sm:py-10 md:py-14 pt-[max(1.5rem,calc(env(safe-area-inset-top)+1rem))] pb-[max(1.5rem,calc(env(safe-area-inset-bottom)+1rem))]">
+        <main className="relative z-10 flex min-h-[100dvh] w-full flex-col justify-center px-[max(1rem,calc(env(safe-area-inset-left)+1rem))] py-6 sm:px-6 sm:py-10 md:py-14 pt-[max(1.5rem,calc(env(safe-area-inset-top)+1rem))] pr-[max(1rem,calc(env(safe-area-inset-right)+1rem))] pb-[max(1.5rem,calc(env(safe-area-inset-bottom)+1rem))]">
           <div className="mx-auto w-full max-w-[420px]">
             <AnimatePresence mode="wait">
               <motion.div

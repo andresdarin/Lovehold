@@ -161,12 +161,26 @@
     padding: 0;
     width: 100%;
     min-height: 100%;
+    min-height: 100dvh;
     background-color: var(--background);
     color: var(--foreground);
   }
 
   html {
     scrollbar-gutter: stable;
+  }
+
+  /*
+   * iOS standalone renders the document behind the translucent status bar.
+   * This is deliberately a system/entry surface, not the reading surface:
+   * normal layouts paint their own background on top of it.
+   */
+  body {
+    background-color: #083A4F;
+  }
+
+  .dark body {
+    background-color: #071D27;
   }
 }
 

@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { motion } from 'framer-motion'
 import { LoaderCircle, ArrowRight } from 'lucide-react'
 
 /**
@@ -119,28 +120,95 @@ export function AuthSubmitButton({
 }
 
 /**
- * Fondo ambiental y fotográfico integrado armónicamente con Navy y Sand.
+ * Colección de las 12 plumas individuales limpias (sin repetición del modelo de pluma).
+ * Configuradas con desfases iniciales negativos y lapsos orgánicos para garantizar
+ * un flujo constante y poblado en pantalla en todo momento sin vacíos.
+ */
+const FEATHER_ITEMS = [
+  { id: 1, src: '/brand/feathers/feather-01.png', left: '5%',   startY: -10, duration: 18, delay: 0,   sway: 20, rotate: [12, -10, 15],   scale: 0.9,  opacity: 0.07 },
+  { id: 2, src: '/brand/feathers/feather-02.png', left: '86%',  startY: 35,  duration: 22, delay: -8,  sway: -22, rotate: [-15, 8, -12],  scale: 0.95, opacity: 0.06 },
+  { id: 3, src: '/brand/feathers/feather-03.png', left: '20%',  startY: 70,  duration: 19, delay: -14, sway: 25, rotate: [20, -15, 18],   scale: 0.85, opacity: 0.065 },
+  { id: 4, src: '/brand/feathers/feather-04.png', left: '74%',  startY: 15,  duration: 24, delay: -4,  sway: -18, rotate: [-25, 15, -20], scale: 0.9,  opacity: 0.07 },
+  { id: 5, src: '/brand/feathers/feather-05.png', left: '12%',  startY: 55,  duration: 21, delay: -11, sway: 22, rotate: [8, -12, 10],    scale: 0.8,  opacity: 0.06 },
+  { id: 6, src: '/brand/feathers/feather-06.png', left: '60%',  startY: -15, duration: 19, delay: -2,  sway: -26, rotate: [-30, 20, -25], scale: 1.0,  opacity: 0.075 },
+  { id: 7, src: '/brand/feathers/feather-07.png', left: '32%',  startY: 40,  duration: 23, delay: -9,  sway: 18, rotate: [5, -18, 12],    scale: 0.85, opacity: 0.065 },
+  { id: 8, src: '/brand/feathers/feather-08.png', left: '93%',  startY: 80,  duration: 20, delay: -16, sway: -20, rotate: [-12, 22, -15], scale: 0.9,  opacity: 0.065 },
+  { id: 9, src: '/brand/feathers/feather-09.png', left: '46%',  startY: 25,  duration: 25, delay: -6,  sway: 24, rotate: [25, -20, 20],   scale: 0.95, opacity: 0.07 },
+  { id: 10, src: '/brand/feathers/feather-10.png', left: '80%', startY: 65,  duration: 22, delay: -13, sway: -18, rotate: [-18, 10, -14], scale: 0.85, opacity: 0.06 },
+  { id: 11, src: '/brand/feathers/feather-11.png', left: '2%',  startY: 85,  duration: 20, delay: -17, sway: 22, rotate: [15, -25, 18],   scale: 0.95, opacity: 0.075 },
+  { id: 12, src: '/brand/feathers/feather-12.png', left: '40%', startY: 5,   duration: 26, delay: -1,  sway: -24, rotate: [-10, 16, -8],  scale: 0.9,  opacity: 0.065 },
+]
+
+/**
+ * Fondo sobrio ambiental para Login con las 12 plumas individuales en flujo continuo descendente.
+ * Color sobrio arena cálida en light mode y navy profundo refinado en dark mode.
  */
 export function AuthBackground() {
   return (
     <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden select-none">
-      {/* Fotografía de fondo editorial */}
-      <img
-        src="/brand/finnic-bg.jpg"
-        alt=""
-        aria-hidden="true"
-        className="h-full w-full object-cover object-center transform scale-105"
-      />
+      {/* Base cromática sobria y refinada */}
+      <div className="absolute inset-0 bg-[#F5F2EC] dark:bg-[#071A24] transition-colors duration-700" />
 
-      {/* Capa de calidez Sand (Light) y profundidad Navy (Dark) */}
-      <div className="absolute inset-0 bg-sand/60 dark:bg-[#071D27]/85 backdrop-blur-[2px] transition-colors duration-500" />
-      
-      {/* Overlay tonal Navy de muy baja opacidad para anclar la identidad */}
-      <div className="absolute inset-0 bg-navy/15 dark:bg-navy/35 mix-blend-multiply transition-colors duration-500" />
-      
-      {/* Gradientes de viñeta suave para máxima legibilidad */}
-      <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-transparent to-background/40 hidden md:block" />
+      {/* Halo tonal sutil en el centro */}
+      <div className="absolute -top-[20%] left-1/2 -translate-x-1/2 w-[90vw] h-[600px] rounded-full bg-sand/30 dark:bg-navy/20 blur-3xl" />
+
+      {/* Capa de plumas en flujo continuo (12 plumas únicas intercaladas, sin repetición) */}
+      <div className="absolute inset-0 overflow-hidden">
+        {FEATHER_ITEMS.map((feather) => (
+          <motion.div
+            key={feather.id}
+            initial={{
+              y: '-25vh',
+              x: 0,
+              rotate: feather.rotate[0],
+            }}
+            animate={{
+              y: '125vh',
+              x: [0, feather.sway, -feather.sway * 0.7, feather.sway * 0.5, 0],
+              rotate: feather.rotate,
+            }}
+            transition={{
+              duration: feather.duration,
+              repeat: Infinity,
+              ease: 'linear',
+              delay: feather.delay,
+              x: {
+                duration: feather.duration * 0.4,
+                repeat: Infinity,
+                repeatType: 'mirror',
+                ease: 'easeInOut',
+              },
+              rotate: {
+                duration: feather.duration * 0.45,
+                repeat: Infinity,
+                repeatType: 'mirror',
+                ease: 'easeInOut',
+              },
+            }}
+            style={{
+              position: 'absolute',
+              left: feather.left,
+              width: `${Math.round(84 * feather.scale)}px`,
+              opacity: feather.opacity,
+            }}
+            className="dark:invert dark:brightness-125 pointer-events-none filter drop-shadow-xs"
+          >
+            <img
+              src={feather.src}
+              alt=""
+              aria-hidden="true"
+              className="w-full h-auto object-contain"
+            />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Filtro de calidez y suavizado óptico */}
+      <div className="absolute inset-0 backdrop-blur-[0.5px]" />
+
+      {/* Gradientes de viñeta suaves para preservar legibilidad absoluta */}
+      <div className="absolute inset-0 bg-radial-[ellipse_at_center,_transparent_30%,_#F5F2EC_90%] dark:bg-radial-[ellipse_at_center,_transparent_30%,_#071A24_90%] opacity-70" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-background/50" />
     </div>
   )
 }

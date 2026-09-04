@@ -5,10 +5,11 @@ import { SwDevCleanup } from './SwDevCleanup'
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
   viewportFit: 'cover',
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#F5F2EE' },
+    // The installed shell is translucent on iOS. Keep the browser chrome in
+    // the same deep surface used by every full-bleed entry point.
+    { media: '(prefers-color-scheme: light)', color: '#083A4F' },
     { media: '(prefers-color-scheme: dark)', color: '#071D27' },
   ],
 }
@@ -61,7 +62,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-screen bg-background text-foreground font-sans antialiased">
+      <body className="min-h-[100dvh] bg-[#083A4F] text-foreground font-sans antialiased dark:bg-[#071D27]">
         <SwDevCleanup />
         {children}
       </body>

@@ -20,7 +20,7 @@ export default function NewExpenseHeader({
   autoCamera?: boolean
 }) {
   return (
-    <header className="relative w-full bg-primary text-primary-foreground pt-4 pb-7 px-4 sm:px-6 rounded-b-[2rem] sm:rounded-b-[2.5rem] shadow-lg select-none overflow-hidden flex flex-col gap-4">
+    <header className="relative w-full bg-primary text-primary-foreground pt-[calc(1rem+env(safe-area-inset-top))] pb-7 px-4 sm:px-6 rounded-b-[2rem] sm:rounded-b-[2.5rem] shadow-lg select-none overflow-hidden flex flex-col gap-4">
       {/* Luces ambientales sutiles */}
       <div className="pointer-events-none absolute -top-12 -right-12 h-44 w-44 rounded-full bg-[#A58D66]/20 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-[#C0D5D6]/15 blur-2xl" />
