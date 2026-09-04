@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from 'react'
 import { PackageOpen, ChevronLeft, ChevronRight } from 'lucide-react'
+import CustomSelect from '@/components/ui/CustomSelect'
 import { formatCurrency } from './constants'
 import type { PersonalExpenseItem } from './types'
 
@@ -120,31 +121,38 @@ export default function ProductMonthlyRanking({ items }: ProductMonthlyRankingPr
     )
   }
 
+  const SORT_OPTIONS = [
+    { value: 'totalSpent', label: 'Mayor gasto' },
+    { value: 'count', label: 'Más unidades' },
+  ]
+
+  const PAGE_SIZE_OPTIONS = PAGE_SIZES.map((s) => ({
+    value: String(s),
+    label: String(s),
+  }))
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5">
-          <select
+          <CustomSelect
+            size="sm"
+            popoverWidth={130}
             value={sortBy}
-            onChange={(e) => { setSortBy(e.target.value as SortBy); setPage(1) }}
-            className="rounded-lg border border-border bg-surface px-2 py-1 text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/45"
-          >
-            <option value="totalSpent">Mayor gasto</option>
-            <option value="count">Más unidades</option>
-          </select>
+            options={SORT_OPTIONS}
+            onChange={(val) => { setSortBy(val as SortBy); setPage(1) }}
+          />
         </div>
 
         <div className="flex items-center gap-1.5">
           <span className="text-xs text-muted-foreground">Mostrar</span>
-          <select
-            value={pageSize}
-            onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1) }}
-            className="rounded-lg border border-border bg-surface px-2 py-1 text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/45"
-          >
-            {PAGE_SIZES.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
+          <CustomSelect
+            size="sm"
+            popoverWidth={70}
+            value={String(pageSize)}
+            options={PAGE_SIZE_OPTIONS}
+            onChange={(val) => { setPageSize(Number(val)); setPage(1) }}
+          />
         </div>
       </div>
 
