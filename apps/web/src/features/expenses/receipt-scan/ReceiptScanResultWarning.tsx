@@ -14,7 +14,7 @@ export default function ReceiptScanResultWarning({
 
   return (
     <div className="space-y-3">
-      <div className="rounded-2xl border border-border bg-lh-surface p-4 text-sm shadow-sm">
+      <div className="neu-raised rounded-2xl border border-border bg-surface p-4 text-sm">
         <div className="flex items-center justify-between gap-2">
           <span className="font-semibold text-foreground">Revisá los datos antes de guardar</span>
           <span className={`text-xs font-bold ${confidenceColor(confidence)}`}>
@@ -42,7 +42,7 @@ export default function ReceiptScanResultWarning({
       <button
         type="button"
         onClick={onClear}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-surface-soft px-4 py-3 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+        className="neu-interactive flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-surface-soft px-4 py-3 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
       >
         <RefreshCw className="h-4 w-4" />
         Limpiar resultado del escaneo

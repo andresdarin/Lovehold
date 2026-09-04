@@ -103,7 +103,7 @@ export default function MessageComposer({ onSend, disabled }: MessageComposerPro
       {/* Pill flotante sin contenedor rectangular */}
       <div className="mx-auto flex max-w-xl items-end gap-2">
         {/* Input Pill Principal */}
-        <div className="flex flex-1 items-center gap-2 rounded-full border border-border/80 bg-surface/95 backdrop-blur-md px-4 py-1.5 shadow-md focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/15 transition-all">
+        <div className="neu-inset flex flex-1 items-center gap-2 rounded-full border border-border/50 px-4 py-1.5 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/15 transition-all">
           <textarea
             ref={textareaRef}
             value={text}

@@ -15,7 +15,7 @@ export default function MonthlySummaryCards({ summary }: MonthlySummaryCardsProp
   const superPct = summary.totalExpense > 0 ? (summary.supermarket / summary.totalExpense) * 100 : 0
 
   return (
-    <div className="rounded-3xl border border-border/80 bg-surface p-5 sm:p-6 shadow-xs">
+    <div className="neu-raised rounded-3xl border border-border/50 bg-surface p-5 sm:p-6">
       {/* Header */}
       <div className="flex items-center justify-between pb-3.5 border-b border-border/50">
         <div className="flex items-center gap-2.5">

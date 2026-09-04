@@ -49,7 +49,7 @@ export default function ProfilePageClient() {
         {/* Right Column: Gamification, Stats, Achievements, Goals, Settings */}
         <div className="space-y-6">
           {/* Gamification & Progress Banner */}
-          <LiquidGlass variant="card" intensity="medium" className="p-6 border border-white/5 relative overflow-hidden">
+          <LiquidGlass variant="card" intensity="medium" className="neu-raised p-6 border border-border/50 relative overflow-hidden">
             <div className="relative z-10">
               <RankProgressCompact
                 data={gamification}

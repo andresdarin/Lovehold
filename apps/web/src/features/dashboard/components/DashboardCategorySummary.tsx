@@ -51,7 +51,7 @@ function CategoryRow({
  */
 export default function DashboardCategorySummary() {
   return (
-    <div className="rounded-3xl border border-border/80 bg-surface p-5 sm:p-6 shadow-xs">
+    <div className="neu-raised rounded-3xl border border-border/50 bg-surface p-5 sm:p-6">
       <div className="flex items-center justify-between pb-3.5 border-b border-border/50">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-full border border-cat-super/40 text-cat-super bg-transparent">

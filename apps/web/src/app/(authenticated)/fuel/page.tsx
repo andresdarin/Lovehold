@@ -16,7 +16,7 @@ export default function FuelPage() {
         </div>
       </header>
 
-      <section className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-surface p-12 text-center shadow-sm">
+      <section className="neu-raised flex flex-col items-center gap-4 rounded-2xl border border-border bg-surface p-12 text-center">
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-soft">
           <Search className="h-6 w-6 text-muted-foreground animate-pulse" />
         </div>

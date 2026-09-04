@@ -55,7 +55,7 @@ export default function MovementDetailDrawer({ movement, onClose }: Props) {
         role="dialog"
         aria-modal="true"
         aria-label="Detalle del movimiento"
-        className="fixed inset-x-0 bottom-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-3xl border border-border bg-surface shadow-2xl lg:inset-y-0 lg:left-auto lg:right-0 lg:max-h-none lg:w-[420px] lg:rounded-l-3xl lg:rounded-tr-none select-none flex flex-col"
+        className="neu-raised fixed inset-x-0 bottom-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-3xl border border-border/50 bg-surface lg:inset-y-0 lg:left-auto lg:right-0 lg:max-h-none lg:w-[420px] lg:rounded-l-3xl lg:rounded-tr-none select-none flex flex-col"
       >
         {/* Cabecera */}
         <div className="flex items-start justify-between gap-4 border-b border-border/60 p-6">

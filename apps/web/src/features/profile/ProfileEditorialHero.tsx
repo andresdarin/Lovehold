@@ -40,7 +40,7 @@ export function ProfileEditorialHero({
     <LiquidGlass
       variant="card"
       intensity="medium"
-      className="relative overflow-hidden border border-white/5 shadow-2xl"
+      className="relative overflow-hidden border border-border/50"
     >
       {/* Ambient background glow */}
       <div

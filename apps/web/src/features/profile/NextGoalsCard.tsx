@@ -15,7 +15,7 @@ const PLACEHOLDER_GOALS = [
  */
 export function NextGoalsCard() {
   return (
-    <LiquidGlass variant="card" intensity="medium" className="p-5 border border-white/5">
+    <LiquidGlass variant="card" intensity="medium" className="neu-raised p-5 border border-border/50">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Target className="h-4 w-4 text-primary" />
