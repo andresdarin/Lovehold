@@ -1,9 +1,7 @@
 'use client'
-
-import { useState, useEffect, useCallback } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { apiFetch } from '@/lib/api'
-import type { AiConversation, AiMessage, SendMessageResponse } from './types'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { chatRequest } from './api'
+import type { AiConversation, AiMessage, AgentResponse } from './types'
 
 export function useFinnicChat() {
   const [conversation, setConversation] = useState<AiConversation | null>(null)
@@ -11,93 +9,42 @@ export function useFinnicChat() {
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
-
-  // Cargar o inicializar la conversación activa
-  const loadConversation = useCallback(async () => {
+  const busy = useRef(false)
+  const refresh = useCallback(async () => {
+    if (busy.current) return
+    setLoading(true)
     try {
-      setLoading(true)
-      setError(null)
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session?.access_token) return
+      const active = await chatRequest<AiConversation>('/api/ai/chat/active')
+      const history = await chatRequest<AiMessage[]>(`/api/ai/conversations/${active.id}/messages`)
+      setConversation(active); setMessages(history); setError(null)
+    } catch { setError('No pudimos cargar la conversación. Volvé a cargar para recuperar el historial.') }
+    finally { setLoading(false) }
+  }, [])
+  useEffect(() => { void refresh() }, [refresh])
 
-      const activeConv = await apiFetch<AiConversation>('/api/ai/chat/active', {}, session.access_token)
-      setConversation(activeConv)
-
-      const history = await apiFetch<AiMessage[]>(
-        `/api/ai/chat/conversations/${activeConv.id}/messages`,
-        {},
-        session.access_token,
-      )
-      setMessages(history)
-    } catch (err: any) {
-      console.error('Error cargando chat:', err)
-      setError(err?.message || 'No pudimos cargar la conversación con Finnic.')
-    } finally {
-      setLoading(false)
-    }
-  }, [supabase])
-
-  useEffect(() => {
-    loadConversation()
-  }, [loadConversation])
-
-  // Enviar mensaje
-  const sendMessage = useCallback(
-    async (content: string) => {
-      const text = content.trim()
-      if (!text || sending || !conversation) return
-
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session?.access_token) return
-
-      const tempId = `temp-${Date.now()}`
-      const optimisticUserMsg: AiMessage = {
-        id: tempId,
-        conversationId: conversation.id,
-        role: 'USER',
-        content: text,
-        createdAt: new Date().toISOString(),
-      }
-
-      // Optimistic update
-      setMessages((prev) => [...prev, optimisticUserMsg])
-      setSending(true)
-      setError(null)
-
-      try {
-        const res = await apiFetch<SendMessageResponse>(
-          `/api/ai/chat/conversations/${conversation.id}/messages`,
-          {
-            method: 'POST',
-            body: JSON.stringify({ content: text }),
-          },
-          session.access_token,
-        )
-
-        // Reemplazar mensaje temporal con el confirmado y agregar respuesta del asistente
-        setMessages((prev) => [
-          ...prev.filter((m) => m.id !== tempId),
-          res.userMessage,
-          res.assistantMessage,
-        ])
-      } catch (err: any) {
-        console.error('Error enviando mensaje:', err)
-        setError(err?.message || 'Finnic no pudo responder en este momento. Intentá nuevamente.')
-      } finally {
-        setSending(false)
-      }
-    },
-    [conversation, sending, supabase],
-  )
-
-  return {
-    conversation,
-    messages,
-    loading,
-    sending,
-    error,
-    sendMessage,
-    refresh: loadConversation,
+  const sendMessage = async (content: string): Promise<boolean> => {
+    const text = content.trim()
+    if (!text || text.length > 2000 || busy.current || !conversation) return false
+    busy.current = true; setSending(true); setError(null)
+    try {
+      await chatRequest<AgentResponse>('/api/ai/chat', { message: text, conversationId: conversation.id })
+      setMessages(await chatRequest<AiMessage[]>(`/api/ai/conversations/${conversation.id}/messages`))
+      return true
+    } catch {
+      setError('No pudimos verificar la respuesta. Conservamos tu texto: revisá el historial antes de volver a enviarlo.')
+      return false
+    } finally { busy.current = false; setSending(false) }
   }
+
+  const resolveAction = async (id: string, decision: 'confirm' | 'cancel') => {
+    if (busy.current || !conversation) return
+    busy.current = true; setSending(true); setError(null)
+    try {
+      await chatRequest(`/api/ai/actions/${id}/${decision}`, {})
+      setMessages(await chatRequest<AiMessage[]>(`/api/ai/conversations/${conversation.id}/messages`))
+    } catch { setError('No pudimos verificar la operación. Volvé a cargar el historial antes de intentar confirmarla otra vez.') }
+    finally { busy.current = false; setSending(false) }
+  }
+  return { conversation, messages, loading, sending, error, sendMessage, resolveAction, refresh }
 }
+
