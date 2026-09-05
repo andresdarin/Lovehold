@@ -17,24 +17,26 @@ export default function DashboardPage() {
   const { profile } = useProfile()
 
   return (
-    <DashboardData><div className="flex flex-col gap-6 pb-12 sm:pb-6">
-      {/* 1. Franja Superior / Hero Negativo Full-Bleed */}
-      <DashboardHero profile={profile} />
+    <DashboardData>
+      <div className="flex flex-col gap-6 pb-12 sm:pb-6 w-full max-w-full min-w-0 overflow-x-hidden">
+        {/* 1. Franja Superior / Hero Negativo Full-Bleed */}
+        <DashboardHero profile={profile} />
 
-      {/* 2. Cuerpo del Dashboard (Fondo Claro Sand / Contenido principal) */}
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-8 flex flex-col gap-6">
-        {/* Acciones Rápidas (Mobile) */}
-        <DashboardQuickActions />
+        {/* 2. Cuerpo del Dashboard (Fondo Claro Sand / Contenido principal) */}
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-8 flex flex-col gap-6 min-w-0">
+          {/* Acciones Rápidas (Mobile) */}
+          <DashboardQuickActions />
 
-        {/* Categorías & Movimientos */}
-        <section className="grid gap-6 md:grid-cols-2">
-          <DashboardCategorySummary />
-          <DashboardRecentMovements />
-        </section>
+          {/* Categorías & Movimientos */}
+          <section className="grid w-full min-w-0 gap-6 md:grid-cols-2">
+            <DashboardCategorySummary />
+            <DashboardRecentMovements />
+          </section>
 
-        {/* Onboarding & Ayuda */}
-        <DashboardOnboarding />
+          {/* Onboarding & Ayuda */}
+          <DashboardOnboarding />
+        </div>
       </div>
-    </div></DashboardData>
+    </DashboardData>
   )
 }

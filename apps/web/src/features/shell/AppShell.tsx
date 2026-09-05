@@ -44,13 +44,13 @@ export default function AppShell({ children, profile, onLogout }: AppShellProps)
 
       {/* Contenido Principal */}
       <main
-        className={`transition-all duration-300 ease-in-out ${
+        className={`w-full max-w-full min-w-0 overflow-x-hidden transition-all duration-300 ease-in-out ${
           isChat
             ? 'h-[100dvh] overflow-hidden p-0'
             : 'min-h-[calc(100dvh-4rem)] lg:min-h-screen pb-[calc(104px+env(safe-area-inset-bottom))] lg:pb-0'
         } ${sidebarCollapsed ? 'lg:pl-[124px]' : 'lg:pl-[292px]'}`}
       >
-        <div className={isFullBleedHero ? 'h-full' : 'p-4 md:p-6 lg:p-8'}>
+        <div className={isFullBleedHero ? 'h-full w-full min-w-0' : 'p-4 md:p-6 lg:p-8 w-full min-w-0'}>
           {children}
         </div>
       </main>

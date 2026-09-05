@@ -42,7 +42,10 @@ export class AiChatController {
       const profileId = await this.getProfileId(user)
       return await this.chatService.getOrCreateActiveConversation(profileId)
     } catch (err: any) {
-      this.logger.error('No se pudo obtener la conversación activa')
+      this.logger.error(
+        `No se pudo obtener la conversación activa for authUserId=${user?.authUserId}: ${err instanceof Error ? err.message : String(err)}`,
+        err instanceof Error ? err.stack : String(err),
+      )
       if (err instanceof NotFoundException) throw err
       throw new InternalServerErrorException('No pudimos cargar la conversación.')
     }
