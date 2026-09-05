@@ -24,7 +24,10 @@ RUN pnpm deploy --filter @lovehold/api --prod --legacy /app/deploy
 FROM node:22-slim AS runner
 ENV NODE_ENV=production
 ENV PORT=3001
+ENV NODE_OPTIONS=--max-old-space-size=160
 WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /app/deploy/ ./
 COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/apps/api/prisma ./prisma

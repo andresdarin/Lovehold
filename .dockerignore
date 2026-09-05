@@ -13,5 +13,11 @@ coverage
 .next
 **/.next
 *.log
+logs
+**/logs
+tmp
+**/*.tmp
+.DS_Store
+.turbo
+.pnpm-store
 Dockerfile*
-docker-compose*.yml
