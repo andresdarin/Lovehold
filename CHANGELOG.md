@@ -20,6 +20,22 @@ Format based on [Keep a Changelog](https://keepachangelog.com/) and [Conventiona
   - Design-token contrast fixes (tertiary, success, warning, danger), global `:focus-visible`, placeholder color, `disabled` cursor, balanced headings and `prefers-reduced-motion` reset.
   - Restored scrollbars and `touch-action: manipulation` for mobile scroll/zoom behavior.
   - Chat page: `role="alert"` error with reload action, `role="status"` skeleton loading, capability-aligned suggestions, composer gated on active conversation, visual distinction of proposal/confirmation states.
+- **Brand system**
+  - `FinnicBrand` horizontal logomarca (`cream`/`navy`/`auto`, `sm`/`md`/`lg`) combining `FinnicOwlIcon` + wordmark, replacing duplicated `<img>` logos in heroes, topbars and sidebar.
+  - `FinnicErrorCard` (`fullscreen`/`contained`) with `finnic-mascot-lost` illustration, floating feathers, status pill, retry + secondary action and brand footer.
+  - `COMPOSER_PLACEHOLDERS` rotation for the chat composer.
+- **Deploy / DB**
+  - API `Dockerfile` (node:22-slim, pnpm deploy, Prisma generate) + `.dockerignore`.
+  - `AiConversation.channel` migration (`web` default, backfill-safe).
+
+### Changed
+
+- Error surfaces (`app/error.tsx`, `(authenticated)/error.tsx`, `ProfileProvider`) consolidated on `FinnicErrorCard`; auth error keeps retry + logout actions.
+- Brand usages consolidated on `FinnicBrand` (`Topbar`, `SidebarHeader`, `BalanceHero`, `DashboardTopBar`, `MovementsHeader`, `FinanzasHero`, `GlobalActionSheet` owl icon).
+- Chat composer simplified: floating pill, random placeholder, autofocus, no dictation/counter (`useDictation` removed); `MessageList`/`ChatHeader` mobile-first polish; `chat/page.tsx` remounts composer per conversation and allows first-message send without active conversation; `hooks.ts` tolerates history-fetch failure.
+- `FeatherLoading` gains `inverted` + `className` for dark heroes; `DashboardDataState` gains `inverted` and adapts error contrast; `DashboardFinancialHero` uses inverted state; `DashboardGreeting` adds fade divider.
+- `GlobalActionSheet` reordered (Gasto → Escanear IA → Ingreso → Transferencia → FX) with solid icon tiles; `Income/Transfer/Exchange` modals no longer force `router.refresh()` on success.
+- `Topbar` marked client component and uses `FinnicBrand auto`; notification button gains `aria-label`; avatar status dot removed.
 
 ### Fixed
 
@@ -27,6 +43,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/) and [Conventiona
 - `FinanceReadService` filters personal movements to `EXPENSE`, exposes account `type`/`isSpendable`/`balance`, and no longer auto-provisions accounts on read paths.
 - `finnic-smoke-e2e` write flow fixed (seeded account, strict-schema args); `confirm-action` hardened against non-promise observability mocks.
 - ESLint: 0 errors (removed unused `SendMessageDto` import, unused error body, unused `catch` binding).
+- API listens on `0.0.0.0` for container networking; `POST /ai/chat` logs `authUserId`/`conversationId` with stack before rethrow.
+- Gemini tool declarations: drop `additionalProperties: false` on object schemas and relax `exclusiveMinimum: 0` → `minimum: 0` for strict-schema compatibility.
 
 ### Verified
 
