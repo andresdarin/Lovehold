@@ -6,6 +6,7 @@ import { CATEGORY_LABELS, formatCurrency } from './constants'
 interface CategoryBreakdownProps {
   byCategory: Record<string, number>
   total: number
+  currency?: 'UYU' | 'USD'
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -22,7 +23,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   internet: 'bg-cat-delivery',
 }
 
-export default function CategoryBreakdown({ byCategory, total }: CategoryBreakdownProps) {
+export default function CategoryBreakdown({ byCategory, total, currency = 'UYU' }: CategoryBreakdownProps) {
   const entries = Object.entries(byCategory).sort(([, a], [, b]) => b - a)
 
   if (entries.length === 0) {
@@ -50,7 +51,7 @@ export default function CategoryBreakdown({ byCategory, total }: CategoryBreakdo
                   {pct.toFixed(0)}%
                 </span>
                 <span className="text-foreground font-bold tabular-nums">
-                  {formatCurrency(amount)}
+                  {formatCurrency(amount, currency)}
                 </span>
               </div>
             </div>
@@ -59,7 +60,7 @@ export default function CategoryBreakdown({ byCategory, total }: CategoryBreakdo
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-border/40">
               <div
                 className={`h-full ${barColor} rounded-full transition-all duration-500`}
-                style={{ width: `${Math.max(pct, 2)}%` }}
+                style={{ width: `${pct}%` }}
               />
             </div>
           </div>
@@ -68,3 +69,4 @@ export default function CategoryBreakdown({ byCategory, total }: CategoryBreakdo
     </div>
   )
 }
+

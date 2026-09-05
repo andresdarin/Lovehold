@@ -42,7 +42,7 @@ export default function DashboardQuickActions() {
           href="/expenses/new?scan=camera"
           aria-label="Escanear ticket"
           title="Escanear ticket con cámara"
-          className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-2xl border border-[#407E8C]/30 bg-[#407E8C]/10 text-[#407E8C] dark:text-[#C0D5D6] shadow-xs transition-all hover:bg-[#407E8C]/20 hover:border-[#407E8C]/50 active:scale-95"
+          className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-2xl border border-[#407E8C]/30 bg-[#407E8C]/10 text-[#407E8C] dark:text-primary shadow-xs transition-all hover:bg-[#407E8C]/20 hover:border-[#407E8C]/50 active:scale-95"
         >
           <ScanLine className="h-5 w-5 stroke-[2.2]" />
         </Link>

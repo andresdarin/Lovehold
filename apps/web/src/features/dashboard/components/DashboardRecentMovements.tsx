@@ -1,54 +1,30 @@
 'use client'
-
-import React from 'react'
 import Link from 'next/link'
-import { Receipt, Plus } from 'lucide-react'
-
-/**
- * Últimos movimientos del mes con empty state minimalista en la sección clara.
- * Iconos con outline circular del mismo color sin rellenos pesados.
- */
+import { ArrowDownLeft, ArrowUpRight, ArrowLeftRight, Plus } from 'lucide-react'
+import { useDashboardData } from '../DashboardData'
+import DashboardDataState from './DashboardDataState'
 export default function DashboardRecentMovements() {
-  return (
-    <div className="neu-raised rounded-3xl border border-border/50 bg-surface p-5 sm:p-6 flex flex-col justify-between">
-      <div>
-        <div className="flex items-center justify-between pb-3.5 border-b border-border/50">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/30 text-primary bg-transparent">
-              <Receipt className="h-4 w-4 stroke-[2]" />
-            </div>
-            <div>
-              <h2 className="text-sm font-bold text-foreground">Últimos movimientos</h2>
-              <p className="text-[11px] text-muted-foreground">Tus gastos y los compartidos en pareja</p>
-            </div>
-          </div>
-          <Link
-            href="/expenses"
-            className="text-xs font-semibold text-primary hover:text-primary-hover transition-colors"
-          >
-            Ver historial
-          </Link>
-        </div>
-
-        {/* Empty state minimal */}
-        <div className="flex flex-col items-center justify-center py-7 text-center">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-muted-foreground bg-transparent">
-            <Receipt className="h-5 w-5 stroke-[1.8]" />
-          </div>
-          <p className="mt-3 text-sm font-semibold text-foreground">Todavía no hay gastos este mes</p>
-          <p className="mt-1 text-xs text-muted-foreground max-w-[240px] leading-relaxed">
-            Registrá tu primera compra para ver el detalle y balance financiero.
-          </p>
-        </div>
-      </div>
-
-      <Link
-        href="/expenses/new"
-        className="flex items-center justify-center gap-2 rounded-2xl border border-border/80 bg-surface-soft/60 py-2.5 text-xs font-bold text-foreground hover:bg-surface-soft hover:border-primary/30 transition-all active:scale-[0.98]"
-      >
-        <Plus className="h-3.5 w-3.5 stroke-[2.5] text-primary" />
-        <span>Registrar movimiento</span>
-      </Link>
+  const { expenses, loading, error } = useDashboardData()
+  const recent = [...expenses].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5)
+  return <section className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <h2 className="text-base font-semibold">Últimos movimientos</h2>
+      <Link href="/finanzas" className="inline-flex min-h-11 items-center text-sm text-primary hover:underline">Ver mes completo</Link>
     </div>
-  )
+    <p className="text-sm text-muted-foreground">Movimientos personales del mes actual</p>
+    {loading || error ? <DashboardDataState /> : recent.length ? <ul className="mt-3 divide-y divide-border">
+      {recent.map(row => {
+        const income = row.movementType === 'INCOME'
+        const transfer = row.movementType === 'TRANSFER'
+        const Icon = transfer ? ArrowLeftRight : income ? ArrowDownLeft : ArrowUpRight
+        return <li key={row.id} className="flex items-center gap-3 py-3">
+          <Icon aria-hidden size={18} className={income ? 'shrink-0 text-success' : 'shrink-0 text-primary'} />
+          <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{row.title}</p><p className="text-xs text-muted-foreground">{transfer ? 'Transferencia' : income ? 'Ingreso' : 'Egreso'} · {new Date(row.date).toLocaleDateString('es-UY', { timeZone: 'UTC', day: 'numeric', month: 'short' })}</p></div>
+          <span className="text-sm font-semibold tabular-nums">{new Intl.NumberFormat('es-UY', { style: 'currency', currency: row.currency || 'UYU' }).format(row.amount)}</span>
+        </li>
+      })}
+    </ul> : <div className="py-8 text-sm"><p className="font-medium">Tu mes empieza acá</p><p className="mt-1 text-muted-foreground">Registrá un ingreso o gasto para entender cómo cambia tu dinero.</p></div>}
+    <Link href="/expenses/new" className="mt-3 flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary-hover"><Plus size={16} /> Registrar movimiento</Link>
+  </section>
 }
+

@@ -56,11 +56,11 @@ export default function FinanzasAccountsCard({ accounts, savings = 0, loading }:
 
   // Total disponible por moneda (cuentas de débito y efectivo)
   const liquidUYU = accounts
-    .filter((a) => a.type !== 'CREDIT' && a.currency === 'UYU')
+    .filter((a) => a.isActive && a.isSpendable && a.type !== 'CREDIT' && a.currency === 'UYU')
     .reduce((sum, a) => sum + (Number(a.balance) || 0), 0)
 
   const liquidUSD = accounts
-    .filter((a) => a.type !== 'CREDIT' && a.currency === 'USD')
+    .filter((a) => a.isActive && a.isSpendable && a.type !== 'CREDIT' && a.currency === 'USD')
     .reduce((sum, a) => sum + (Number(a.balance) || 0), 0)
 
   return (
@@ -77,7 +77,7 @@ export default function FinanzasAccountsCard({ accounts, savings = 0, loading }:
           </div>
           <div>
             <h2 className="text-sm font-bold text-[#F5F2EE]">Tus cuentas</h2>
-            <p className="text-[11px] text-[#C0D5D6]/70">Disponibilidad real por divisa</p>
+            <p className="text-[11px] text-[#C0D5D6]/70">Saldos registrados por moneda</p>
           </div>
         </div>
         <div className="text-right">
@@ -85,7 +85,7 @@ export default function FinanzasAccountsCard({ accounts, savings = 0, loading }:
             <span className="text-xs font-bold text-[#4BE3B5] tabular-nums">
               {formatCurrency(liquidUYU)}
             </span>
-            {liquidUSD > 0 && (
+            {liquidUSD !== 0 && (
               <span className="text-xs font-bold text-[#C0D5D6] tabular-nums">
                 <span className="text-[10px] text-white/40 mr-0.5">|</span>
                 US${liquidUSD.toLocaleString('es-UY', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
@@ -93,7 +93,7 @@ export default function FinanzasAccountsCard({ accounts, savings = 0, loading }:
             )}
           </div>
           <div className="flex items-center justify-end gap-1.5 mt-0.5">
-            <span className="text-[10px] text-[#C0D5D6]/70">Líquido disponible</span>
+            <span className="text-[10px] text-[#C0D5D6]/70">Saldo líquido registrado</span>
             {savings !== 0 && (
               <span className="rounded-full bg-white/[0.06] border border-white/[0.08] px-1.5 py-0.2 text-[9px] font-semibold text-[#A58D66]">
                 Ahorro: {formatCurrency(savings)}
@@ -151,3 +151,4 @@ export default function FinanzasAccountsCard({ accounts, savings = 0, loading }:
     </div>
   )
 }
+

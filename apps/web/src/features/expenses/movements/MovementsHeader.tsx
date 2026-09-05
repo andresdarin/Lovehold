@@ -3,6 +3,7 @@
 import React from 'react'
 import { Clock3, Bell } from 'lucide-react'
 import { useProfile } from '@/features/auth/ProfileProvider'
+import BannerFeatherPattern from '@/components/ui/BannerFeatherPattern'
 
 export default function MovementsHeader() {
   const { profile } = useProfile()
@@ -19,6 +20,9 @@ export default function MovementsHeader() {
 
   return (
     <header className="relative w-full overflow-hidden bg-gradient-to-b from-[#062433] via-[#083A4F] to-[#072F40] dark:from-[#04141D] dark:via-[#061D27] dark:to-[#051720] pt-[calc(0.5rem+env(safe-area-inset-top))] pb-6 sm:pb-8 px-4 sm:px-6 md:px-8 rounded-b-[2rem] sm:rounded-b-[2.5rem] border-b border-black/10 dark:border-white/[0.06] shadow-[0_12px_30px_rgba(8,58,79,0.12)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.4)]">
+      {/* Plumas de fondo estáticas sutiles */}
+      <BannerFeatherPattern />
+
       {/* Luces de ambiente sutiles */}
       <div className="pointer-events-none absolute -top-24 left-1/4 h-72 w-72 rounded-full bg-[#407E8C]/15 blur-3xl" />
       <div className="pointer-events-none absolute top-1/2 -right-20 h-64 w-64 rounded-full bg-[#A58D66]/10 blur-3xl" />

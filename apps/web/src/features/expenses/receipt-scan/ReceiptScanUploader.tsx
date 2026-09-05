@@ -136,17 +136,17 @@ export default function ReceiptScanUploader({
             {/* Acción 1: Sacar Foto */}
             <label className={`flex h-24 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl p-3 text-center transition-all active:scale-[0.98] shadow-xs ${
               inBanner
-                ? 'border border-white/20 bg-white/10 hover:bg-white/20 text-white'
+                ? 'border border-white/25 bg-white/[0.08] hover:bg-white/[0.15] text-[#F5F2EE] focus-within:ring-2 focus-within:ring-white/40'
                 : 'border border-[#407E8C]/25 bg-[#C0D5D6]/20 dark:bg-[#083A4F]/40 hover:bg-[#C0D5D6]/35 text-primary'
             }`}>
               <div className={`flex h-8 w-8 items-center justify-center rounded-full border shadow-2xs ${
                 inBanner
-                  ? 'border-white/30 bg-white/20 text-white'
+                  ? 'border-white/30 bg-white/15 text-[#F5F2EE]'
                   : 'border-[#407E8C]/30 bg-surface text-primary'
               }`}>
                 <Camera className="h-4 w-4 stroke-[2.2]" />
               </div>
-              <span className={`text-xs font-bold ${inBanner ? 'text-white' : 'text-primary dark:text-primary-foreground'}`}>
+              <span className={`text-xs font-bold ${inBanner ? 'text-[#F5F2EE]' : 'text-primary dark:text-primary-foreground'}`}>
                 Sacar foto
               </span>
               <input
@@ -165,7 +165,7 @@ export default function ReceiptScanUploader({
             {/* Acción 2: Subir Imagen */}
             <label className={`flex h-24 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl p-3 text-center transition-all active:scale-[0.98] shadow-xs ${
               inBanner
-                ? 'border border-[#A58D66]/40 bg-[#A58D66]/20 hover:bg-[#A58D66]/30 text-white'
+                ? 'border border-[#A58D66]/45 bg-[#A58D66]/20 hover:bg-[#A58D66]/30 text-[#F5F2EE] focus-within:ring-2 focus-within:ring-[#A58D66]/50'
                 : 'border border-[#A58D66]/30 bg-[#A58D66]/10 dark:bg-[#A58D66]/20 hover:bg-[#A58D66]/20 text-primary'
             }`}>
               <div className={`flex h-8 w-8 items-center justify-center rounded-full border shadow-2xs ${

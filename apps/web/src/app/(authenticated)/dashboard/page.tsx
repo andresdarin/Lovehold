@@ -7,6 +7,7 @@ import DashboardQuickActions from '@/features/dashboard/components/DashboardQuic
 import DashboardCategorySummary from '@/features/dashboard/components/DashboardCategorySummary'
 import DashboardRecentMovements from '@/features/dashboard/components/DashboardRecentMovements'
 import DashboardOnboarding from '@/features/dashboard/components/DashboardOnboarding'
+import { DashboardData } from '@/features/dashboard/DashboardData'
 
 /**
  * Dashboard principal de Finnic.
@@ -16,7 +17,7 @@ export default function DashboardPage() {
   const { profile } = useProfile()
 
   return (
-    <div className="flex flex-col gap-6 pb-12 sm:pb-6">
+    <DashboardData><div className="flex flex-col gap-6 pb-12 sm:pb-6">
       {/* 1. Franja Superior / Hero Negativo Full-Bleed */}
       <DashboardHero profile={profile} />
 
@@ -34,6 +35,6 @@ export default function DashboardPage() {
         {/* Onboarding & Ayuda */}
         <DashboardOnboarding />
       </div>
-    </div>
+    </div></DashboardData>
   )
 }

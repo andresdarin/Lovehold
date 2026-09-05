@@ -4,6 +4,7 @@ import React from 'react'
 import { ChevronLeft, ChevronRight, Bell } from 'lucide-react'
 import { monthLabel, formatCurrency } from './constants'
 import type { MonthlySummary } from './types'
+import BannerFeatherPattern from '@/components/ui/BannerFeatherPattern'
 
 interface FinanzasHeroProps {
   profile: {
@@ -44,7 +45,7 @@ function StatMetric({ label, value, dotColor, highlighted = false }: StatMetricP
         <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${dotColor}`} />
       </div>
       <span
-        className={`text-base sm:text-lg md:text-xl font-bold tracking-tight tabular-nums truncate ${
+        className={`text-base sm:text-lg md:text-xl font-bold tracking-tight tabular-nums break-words ${
           highlighted ? 'text-[#F5F2EE]' : 'text-[#F5F2EE]/90'
         }`}
       >
@@ -70,10 +71,13 @@ export default function FinanzasHero({
         .toUpperCase()
     : userInitial
 
-  const isNetPositive = summary.netBalance >= 0
+  const isNetPositive = summary.netByCurrency.UYU >= 0 && summary.netByCurrency.USD >= 0
 
   return (
     <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#062433] via-[#083A4F] to-[#072F40] dark:from-[#04141D] dark:via-[#061D27] dark:to-[#051720] pt-[calc(0.5rem+env(safe-area-inset-top))] pb-7 sm:pb-9 px-4 sm:px-6 md:px-8 rounded-b-[2rem] sm:rounded-b-[2.5rem] border-b border-black/10 dark:border-white/[0.06] shadow-[0_12px_30px_rgba(8,58,79,0.12)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.4)]">
+      {/* Plumas de fondo estáticas sutiles */}
+      <BannerFeatherPattern />
+
       {/* Luces de ambiente sutiles */}
       <div className="pointer-events-none absolute -top-24 left-1/4 h-72 w-72 rounded-full bg-[#407E8C]/15 blur-3xl" />
       <div className="pointer-events-none absolute top-1/2 -right-20 h-64 w-64 rounded-full bg-[#A58D66]/10 blur-3xl" />
@@ -180,14 +184,14 @@ export default function FinanzasHero({
                 }`}
               />
               <span className={isNetPositive ? 'text-[#4BE3B5]' : 'text-[#FF9E9E]'}>
-                {isNetPositive ? 'Superávit mensual' : 'Déficit mensual'}
+                {'Ingresos menos egresos · no es saldo disponible'}
               </span>
             </div>
           </div>
         </div>
 
         {/* 3. Tres Métricas Clave en una sola fila (Ingresos, Egresos, Tarjetas/Comprometido) */}
-        <div className="grid grid-cols-3 gap-2 border-t border-white/[0.08] pt-3.5 sm:gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 border-t border-white/[0.08] pt-3.5 sm:gap-3">
           <StatMetric
             label="Ingresos"
             value={
@@ -209,7 +213,7 @@ export default function FinanzasHero({
           />
           <StatMetric
             label="Tarjetas"
-            value={formatCurrency(summary.creditCommitted)}
+            value="Ver desglose por moneda"
             dotColor="bg-[#CCA46D] shadow-[0_0_6px_rgba(204,164,109,0.6)]"
           />
         </div>
@@ -217,3 +221,4 @@ export default function FinanzasHero({
     </section>
   )
 }
+
