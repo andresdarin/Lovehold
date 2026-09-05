@@ -63,6 +63,9 @@ export class CreateExpenseUseCase {
               where: { profileId: command.profileId, currency: input.currency, isActive: true },
             })
 
+        if (input.financeAccountId && (!account || account.isActive === false || account.currency !== input.currency)) {
+          throw new BadRequestException('La cuenta no está disponible para registrar este gasto en esa moneda.')
+        }
         const expense = await tx.personalExpense.create({
           data: {
             profileId: command.profileId,
