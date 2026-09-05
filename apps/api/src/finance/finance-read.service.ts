@@ -28,14 +28,14 @@ export class FinanceReadService {
     const to = window.to ?? new Date(asOf.getTime() + 366 * 86400000)
     const timeZone = profile.timeZone ?? 'America/Montevideo'
     const [accounts, flows, goals, personal, household] = await Promise.all([
-      this.accounts.findActive(profileId), this.cashFlows.findRelevant(profileId, from, to), this.goals.findActive(profileId),
+      this.accounts.findActive(profileId, false), this.cashFlows.findRelevant(profileId, from, to), this.goals.findActive(profileId),
       this.prisma.personalExpense.findMany({ where: { profileId, date: { gte: from, lte: to } } }),
       this.prisma.expense.findMany({ where: { household: { members: { some: { profileId } } }, date: { gte: from, lte: to } }, include: { category: true, splits: true, household: { include: { members: true } } } }),
     ])
 
     const baseCurrency = (profile.baseCurrency ?? 'UYU') as Currency
     const inputExpenses = [
-      ...personal.map((expense) => ({
+      ...personal.filter(expense => expense.movementType === 'EXPENSE').map((expense) => ({
         id: expense.id, direction: 'OUTFLOW', occurredOn: expense.date.toISOString(), category: normalizeCategory(expense.categoryKey ?? expense.category),
         amount: normalizeMoney(expense.amount, String(expense.currency) as Currency),
       })),
@@ -61,7 +61,7 @@ export class FinanceReadService {
     }
     return {
       asOf: asOf.toISOString(), baseCurrency, timeZone, minimumBuffer: decimalToString(profile.minimumBuffer),
-      accounts: accounts.map((account) => ({ currency: account.currency, spendable: normalizeMoney(account.balance, account.currency as Currency).amount, nonSpendable: '0.00', balanceAsOf: account.updatedAt.toISOString() })),
+      accounts: accounts.map((account) => ({ type: account.type, isSpendable: account.isSpendable, currency: account.currency, balance: normalizeMoney(account.balance, account.currency as Currency).amount, balanceAsOf: account.updatedAt.toISOString() })),
       scheduledCashFlows: flows.map((flow) => ({ scheduledCashFlowId: flow.id, scheduledDueOn: localDate(flow.scheduledDueOn, timeZone), amount: normalizeMoney(flow.amount, flow.currency as Currency), direction: flow.direction, lifecycle: flow.lifecycle })),
       goals: goals.map((goal) => ({ id: goal.id, name: goal.name, targetAmount: normalizeMoney(goal.targetAmount, goal.currency as Currency), currentAmount: normalizeMoney(goal.currentAmount, goal.currency as Currency), targetDate: localDate(goal.targetDate, timeZone), status: goal.status })),
       expenses: inputExpenses,

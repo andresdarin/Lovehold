@@ -15,11 +15,13 @@ import { SavingsGoalService } from './savings-goal.service'
 import { FinanceReadService } from './finance-read.service'
 import { ConfigurableFxAdapter, FX_ADAPTER } from './fx'
 import { FinanceService } from './finance.service'
+import { FinanceActivityService } from './application/finance-activity.service'
 
 @Module({
   imports: [PrismaModule],
   controllers: [FinanceController],
   providers: [
+    FinanceActivityService,
     CreateExpenseUseCase,
     RegisterIncomeUseCase,
     CreateTransferUseCase,
@@ -36,6 +38,7 @@ import { FinanceService } from './finance.service'
     { provide: FX_ADAPTER, useFactory: () => new ConfigurableFxAdapter() },
   ],
   exports: [
+    FinanceActivityService,
     CreateExpenseUseCase,
     RegisterIncomeUseCase,
     CreateTransferUseCase,
