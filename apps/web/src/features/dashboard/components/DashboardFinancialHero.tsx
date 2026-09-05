@@ -36,7 +36,7 @@ export default function DashboardFinancialHero() {
       </div>
 
       {loading || error ? (
-        <DashboardDataState />
+        <DashboardDataState inverted />
       ) : (
         <div className="mt-3 flex flex-col gap-3 min-w-0">
           {/* Selector de moneda en mobile / vista combinada en desktop */}

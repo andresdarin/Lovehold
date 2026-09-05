@@ -11,33 +11,44 @@ interface FeatherLoadingProps {
   variant?: 'fullscreen' | 'inline' | 'card'
   /** Si debe incluir overlay de fondo */
   withBackdrop?: boolean
+  /** Si se renderiza sobre superficies oscuras/negativas como el Hero para forzar contraste alto */
+  inverted?: boolean
+  /** Clases CSS adicionales */
+  className?: string
 }
 
 /**
  * Componente de carga insignia para Finnic con animación de plumas en flotación continua.
- * Usa CSS puro y GPU compositing (sin bloqueo de JS) con estética sobria y premium.
+ * Soporta variantes regulares (fondo claro) e invertidas (fondo Navy profundo).
+ * Cumple con contraste de alta legibilidad y compositing GPU sin bloqueo de JS.
  */
 export default function FeatherLoading({
   message = 'Cargando tu espacio…',
   subtitle,
   variant = 'inline',
   withBackdrop = false,
+  inverted = false,
+  className = '',
 }: FeatherLoadingProps) {
   const containerHeight =
     variant === 'fullscreen'
       ? 'min-h-[100dvh]'
       : variant === 'card'
-      ? 'min-h-[260px]'
-      : 'py-10 min-h-[180px]'
+      ? 'min-h-[220px] sm:min-h-[260px]'
+      : 'py-8 min-h-[160px]'
+
+  const featherFilter = inverted
+    ? 'brightness-125 invert opacity-90'
+    : 'filter dark:brightness-125 dark:invert opacity-80'
 
   return (
     <div
       role="status"
       aria-live="polite"
       aria-busy="true"
-      className={`relative flex flex-col items-center justify-center select-none w-full ${containerHeight} ${
+      className={`relative flex flex-col items-center justify-center select-none w-full min-w-0 ${containerHeight} ${
         withBackdrop ? 'bg-background' : ''
-      }`}
+      } ${className}`}
     >
       <style>{`
         @keyframes feather-float-1 {
@@ -104,12 +115,18 @@ export default function FeatherLoading({
       `}</style>
 
       {/* Escena central de plumas flotantes */}
-      <div className="relative flex items-center justify-center h-28 w-28">
+      <div className="relative flex items-center justify-center h-24 w-24 sm:h-28 sm:w-28">
         {/* Halo luminoso orgánico de fondo */}
-        <div className="animate-glow-pulse pointer-events-none absolute h-24 w-24 rounded-full bg-radial from-[#407E8C]/25 via-[#A58D66]/15 to-transparent blur-xl dark:from-[#4BE3B5]/20 dark:via-[#A58D66]/15" />
+        <div
+          className={`animate-glow-pulse pointer-events-none absolute h-24 w-24 rounded-full blur-xl ${
+            inverted
+              ? 'bg-radial from-[#407E8C]/40 via-[#A58D66]/25 to-transparent'
+              : 'bg-radial from-[#407E8C]/25 via-[#A58D66]/15 to-transparent dark:from-[#4BE3B5]/20 dark:via-[#A58D66]/15'
+          }`}
+        />
 
         {/* Pluma izquierda (feather-04) */}
-        <div className="animate-feather-1 absolute -left-1 top-2 w-11 filter dark:brightness-125 dark:invert opacity-75">
+        <div className={`animate-feather-1 absolute -left-1 top-2 w-10 sm:w-11 ${featherFilter}`}>
           <img
             src="/brand/feathers/feather-04.png"
             alt=""
@@ -119,7 +136,7 @@ export default function FeatherLoading({
         </div>
 
         {/* Pluma derecha en contrapunto (feather-07) */}
-        <div className="animate-feather-2 absolute -right-1 top-3 w-12 filter dark:brightness-125 dark:invert opacity-80">
+        <div className={`animate-feather-2 absolute -right-1 top-3 w-11 sm:w-12 ${featherFilter}`}>
           <img
             src="/brand/feathers/feather-07.png"
             alt=""
@@ -129,7 +146,13 @@ export default function FeatherLoading({
         </div>
 
         {/* Pluma central dorada / principal flotando suavemente (feather-01) */}
-        <div className="animate-feather-3 relative z-10 w-14 drop-shadow-[0_8px_16px_rgba(8,58,79,0.18)] dark:drop-shadow-[0_8px_20px_rgba(0,0,0,0.6)] filter dark:brightness-125 dark:invert">
+        <div
+          className={`animate-feather-3 relative z-10 w-12 sm:w-14 ${
+            inverted
+              ? 'drop-shadow-[0_8px_20px_rgba(0,0,0,0.5)] brightness-125 invert'
+              : 'drop-shadow-[0_8px_16px_rgba(8,58,79,0.18)] filter dark:brightness-125 dark:invert dark:drop-shadow-[0_8px_20px_rgba(0,0,0,0.6)]'
+          }`}
+        >
           <img
             src="/brand/feathers/feather-01.png"
             alt=""
@@ -139,21 +162,37 @@ export default function FeatherLoading({
         </div>
       </div>
 
-      {/* Texto de estado con tipografía sobria */}
-      <div className="mt-4 flex flex-col items-center text-center px-4">
-        <p className="text-sm font-semibold tracking-tight text-foreground/90">
+      {/* Texto de estado con tipografía sobria y contraste garantizado */}
+      <div className="mt-3 sm:mt-4 flex flex-col items-center text-center px-4 max-w-sm">
+        <p
+          className={`text-xs sm:text-sm font-semibold tracking-tight ${
+            inverted ? 'text-[#F5F2EE]' : 'text-foreground/90'
+          }`}
+        >
           {message}
         </p>
         {subtitle && (
-          <p className="mt-1 text-xs text-muted-foreground max-w-xs">
+          <p
+            className={`mt-1 text-xs max-w-xs ${
+              inverted ? 'text-[#C0D5D6]' : 'text-muted-foreground'
+            }`}
+          >
             {subtitle}
           </p>
         )}
       </div>
 
       {/* Barra de progreso sutil y minimalista */}
-      <div className="mt-4 h-1 w-24 overflow-hidden rounded-full bg-border/50">
-        <div className="animate-bar-shimmer h-full w-full rounded-full bg-gradient-to-r from-transparent via-[#407E8C] to-transparent dark:via-[#C0D5D6]" />
+      <div
+        className={`mt-3 sm:mt-4 h-1 w-20 sm:w-24 overflow-hidden rounded-full ${
+          inverted ? 'bg-white/15' : 'bg-border/60'
+        }`}
+      >
+        <div
+          className={`animate-bar-shimmer h-full w-full rounded-full bg-gradient-to-r from-transparent ${
+            inverted ? 'via-[#C0D5D6]' : 'via-[#407E8C] dark:via-[#C0D5D6]'
+          } to-transparent`}
+        />
       </div>
     </div>
   )

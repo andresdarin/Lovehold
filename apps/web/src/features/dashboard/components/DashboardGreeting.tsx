@@ -32,6 +32,11 @@ export default function DashboardGreeting({ displayName, email }: DashboardGreet
       <h1 className="mt-0.5 text-2xl font-bold tracking-tight text-[#F5F2EE] sm:text-3xl">
         {greeting}, {firstName}
       </h1>
+      {/* Separador sutil con desvanecimiento hacia la derecha */}
+      <div
+        className="mt-3.5 sm:mt-4 h-px w-full bg-gradient-to-r from-white/20 via-white/10 to-transparent"
+        aria-hidden="true"
+      />
     </div>
   )
 }
