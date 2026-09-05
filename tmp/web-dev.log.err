@@ -1,0 +1,3 @@
+$ next dev --webpack
+⚠ Port 3000 is in use by process 23252, using available port 3002 instead.
+^C

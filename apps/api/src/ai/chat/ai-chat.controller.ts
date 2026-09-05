@@ -2,7 +2,13 @@ import { Body, Controller, Get, Param, Post, UseGuards, NotFoundException, Logge
 import { CurrentUser } from '../../common/decorators/current-user.decorator'
 import { AuthGuard, type AuthenticatedUser } from '../../common/guards/auth.guard'
 import { PrismaService } from '../../prisma/prisma.service'
-import { AiChatService, CreateConversationDto, SendMessageDto } from './ai-chat.service'
+import { AiChatService, CreateConversationDto } from './ai-chat.service'
+import { AgentOrchestrator } from '../agent/agent.orchestrator'
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator'
+
+class LegacyMessageDto {
+  @IsString() @IsNotEmpty() @MaxLength(2000) content!: string
+}
 
 @Controller('ai/chat')
 @UseGuards(AuthGuard)
@@ -12,6 +18,7 @@ export class AiChatController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly chatService: AiChatService,
+    private readonly orchestrator: AgentOrchestrator,
   ) {}
 
   private async getProfileId(user: AuthenticatedUser): Promise<string> {
@@ -32,13 +39,15 @@ export class AiChatController {
   @Get('active')
   async getActiveConversation(@CurrentUser() user: AuthenticatedUser) {
     try {
-      this.logger.log(`Fetching active conversation for authUser: ${user.authUserId}`)
       const profileId = await this.getProfileId(user)
       return await this.chatService.getOrCreateActiveConversation(profileId)
     } catch (err: any) {
-      this.logger.error(`Error in getActiveConversation: ${err.message}`, err.stack)
+      this.logger.error(
+        `No se pudo obtener la conversación activa for authUserId=${user?.authUserId}: ${err instanceof Error ? err.message : String(err)}`,
+        err instanceof Error ? err.stack : String(err),
+      )
       if (err instanceof NotFoundException) throw err
-      throw new InternalServerErrorException(err.message || 'Error al obtener conversación activa')
+      throw new InternalServerErrorException('No pudimos cargar la conversación.')
     }
   }
 
@@ -82,9 +91,12 @@ export class AiChatController {
   async sendMessage(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') conversationId: string,
-    @Body() dto: SendMessageDto,
+    @Body() dto: LegacyMessageDto,
   ) {
     const profileId = await this.getProfileId(user)
-    return this.chatService.sendMessage(profileId, conversationId, dto)
+    await this.orchestrator.run({ profileId, conversationId, message: dto.content })
+    const messages = await this.chatService.getConversationMessages(profileId, conversationId)
+    const recent = [...messages].reverse()
+    return { userMessage: recent.find(message => message.role === 'USER'), assistantMessage: recent.find(message => message.role === 'ASSISTANT') }
   }
 }

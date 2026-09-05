@@ -1,43 +1,11 @@
 'use client'
-
 import ReactMarkdown from 'react-markdown'
-
-interface FinnicMarkdownProps {
-  content: string
+const routes = new Set(['/dashboard', '/expenses', '/expenses/new', '/balance', '/finanzas', '/goals', '/fuel', '/settings', '/profile', '/chat'])
+/** Only verified product routes become links; HTML, images and external URLs cannot execute. */
+export default function FinnicMarkdown({ content }: { content: string }) {
+  return <ReactMarkdown allowedElements={['p', 'strong', 'em', 'ul', 'ol', 'li', 'br', 'del', 'a']} unwrapDisallowed skipHtml
+    components={{ a: ({ href, children }) => href && routes.has(href) ? <a href={href} className="font-medium text-primary underline underline-offset-4">{children}</a> : <span>{children}</span> }}>
+    {content}
+  </ReactMarkdown>
 }
 
-/**
- * Renders Finnic's chat responses with sanitized Markdown.
- * Supports bold, italic, lists, and paragraphs only.
- * Strips headers, code blocks, images, and links for chat safety.
- */
-export default function FinnicMarkdown({ content }: FinnicMarkdownProps) {
-  return (
-    <ReactMarkdown
-      allowedElements={['p', 'strong', 'em', 'ul', 'ol', 'li', 'br', 'del']}
-      unwrapDisallowed
-      components={{
-        p: ({ children }) => (
-          <p className="mb-2 last:mb-0">{children}</p>
-        ),
-        strong: ({ children }) => (
-          <strong className="font-bold">{children}</strong>
-        ),
-        em: ({ children }) => (
-          <em className="italic">{children}</em>
-        ),
-        ul: ({ children }) => (
-          <ul className="ml-3.5 mb-2 last:mb-0 space-y-0.5 list-disc marker:text-primary/40">{children}</ul>
-        ),
-        ol: ({ children }) => (
-          <ol className="ml-3.5 mb-2 last:mb-0 space-y-0.5 list-decimal marker:text-primary/40">{children}</ol>
-        ),
-        li: ({ children }) => (
-          <li className="pl-0.5">{children}</li>
-        ),
-      }}
-    >
-      {content}
-    </ReactMarkdown>
-  )
-}

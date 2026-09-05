@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ArrowLeft, ReceiptText } from 'lucide-react'
 import ReceiptScanUploader from './receipt-scan/ReceiptScanUploader'
+import BannerFeatherPattern from '@/components/ui/BannerFeatherPattern'
 
 export default function NewExpenseHeader({
   preview,
@@ -20,7 +21,10 @@ export default function NewExpenseHeader({
   autoCamera?: boolean
 }) {
   return (
-    <header className="relative w-full bg-primary text-primary-foreground pt-[calc(1rem+env(safe-area-inset-top))] pb-7 px-4 sm:px-6 rounded-b-[2rem] sm:rounded-b-[2.5rem] shadow-lg select-none overflow-hidden flex flex-col gap-4">
+    <header className="relative w-full bg-gradient-to-b from-[#062433] via-[#083A4F] to-[#072F40] dark:from-[#04141D] dark:via-[#061D27] dark:to-[#051720] text-[#F5F2EE] pt-[calc(1rem+env(safe-area-inset-top))] pb-7 px-4 sm:px-6 rounded-b-[2rem] sm:rounded-b-[2.5rem] shadow-lg border-b border-black/10 dark:border-white/[0.06] select-none overflow-hidden flex flex-col gap-4">
+      {/* Plumas de fondo estáticas sutiles */}
+      <BannerFeatherPattern />
+
       {/* Luces ambientales sutiles */}
       <div className="pointer-events-none absolute -top-12 -right-12 h-44 w-44 rounded-full bg-[#A58D66]/20 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-[#C0D5D6]/15 blur-2xl" />

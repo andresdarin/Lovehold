@@ -11,13 +11,13 @@ import {
 export class FinanceAccountService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findActive(profileId: string) {
+  async findActive(profileId: string, provision = true) {
     const existing = await this.prisma.financeAccount.findMany({
       where: { profileId, isActive: true },
       orderBy: { createdAt: 'asc' },
     })
 
-    if (existing.length === 0) {
+    if (existing.length === 0 && provision) {
       // Auto-provision standard accounts for a new profile
       const defaultCash = await this.prisma.financeAccount.create({
         data: {

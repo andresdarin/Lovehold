@@ -10,11 +10,12 @@ export class ToolExecutor {
     if (!this.registry.has(call.name)) return { name: call.name, success: false, error: 'Tool no permitida' }
     const definition = this.registry.get(call.name)
     const parsed = definition.inputSchema.safeParse(call.args)
-    if (!parsed.success) return { name: call.name, success: false, error: `Argumentos inválidos: ${parsed.error.message}` }
+    if (!parsed.success) return { name: call.name, success: false, error: `Argumentos inválidos. Revisar: ${parsed.error.issues.map(issue => issue.path.join('.')).join(', ')}` }
+    if (definition.risk !== 'read' && !ctx.pendingId) return { name: call.name, success: false, error: 'La operación requiere una confirmación vinculada.' }
     try {
       return { name: call.name, success: true, data: await definition.execute(parsed.data, ctx) }
-    } catch (error) {
-      console.error(`Error ejecutando tool ${call.name}`, error)
+    } catch {
+      console.error(`Error ejecutando tool ${call.name}`)
       return { name: call.name, success: false, error: 'Error interno ejecutando tool' }
     }
   }

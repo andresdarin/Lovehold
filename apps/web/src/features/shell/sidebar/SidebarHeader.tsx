@@ -2,15 +2,25 @@
 
 import React from 'react'
 import { ChevronLeft } from 'lucide-react'
+import FinnicOwlIcon from '@/components/ui/FinnicOwlIcon'
+import FinnicBrand from '@/components/ui/FinnicBrand'
 
 interface SidebarHeaderProps {
   collapsed: boolean
   onToggle: () => void
 }
 
+/**
+ * Cabecera del sidebar de navegación.
+ * Utiliza el nuevo icono de la lechuza en estado colapsado y la logomarca horizontal expandida.
+ */
 export default function SidebarHeader({ collapsed, onToggle }: SidebarHeaderProps) {
   return (
-    <div className={`flex h-14 items-center rounded-full border border-border bg-surface-soft/60 ${collapsed ? 'justify-center' : 'gap-3 pl-3 pr-2'}`}>
+    <div
+      className={`flex h-14 items-center rounded-full border border-border bg-surface-soft/60 ${
+        collapsed ? 'justify-center' : 'justify-between pl-3.5 pr-2'
+      }`}
+    >
       {collapsed ? (
         <button
           onClick={onToggle}
@@ -18,25 +28,15 @@ export default function SidebarHeader({ collapsed, onToggle }: SidebarHeaderProp
           title="Expandir menú"
           aria-label="Expandir menú"
         >
-          <img
-            src="/brand/finnic-symbol-navy.png"
-            alt="Finnic logo"
-            className="h-7 w-7 object-contain"
-          />
+          <FinnicOwlIcon color="navy" className="h-7 w-7 dark:hidden" />
+          <FinnicOwlIcon color="cream" className="h-7 w-7 hidden dark:block" />
         </button>
       ) : (
         <>
-          <img
-            src="/brand/finnic-symbol-navy.png"
-            alt="Finnic logo"
-            className="h-7 w-7 shrink-0 object-contain"
-          />
-          <span className="text-base font-bold tracking-tight text-foreground">
-            Finnic
-          </span>
+          <FinnicBrand variant="auto" size="md" />
           <button
             onClick={onToggle}
-            className="ml-auto flex h-8 w-8 items-center justify-center rounded-full border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-soft hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/45"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-soft hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/45 shrink-0"
             title="Colapsar menú"
             aria-label="Colapsar menú"
           >

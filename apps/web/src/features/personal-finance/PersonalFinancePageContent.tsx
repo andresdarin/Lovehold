@@ -6,7 +6,7 @@ import {
   ChevronLeft,
   ArrowDown,
   ArrowUp,
-  Receipt,
+
   ScanLine,
 } from 'lucide-react'
 import { useProfile } from '@/features/auth/ProfileProvider'
@@ -14,13 +14,10 @@ import { usePersonalFinance, useFinanceAccounts, useCreateExpense } from './hook
 import { currentMonthKey } from './constants'
 import { computeSummary } from './utils'
 import FinanzasHero from './FinanzasHero'
-import MonthlySummaryCards from './MonthlySummaryCards'
+import FinanceMonthlyDetails from './FinanceMonthlyDetails'
 import FinanzasAccountsCard from './FinanzasAccountsCard'
 import ExpenseForm from './ExpenseForm'
 import ReceiptPasteForm from './ReceiptPasteForm'
-import RecentExpensesList from './RecentExpensesList'
-import CategoryBreakdown from './CategoryBreakdown'
-import ProductMonthlyRanking from './ProductMonthlyRanking'
 import IncomeFormModal from './IncomeFormModal'
 import TransferFormModal from './TransferFormModal'
 
@@ -37,7 +34,7 @@ export default function PersonalFinancePageContent() {
   const { accounts, loading: loadingAccounts, refetch: refetchAccounts } = useFinanceAccounts()
   const { create, submitting } = useCreateExpense()
 
-  const allItems = useMemo(() => expenses.flatMap((e) => e.items ?? []), [expenses])
+
   const summary = useMemo(() => computeSummary(expenses), [expenses])
 
   function shiftMonth(delta: number) {
@@ -98,7 +95,7 @@ export default function PersonalFinancePageContent() {
       {/* 2. Cuerpo Modular Claro (Sand / Surface) */}
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-8 flex flex-col gap-6">
         {/* Acciones Rápidas (3 Botones con el mismo criterio que el Dashboard) */}
-        <section className="flex items-center gap-2.5 sm:hidden" aria-label="Acciones rápidas">
+        <section className="flex items-center gap-2.5" aria-label="Acciones rápidas">
           {/* Ingreso */}
           <button
             type="button"
@@ -130,71 +127,8 @@ export default function PersonalFinancePageContent() {
           </Link>
         </section>
 
-        {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          </div>
-        ) : error ? (
-          <p className="rounded-xl border border-danger/30 bg-danger/5 p-4 text-sm text-danger">{error}</p>
-        ) : (
-          <div className="flex flex-col gap-6">
-            {/* 3. Tarjeta de Resumen del mes */}
-            <MonthlySummaryCards summary={summary} />
-
-            {/* 4. Cuentas y Liquidez con estilo Navy y Ahorro */}
-            {accounts.length > 0 && (
-              <FinanzasAccountsCard
-                accounts={accounts}
-                savings={summary.netBalance}
-                loading={loadingAccounts}
-              />
-            )}
-
-            {/* 5. Categorías & Movimientos en Grid responsivo */}
-            <section className="grid gap-6 md:grid-cols-2">
-              <div className="neu-raised rounded-3xl border border-border/50 bg-surface p-5 sm:p-6">
-                <div className="flex items-center justify-between pb-3.5 border-b border-border/50 mb-3.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/30 text-primary bg-transparent">
-                      <Receipt className="h-4 w-4 stroke-[2]" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-bold text-foreground">Movimientos del mes</h2>
-                      <p className="text-[11px] text-muted-foreground">Listado cronológico</p>
-                    </div>
-                  </div>
-                </div>
-                <RecentExpensesList expenses={expenses} />
-              </div>
-
-              <div className="neu-raised rounded-3xl border border-border/50 bg-surface p-5 sm:p-6">
-                <div className="flex items-center justify-between pb-3.5 border-b border-border/50 mb-3.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full border border-cat-super/40 text-cat-super bg-transparent">
-                      <Receipt className="h-4 w-4 stroke-[2]" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-bold text-foreground">Distribución por categoría</h2>
-                      <p className="text-[11px] text-muted-foreground">Desglose de egresos</p>
-                    </div>
-                  </div>
-                </div>
-                <CategoryBreakdown byCategory={summary.byCategory} total={summary.total} />
-              </div>
-            </section>
-
-            {/* 6. Ranking de productos */}
-            {allItems.length > 0 && (
-              <section className="neu-raised rounded-3xl border border-border/50 bg-surface p-5 sm:p-6">
-                <div className="pb-3.5 border-b border-border/50 mb-3.5">
-                  <h2 className="text-sm font-bold text-foreground">Productos más comprados</h2>
-                  <p className="text-[11px] text-muted-foreground">Artículos recurrentes de tickets</p>
-                </div>
-                <ProductMonthlyRanking items={allItems} />
-              </section>
-            )}
-          </div>
-        )}
+        <FinanceMonthlyDetails expenses={expenses} loading={loading} error={error} onRetry={refetch} />
+        <FinanzasAccountsCard accounts={accounts} loading={loadingAccounts} />
       </div>
 
       {/* Modales */}
@@ -212,3 +146,5 @@ export default function PersonalFinancePageContent() {
     </div>
   )
 }
+
+

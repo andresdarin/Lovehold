@@ -50,7 +50,7 @@ describe('AgentOrchestrator', () => {
     const executor = makeExecutor(); const pending = makePending({ id: 'pending-1', ...request, toolName: writeTool.name, args, risk: 'write', status: 'pending' })
     const result = await makeSubject({ chat: vi.fn(async () => ({ functionCalls: [{ name: writeTool.name, args }] })) }, makeRegistry(true, writeTool), executor, makeConversations(), pending).run({ ...request, message: 'registrá' })
     expect(result.pendingActionId).toBe('pending-1'); expect(result.pendingActionId).toBe((await pending.create.mock.results[0].value).id)
-    expect(pending.create).toHaveBeenCalledWith(expect.objectContaining({ profileId: 'p', conversationId: 'c1', args })); expect(executor.execute).not.toHaveBeenCalled()
+    expect(pending.create).toHaveBeenCalledWith(expect.objectContaining({ profileId: 'p', conversationId: 'c1', args: expect.objectContaining({ ...args, date: expect.any(String) }) })); expect(executor.execute).not.toHaveBeenCalled()
   })
 
   it('5. confirma y ejecuta el write exactamente una vez', async () => {

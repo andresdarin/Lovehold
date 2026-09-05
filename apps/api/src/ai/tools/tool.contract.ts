@@ -8,6 +8,7 @@ export interface ToolDefinition {
   description: string
   risk: ToolRisk
   inputSchema: ZodSchema
+  describe?: (args: Record<string, unknown>, ctx: { profileId: string }) => Promise<string>
   // Every risk:write tool must use AiPendingAction.id as its idempotency key.
   execute: (args: any, ctx: { profileId: string; sourceMessageId?: string; pendingId?: string }) => Promise<unknown>
 }

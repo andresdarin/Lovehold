@@ -6,7 +6,7 @@ import { Sparkle, CheckCircle2, Circle, HelpCircle } from 'lucide-react'
 function StepBadge({ label, done }: { label: string; done: boolean }) {
   return (
     <div
-      className={`flex items-center gap-2 rounded-xl border p-2 text-xs font-semibold transition-all ${
+      className={`flex items-center gap-2 rounded-xl border p-2 text-xs font-semibold transition-all min-w-0 overflow-hidden ${
         done
           ? 'border-[#208B6B]/40 bg-[#208B6B]/20 text-[#4BE3B5]'
           : 'border-white/[0.08] bg-white/[0.04] text-[#C0D5D6]/70'
@@ -17,7 +17,9 @@ function StepBadge({ label, done }: { label: string; done: boolean }) {
       ) : (
         <Circle className="h-3.5 w-3.5 shrink-0 opacity-60" />
       )}
-      <span className="truncate">{label}</span>
+      <span className="truncate min-w-0 flex-1" title={label}>
+        {label}
+      </span>
     </div>
   )
 }
@@ -25,29 +27,30 @@ function StepBadge({ label, done }: { label: string; done: boolean }) {
 /**
  * Módulo de Onboarding y bloque de ayuda interactivo.
  * Sección "Primeros pasos" con estilo Navy coherente con el Hero superior.
+ * Contención estricta para pantallas móviles.
  */
 export default function DashboardOnboarding() {
   const [showOnboarding, setShowOnboarding] = useState(true)
   const [showHelper, setShowHelper] = useState(false)
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 w-full min-w-0">
       {showOnboarding && (
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#062433] via-[#083A4F] to-[#072F40] dark:from-[#04141D] dark:via-[#061D27] dark:to-[#051720] border border-white/[0.1] p-5 shadow-[0_12px_30px_rgba(8,58,79,0.15)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.4)]">
+        <section className="relative w-full min-w-0 overflow-hidden rounded-3xl bg-gradient-to-b from-[#062433] via-[#083A4F] to-[#072F40] dark:from-[#04141D] dark:via-[#061D27] dark:to-[#051720] border border-white/[0.1] p-4 sm:p-5 shadow-[0_12px_30px_rgba(8,58,79,0.15)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.4)]">
           {/* Luces de ambiente sutiles */}
           <div className="pointer-events-none absolute -top-16 -right-16 h-40 w-40 rounded-full bg-[#407E8C]/20 blur-2xl" />
           <div className="pointer-events-none absolute -bottom-16 -left-16 h-40 w-40 rounded-full bg-[#A58D66]/15 blur-2xl" />
 
-          <div className="relative z-10 flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Sparkle className="h-4 w-4 text-[#A58D66]" />
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#F5F2EE]">
+          <div className="relative z-10 flex items-center justify-between gap-2 mb-3 min-w-0">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <Sparkle className="h-4 w-4 shrink-0 text-[#A58D66]" />
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#F5F2EE] truncate min-w-0">
                 Primeros pasos (1 de 4)
               </h3>
             </div>
             <button
               onClick={() => setShowOnboarding(false)}
-              className="text-xs text-[#C0D5D6]/70 hover:text-[#F5F2EE] font-medium transition-colors"
+              className="text-xs text-[#C0D5D6]/70 hover:text-[#F5F2EE] font-medium transition-colors shrink-0"
             >
               Ocultar
             </button>
@@ -57,7 +60,7 @@ export default function DashboardOnboarding() {
             <div className="h-full w-1/4 rounded-full bg-gradient-to-r from-[#A58D66] to-[#4BE3B5] transition-all duration-500" />
           </div>
 
-          <div className="relative z-10 mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="relative z-10 mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4 min-w-0">
             <StepBadge label="Cuenta creada" done />
             <StepBadge label="Primer gasto personal" done={false} />
             <StepBadge label="Invitar a tu pareja" done={false} />
@@ -67,21 +70,23 @@ export default function DashboardOnboarding() {
       )}
 
       {/* Help tooltip toggle */}
-      <div className="flex items-center justify-between rounded-2xl border border-border/70 bg-surface px-4 py-3 text-xs text-muted-foreground">
-        <div className="flex items-center gap-2">
-          <HelpCircle className="h-4 w-4 text-primary" />
-          <span>¿Cómo gestiona Finnic los gastos personales y en pareja?</span>
+      <div className="flex items-center justify-between rounded-2xl border border-border/70 bg-surface px-4 py-3 text-xs text-muted-foreground min-w-0 gap-2">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <HelpCircle className="h-4 w-4 shrink-0 text-primary" />
+          <span className="truncate min-w-0 flex-1">
+            ¿Cómo gestiona Finnic los gastos personales y en pareja?
+          </span>
         </div>
         <button
           onClick={() => setShowHelper((v) => !v)}
-          className="font-bold text-primary hover:underline"
+          className="font-bold text-primary hover:underline shrink-0"
         >
           {showHelper ? 'Ocultar' : 'Ver explicación'}
         </button>
       </div>
 
       {showHelper && (
-        <div className="rounded-2xl border border-border bg-surface p-4 text-xs text-muted-foreground leading-relaxed animate-in fade-in duration-200">
+        <div className="rounded-2xl border border-border bg-surface p-4 text-xs text-muted-foreground leading-relaxed animate-in fade-in duration-200 min-w-0">
           <p className="font-semibold text-foreground mb-1">
             Finanzas personales con sincronización en pareja
           </p>

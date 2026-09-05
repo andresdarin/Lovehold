@@ -111,7 +111,8 @@ describe('Finnic Smoke E2E — Fase 4', () => {
     const orchestrator = new AgentOrchestrator(runtimeGemini as any, tools, executor, { get: vi.fn() } as any, conversations as any, pending, observations, context as any, resolver)
     const runtime = await orchestrator.run({ profileId: 'profile-1', conversationId: 'conversation-1', message: 'hello' })
     expect(runtime.text).toBe('respuesta v2')
-    expect(runtimeGemini.chat.mock.calls[0]![0].systemInstruction).toBe('test personality')
+    expect(runtimeGemini.chat.mock.calls[0]![0].systemInstruction).toContain('test personality')
+    expect(runtimeGemini.chat.mock.calls[0]![0].systemInstruction).toContain('CONTRATO DEL PRODUCTO')
 
     // 9–10. Roll back by deploying the known previous version and verify restoration.
     await config.deploy({ agentSlug: 'finnic', environment: 'PROD', promptVersionId: 'prompt-v1' })
@@ -125,8 +126,10 @@ describe('Finnic Smoke E2E — Fase 4', () => {
 
     // Verification 2: write is pending, then confirmed and completed.
     const actualExpense = new CreateExpenseUseCase(prisma)
-    const writeTools = new ToolRegistry(snapshot as any, { execute: vi.fn() } as any, { execute: vi.fn() } as any, { execute: vi.fn() } as any, actualExpense)
-    const writeOrchestrator = new AgentOrchestrator({ chat: vi.fn(async () => ({ functionCalls: [{ name: 'create_expense', args: { amount: 10, currency: 'UYU', category: 'OTROS', title: 'Test' } }] })) } as any, writeTools, new ToolExecutor(writeTools), { get: vi.fn() } as any, conversations as any, new AiPendingActionService(prisma, writeTools), observations, context as any, resolver)
+    data.financeAccount.push({ id: 'acc-1', profileId: 'profile-1', name: 'Efectivo', type: 'CASH', currency: 'UYU', isActive: true, balance: '100.00' })
+    const activity = { monthly: vi.fn(), accounts: vi.fn(async () => ({ accounts: [{ id: 'acc-1', name: 'Efectivo', currency: 'UYU' }] })) } as any
+    const writeTools = new ToolRegistry(snapshot as any, { execute: vi.fn() } as any, { execute: vi.fn() } as any, { execute: vi.fn() } as any, actualExpense, activity)
+    const writeOrchestrator = new AgentOrchestrator({ chat: vi.fn(async () => ({ functionCalls: [{ name: 'create_expense', args: { amount: 10, currency: 'UYU', category: 'OTROS', title: 'Test', financeAccountId: 'acc-1' } }] })) } as any, writeTools, new ToolExecutor(writeTools), { get: vi.fn() } as any, conversations as any, new AiPendingActionService(prisma, writeTools), observations, context as any, resolver)
     const pendingResult = await writeOrchestrator.run({ profileId: 'profile-1', conversationId: 'conversation-2', message: 'registrá' })
     expect(pendingResult.pendingActionId).toBeTruthy()
     const confirmed = await writeOrchestrator.confirmPending({ profileId: 'profile-1', pendingActionId: pendingResult.pendingActionId! })

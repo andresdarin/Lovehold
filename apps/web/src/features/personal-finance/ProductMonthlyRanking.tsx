@@ -17,6 +17,7 @@ interface ProductRankingItemExtended {
 
 interface ProductMonthlyRankingProps {
   items: PersonalExpenseItem[]
+  currency?: 'UYU' | 'USD'
 }
 
 type SortBy = 'totalSpent' | 'count'
@@ -102,7 +103,7 @@ function computeRanking(items: PersonalExpenseItem[], sortBy: SortBy): ProductRa
     .sort((a, b) => (sortBy === 'count' ? b.count - a.count : b.totalSpent - a.totalSpent))
 }
 
-export default function ProductMonthlyRanking({ items }: ProductMonthlyRankingProps) {
+export default function ProductMonthlyRanking({ items, currency = 'UYU' }: ProductMonthlyRankingProps) {
   const [sortBy, setSortBy] = useState<SortBy>('totalSpent')
   const [pageSize, setPageSize] = useState(10)
   const [page, setPage] = useState(1)
@@ -179,7 +180,7 @@ export default function ProductMonthlyRanking({ items }: ProductMonthlyRankingPr
 
               {/* Monto a la derecha */}
               <p className="shrink-0 text-sm font-medium text-foreground">
-                {formatCurrency(item.totalSpent)}
+                {formatCurrency(item.totalSpent, currency)}
               </p>
             </div>
           )
@@ -208,3 +209,4 @@ export default function ProductMonthlyRanking({ items }: ProductMonthlyRankingPr
     </div>
   )
 }
+

@@ -2,10 +2,12 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Heart } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { apiFetch, ApiError } from '@/lib/api'
 import AppShell from '../shell/AppShell'
+import FeatherLoading from '@/components/ui/FeatherLoading'
+import FinnicErrorCard from '@/components/ui/FinnicErrorCard'
 
 interface Profile {
   id: string
@@ -51,40 +53,46 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     if (me.isAdmin === true || me.role?.toUpperCase() === 'ADMIN') setIsAdmin(true)
   }
 
-  useEffect(() => {
-    async function load() {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+  const load = React.useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
 
-      if (sessionError || !session) {
+    if (sessionError || !session) {
+      router.push('/login')
+      return
+    }
+
+    const claims = session.user.app_metadata ?? {}
+    const jwtRole = typeof claims.role === 'string' ? claims.role : null
+    setRole(jwtRole)
+    setIsAdmin(claims.isAdmin === true || claims.admin === true || jwtRole?.toUpperCase() === 'ADMIN')
+
+    try {
+      await fetchProfile(session.access_token)
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        await supabase.auth.signOut()
         router.push('/login')
         return
       }
-
-      const claims = session.user.app_metadata ?? {}
-      const jwtRole = typeof claims.role === 'string' ? claims.role : null
-      setRole(jwtRole)
-      setIsAdmin(claims.isAdmin === true || claims.admin === true || jwtRole?.toUpperCase() === 'ADMIN')
-
-      try {
-        await fetchProfile(session.access_token)
-      } catch (err) {
-        if (err instanceof ApiError && err.status === 401) {
-          await supabase.auth.signOut()
-          router.push('/login')
-          return
-        }
-        if (err instanceof ApiError && err.status === 404) {
-          setError('Perfil no encontrado. Por favor, volvé a iniciar sesión.')
-        } else {
-          setError(err instanceof Error ? err.message : 'Error al cargar el perfil')
-        }
-      } finally {
-        setLoading(false)
+      if (err instanceof ApiError && err.status === 404) {
+        setError('Perfil no encontrado. Por favor, volvé a iniciar sesión.')
+      } else {
+        setError(err instanceof Error ? err.message : 'Error al cargar el perfil')
       }
+    } finally {
+      setLoading(false)
     }
-
-    load()
   }, [router, supabase])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  const handleRetry = () => {
+    load()
+  }
 
   async function refreshProfile() {
     const { data: { session } } = await supabase.auth.getSession()
@@ -103,27 +111,34 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-3">
-          <Heart className="h-8 w-8 animate-pulse text-primary" />
-          <p className="text-sm text-muted-foreground">Cargando tu espacio…</p>
-        </div>
+      <main className="flex min-h-screen items-center justify-center bg-background px-4">
+        <FeatherLoading
+          variant="fullscreen"
+          message="Cargando tu espacio…"
+          subtitle="Conectando con Finnic"
+        />
       </main>
     )
   }
 
   if (error) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 bg-background">
-        <Heart className="h-10 w-10 text-primary/40" />
-        <p className="max-w-xs text-center text-sm text-danger">{error}</p>
-        <button
-          onClick={logout}
-          className="rounded-2xl border border-border bg-surface px-6 py-3 text-sm text-foreground transition hover:bg-surface-soft"
-        >
-          Volver al inicio
-        </button>
-      </main>
+      <FinnicErrorCard
+        eyebrow="No pudimos conectar con tu espacio"
+        title="Error de conexión"
+        description={
+          error === 'Failed to fetch'
+            ? 'No pudimos comunicarnos con el servidor de Finnic. Comprobá tu conexión a internet o reintentá en unos segundos.'
+            : error
+        }
+        onRetry={handleRetry}
+        retryLabel="Reintentar"
+        secondaryAction={{
+          label: 'Cerrar sesión',
+          onClick: logout,
+          icon: <LogOut className="h-4 w-4 stroke-[2] text-muted-foreground" />,
+        }}
+      />
     )
   }
 

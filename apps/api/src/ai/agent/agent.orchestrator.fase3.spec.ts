@@ -16,10 +16,14 @@ describe('AgentOrchestrator Fase 3', () => {
     const gemini = { chat: vi.fn(async () => ({ text: 'respuesta' })) }
     const result = await deps(gemini, { create: vi.fn(), getForConfirm: vi.fn() }, conversations).run({ profileId: 'p1', conversationId: 'c1', message: 'nuevo' })
     expect(result.text).toBe('respuesta')
-    expect(gemini.chat.mock.calls[0]![0].history).toEqual([
-      { role: 'user', parts: [{ text: 'persistido' }] },
-      { role: 'user', parts: [{ text: 'nuevo' }] },
-    ])
+    expect(gemini.chat).toHaveBeenCalledWith(
+      expect.objectContaining({
+        history: [
+          { role: 'user', parts: [{ text: 'persistido' }] },
+          { role: 'user', parts: [{ text: 'nuevo' }] },
+        ],
+      }),
+    )
   })
 
   it('crea la pending action con el profileId del request', async () => {
