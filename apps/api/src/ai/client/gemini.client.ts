@@ -38,8 +38,8 @@ export class GeminiClient {
       if (opts.systemPrompt && opts.contents?.length) body.systemInstruction = { parts: [{ text: opts.systemPrompt }] }
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': config.GEMINI_API_KEY }, signal: opts.signal || controller?.signal, body: JSON.stringify(body) })
       if (!response.ok) {
-        const body = await response.text().catch(() => 'Unknown error')
-        console.error(`[GeminiClient] Gemini request failed (${response.status}): ${body.slice(0, 1000)}`)
+        await response.text().catch(() => 'Unknown error')
+        console.error(`[GeminiClient] Gemini request failed (${response.status})`)
         throw new ServiceUnavailableException('Gemini no disponible temporalmente')
       }
 
@@ -69,19 +69,18 @@ export class GeminiClient {
     try {
       const contents = opts.history.map((m) => ({
         role: m.role,
-        parts: m.parts.map((p) => p.functionCall
-          ? { functionCall: p.functionCall }
-          : p.functionResponse ? { functionResponse: p.functionResponse } : { text: p.text }),
+        parts: m.parts,
       }))
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(opts.model || config.GEMINI_API_MODEL)}:generateContent`, {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': config.GEMINI_API_KEY },
         signal: opts.signal || controller?.signal,
         body: JSON.stringify({ systemInstruction: opts.systemInstruction ? { parts: [{ text: opts.systemInstruction }] } : undefined, contents, tools: opts.tools?.length ? [{ functionDeclarations: opts.tools }] : undefined, generationConfig: opts.generationConfig }),
       })
-      if (!response.ok) { const body = await response.text().catch(() => 'Unknown error'); console.error(`[GeminiClient] Gemini request failed (${response.status}): ${body.slice(0, 1000)}`); throw new ServiceUnavailableException('Gemini no disponible temporalmente') }
-      const candidate = ((await response.json()) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string; functionCall?: FunctionCall }> }; finishReason?: string }> }).candidates?.[0]
+      if (!response.ok) { console.error(`[GeminiClient] Gemini request failed (${response.status})`); throw new ServiceUnavailableException('Gemini no disponible temporalmente') }
+      const candidate = ((await response.json()) as { candidates?: Array<{ content?: ChatMessage; finishReason?: string }> }).candidates?.[0]
       const parts = candidate?.content?.parts || []
-      return { text: parts.find((p) => p.text)?.text, functionCalls: parts.filter((p) => p.functionCall).map((p) => p.functionCall as FunctionCall), finishReason: candidate?.finishReason }
+      if (!parts.length || (candidate?.finishReason && candidate.finishReason !== 'STOP')) throw new ServiceUnavailableException('Finnic no pudo completar la respuesta.')
+      return { modelContent: candidate?.content, text: parts.filter(p => !p.thought).map(p => p.text || '').join(''), functionCalls: parts.filter((p) => p.functionCall).map((p) => p.functionCall as FunctionCall), finishReason: candidate?.finishReason }
     } catch (error) {
       if (error instanceof ServiceUnavailableException) throw error
       if (controller && (error as { name?: string })?.name === 'AbortError') throw new ServiceUnavailableException('Tiempo de espera agotado al contactar Gemini')

@@ -37,6 +37,8 @@ export interface FunctionCall {
 export interface ChatMessage {
   role: 'user' | 'model'
   parts: Array<{
+    thoughtSignature?: string
+    thought?: boolean
     text?: string
     functionCall?: FunctionCall
     functionResponse?: { name: string; response: unknown }
@@ -51,6 +53,7 @@ export interface ChatGenerateRequest {
 }
 
 export interface ChatGenerateResponse {
+  modelContent?: ChatMessage
   text?: string
   functionCalls?: FunctionCall[]
   finishReason?: string

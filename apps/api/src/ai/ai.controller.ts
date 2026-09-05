@@ -45,7 +45,16 @@ export class AiController {
     const { profileId } = await this.context.resolveProfile(user.authUserId)
     await this.context.assertConversationOwnership(profileId, conversationId)
     const conversation = await this.conversations.getById(profileId, conversationId)
-    return conversation.messages
+    return Promise.all(conversation.messages.filter(message => {
+      const metadata = message.metadata as Record<string, unknown> | null
+      return message.role !== 'SYSTEM' && !metadata?.internal && !metadata?.functionCall && !metadata?.functionResponse
+    }).map(async message => {
+      const metadata = message.metadata as Record<string, unknown> | null
+      if (typeof metadata?.pendingActionId !== 'string') return message
+      const action = await this.pending.getForConfirm(profileId, metadata.pendingActionId)
+      const status = action.status === 'pending' && action.expiresAt <= new Date() ? 'expired' : action.status
+      return { ...message, metadata: { ...metadata, actionStatus: status } }
+    }))
   }
 
   @Post('actions/:id/confirm')
