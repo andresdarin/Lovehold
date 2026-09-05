@@ -7,7 +7,7 @@ import BannerFeatherPattern from '@/components/ui/BannerFeatherPattern'
 
 export default function ChatHeader() {
   return (
-    <header className="relative w-full bg-gradient-to-b from-[#062433] via-[#083A4F] to-[#072F40] dark:from-[#04141D] dark:via-[#061D27] dark:to-[#051720] text-[#F5F2EE] pt-[calc(1rem+env(safe-area-inset-top))] pb-5 px-4 sm:px-6 rounded-b-[2rem] sm:rounded-b-[2.2rem] select-none overflow-hidden shrink-0 border-b border-black/10 dark:border-white/[0.06] shadow-lg">
+    <header className="relative w-full bg-gradient-to-b from-[#062433] via-[#083A4F] to-[#072F40] text-[#F5F2EE] pt-[calc(.65rem+env(safe-area-inset-top))] pb-3.5 px-3 sm:px-6 sm:pt-[calc(1rem+env(safe-area-inset-top))] sm:pb-5 rounded-b-[1.4rem] sm:rounded-b-[2.2rem] select-none overflow-hidden shrink-0 shadow-md">
       {/* Plumas de fondo estáticas sutiles */}
       <BannerFeatherPattern />
 
@@ -19,7 +19,7 @@ export default function ChatHeader() {
         {/* Botón Volver */}
         <Link
           href="/dashboard"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-[#F5F2EE] transition-colors hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-accent"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-[#F5F2EE] transition-colors hover:bg-white/20 sm:h-11 sm:w-11"
           aria-label="Volver al dashboard"
         >
           <ArrowLeft className="h-4 w-4 stroke-[2.2]" />
@@ -28,19 +28,19 @@ export default function ChatHeader() {
         {/* Identidad de Finnic centrada */}
         <div className="text-center flex-1 px-3 flex flex-col items-center">
           <div className="flex items-center gap-1.5">
-            <h1 className="text-sm sm:text-base font-extrabold text-[#F5F2EE] tracking-tight">
+            <h1 className="text-[13px] font-extrabold tracking-tight sm:text-base">
               Finnic
             </h1>
             <span className="flex h-2 w-2 rounded-full bg-[#C0D5D6] animate-pulse" />
           </div>
-          <p className="text-[11px] text-[#C0D5D6] font-medium">
+          <p className="text-[10px] font-medium text-[#C0D5D6] sm:text-[11px]">
             Tu copiloto financiero
           </p>
         </div>
 
         {/* Icono contextual */}
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-accent/40 bg-accent/20 text-sand">
-          <FinnicOwlIcon color="cream" className="h-5.5 w-5.5" />
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/20 text-sand sm:h-9 sm:w-9">
+          <FinnicOwlIcon color="cream" className="h-5 w-5" />
         </div>
       </div>
     </header>

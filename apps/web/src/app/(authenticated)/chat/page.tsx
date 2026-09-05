@@ -14,7 +14,7 @@ export default function ChatPage() {
       {loading ? <div role="status" className="space-y-4 p-6"><p className="text-sm text-muted-foreground">Cargando conversación…</p>{[1, 2, 3].map(n => <div key={n} className="h-16 rounded-2xl bg-surface-soft motion-safe:animate-pulse" />)}</div>
         : <MessageList messages={messages} sending={sending} onSelectSuggestion={sendMessage} onResolveAction={resolveAction} />}
     </div>
-    <MessageComposer onSend={sendMessage} disabled={loading || sending || !conversation} />
+    <MessageComposer key={conversation?.id ?? 'new'} onSend={sendMessage} disabled={loading || sending} />
   </div>
 }
 

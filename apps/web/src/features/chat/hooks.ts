@@ -15,8 +15,11 @@ export function useFinnicChat() {
     setLoading(true)
     try {
       const active = await chatRequest<AiConversation>('/api/ai/chat/active')
-      const history = await chatRequest<AiMessage[]>(`/api/ai/conversations/${active.id}/messages`)
-      setConversation(active); setMessages(history); setError(null)
+      setConversation(active)
+      try {
+        const history = await chatRequest<AiMessage[]>(`/api/ai/conversations/${active.id}/messages`)
+        setMessages(history); setError(null)
+      } catch { setMessages([]); setError('Pudimos abrir la conversación pero no el historial. Podés escribir igual.') }
     } catch { setError('No pudimos cargar la conversación. Volvé a cargar para recuperar el historial.') }
     finally { setLoading(false) }
   }, [])
@@ -24,11 +27,13 @@ export function useFinnicChat() {
 
   const sendMessage = async (content: string): Promise<boolean> => {
     const text = content.trim()
-    if (!text || text.length > 2000 || busy.current || !conversation) return false
+    if (!text || busy.current) return false
     busy.current = true; setSending(true); setError(null)
     try {
-      await chatRequest<AgentResponse>('/api/ai/chat', { message: text, conversationId: conversation.id })
-      setMessages(await chatRequest<AiMessage[]>(`/api/ai/conversations/${conversation.id}/messages`))
+      const res = await chatRequest<AgentResponse>('/api/ai/chat', { message: text, ...(conversation ? { conversationId: conversation.id } : {}) })
+      const id = res.conversationId ?? conversation?.id
+      if (id && !conversation) setConversation({ id, profileId: '', title: null, createdAt: '', updatedAt: '' })
+      if (id) setMessages(await chatRequest<AiMessage[]>(`/api/ai/conversations/${id}/messages`))
       return true
     } catch {
       setError('No pudimos verificar la respuesta. Conservamos tu texto: revisá el historial antes de volver a enviarlo.')
