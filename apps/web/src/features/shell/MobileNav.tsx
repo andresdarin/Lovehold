@@ -94,11 +94,11 @@ export default function MobileNav({ onAddClick }: MobileNavProps) {
           <motion.div
             initial={false}
             animate={{
-              height: isCompact ? 38 : 58,
-              padding: isCompact ? '2px' : '4px',
+              height: isCompact ? 40 : 58,
+              padding: isCompact ? '3px' : '5px',
             }}
             transition={SYNC_SPRING}
-            className="pointer-events-auto flex-1 h-full bg-surface/90 border border-border/60 shadow-xl shadow-black/15 backdrop-blur-md rounded-full flex items-center justify-around overflow-hidden"
+            className="pointer-events-auto flex-1 h-full bg-surface/90 border border-border/60 shadow-xl shadow-black/15 backdrop-blur-md rounded-full flex items-center justify-between gap-1"
           >
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon
@@ -115,11 +115,11 @@ export default function MobileNav({ onAddClick }: MobileNavProps) {
                   className={`relative flex items-center justify-center h-full rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                     isActive
                       ? isCompact
-                        ? 'px-2 text-primary-foreground font-semibold'
-                        : 'px-3.5 sm:px-4 text-primary-foreground font-semibold'
+                        ? 'px-2.5 text-primary-foreground font-semibold'
+                        : 'px-4 text-primary-foreground font-semibold'
                       : isCompact
-                      ? 'px-1.5 text-muted-foreground hover:text-foreground'
-                      : 'px-2 text-muted-foreground hover:text-foreground'
+                      ? 'px-2 text-muted-foreground hover:text-foreground'
+                      : 'px-3 text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {isActive && (
