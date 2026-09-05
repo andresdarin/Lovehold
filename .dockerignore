@@ -1,0 +1,17 @@
+node_modules
+**/node_modules
+dist
+**/dist
+.git
+.gitignore
+apps/web
+.env
+.env.*
+!.env.example
+coverage
+**/coverage
+.next
+**/.next
+*.log
+Dockerfile*
+docker-compose*.yml
