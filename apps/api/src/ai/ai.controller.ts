@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, UseGuards, Logger } from '@nestjs/common'
 import { CurrentUser } from '../common/decorators/current-user.decorator'
 import { AuthGuard, type AuthenticatedUser } from '../common/guards/auth.guard'
 import { AgentOrchestrator } from './agent/agent.orchestrator'
@@ -10,6 +10,7 @@ import { AiPendingActionService } from './pending/ai-pending-action.service'
 @Controller('ai')
 @UseGuards(AuthGuard)
 export class AiController {
+  private readonly logger = new Logger(AiController.name)
   constructor(
     private readonly context: AiContextService,
     private readonly conversations: AiConversationService,
@@ -22,13 +23,21 @@ export class AiController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: ChatRequestDto,
   ): Promise<ChatResponseDto> {
-    const { profileId } = await this.context.resolveProfile(user.authUserId)
-    const conversation = await this.context.ensureConversation(profileId, dto.conversationId, dto.message)
-    return this.orchestrator.run({
-      profileId,
-      conversationId: conversation.id,
-      message: dto.message,
-    })
+    try {
+      const { profileId } = await this.context.resolveProfile(user.authUserId)
+      const conversation = await this.context.ensureConversation(profileId, dto.conversationId, dto.message)
+      return this.orchestrator.run({
+        profileId,
+        conversationId: conversation.id,
+        message: dto.message,
+      })
+    } catch (err) {
+      this.logger.error(
+        `POST /ai/chat failed authUserId=${user?.authUserId} conversationId=${dto?.conversationId}: ${err instanceof Error ? err.message : String(err)}`,
+        err instanceof Error ? err.stack : String(err),
+      )
+      throw err
+    }
   }
 
   @Get('conversations')
