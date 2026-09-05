@@ -4,6 +4,7 @@ import React from 'react'
 import { Clock3, Bell } from 'lucide-react'
 import { useProfile } from '@/features/auth/ProfileProvider'
 import BannerFeatherPattern from '@/components/ui/BannerFeatherPattern'
+import FinnicBrand from '@/components/ui/FinnicBrand'
 
 export default function MovementsHeader() {
   const { profile } = useProfile()
@@ -30,16 +31,7 @@ export default function MovementsHeader() {
       <div className="relative z-10 mx-auto flex max-w-7xl flex-col gap-4 sm:gap-5">
         {/* TopBar Integrada (Logo + Notificación + Avatar) */}
         <div className="flex items-center justify-between pb-1 select-none">
-          <div className="flex items-center gap-2.5">
-            <img
-              src="/brand/finnic-symbol-cream.png"
-              alt="Finnic logo"
-              className="h-6 w-6 object-contain drop-shadow-[0_2px_8px_rgba(192,213,214,0.3)]"
-            />
-            <span className="text-base font-bold tracking-tight text-[#F5F2EE]">
-              Finnic
-            </span>
-          </div>
+          <FinnicBrand variant="cream" size="md" />
 
           <div className="flex items-center gap-2">
             <button
