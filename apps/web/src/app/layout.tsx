@@ -5,8 +5,6 @@ import { SwDevCleanup } from './SwDevCleanup'
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   viewportFit: 'cover',
   themeColor: [
     // The installed shell is translucent on iOS. Keep the browser chrome in
