@@ -166,6 +166,41 @@
 
     /* Legacy compatibility mappings */
     --lh-navy: var(--foreground);
+
+    /* Typography Dark */
+    --foreground: #F3F1ED;
+    --text-primary: #F3F1ED;
+    --text-secondary: #B7C2C4;
+    --text-tertiary: #84979C;
+    --muted-foreground: #B7C2C4;
+    --muted: #103642;
+
+    /* Borders Dark */
+    --border: #214651;
+    --border-soft: #183A44;
+
+    /* Feedback Colors Dark */
+    --success: #35D39A;
+    --warning: #BCA47B;
+    --danger: #FF7272;
+    --info: #5C9AA7;
+
+    /* Categories Dark */
+    --cat-super: #48B89F;
+    --cat-super-bg: #0D332B;
+    --cat-hygiene: #8CB5BE;
+    --cat-hygiene-bg: #123038;
+    --cat-snacks: #BCA47B;
+    --cat-snacks-bg: #2E271D;
+    --cat-fuel: #CCA46D;
+    --cat-fuel-bg: #302315;
+    --cat-delivery: #72B1BE;
+    --cat-delivery-bg: #11323B;
+    --cat-home: #C0D5D6;
+    --cat-home-bg: #123845;
+
+    /* Legacy compatibility mappings */
+    --lh-navy: var(--foreground);
     --lh-primary: var(--primary);
     --lh-primary-rose: var(--primary-hover);
     --lh-border-light: var(--border);
@@ -175,6 +210,12 @@
   * {
     border-color: var(--border);
     transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE / Edge */
+  }
+
+  *::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
   }
 
   html,
@@ -186,10 +227,15 @@
     min-height: 100dvh;
     background-color: var(--background);
     color: var(--foreground);
+    touch-action: pan-x pan-y; /* Prevent double-tap zoom & pinch gestures across mobile browsers */
+    -webkit-text-size-adjust: 100%;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
-  html {
-    scrollbar-gutter: stable;
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
   }
 
   /*
