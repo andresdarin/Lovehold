@@ -16,7 +16,7 @@ const obligationsSchema = z.object({ window: z.enum(windows).default('restOfMont
 const simulateSchema = z.object({ amount: z.number().positive(), currency: z.enum(['UYU', 'USD']).default('UYU').optional(), description: z.string().optional() })
 const expenseSchema = z.object({
   amount: z.number().finite().positive().multipleOf(0.01), currency: z.enum(['UYU', 'USD']),
-  category: z.string().trim().min(1).max(80), title: z.string().trim().min(1).max(120), date: z.string().datetime().optional(),
+  category: z.string().trim().min(1).max(80), title: z.string().trim().min(1).max(120), date: z.string().optional(),
   notes: z.string().max(500).optional(), financeAccountId: z.string().min(1),
 }).strict()
 

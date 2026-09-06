@@ -336,15 +336,40 @@ export class ExpensesService {
 
     const isPersonal = dto.scope === 'personal'
     if (isPersonal) {
-      const expense = await this.createExpenseUseCase.execute({ profileId: profile.id, input: {
-        title: dto.title, merchant: dto.merchant, amount: dto.amount, currency: profile.baseCurrency ?? 'UYU', date: dto.date,
-        category: dto.category, notes: dto.notes, items: dto.items?.map((item) => ({ name: item.name, itemCategory: item.itemCategory, quantity: item.quantity, unitPrice: item.unitPrice, total: item.total, rawText: item.rawText })),
-      }, context: { source: 'web' } })
-      return { ...expense, scope: 'personal', xpEarned: this.calculateExpenseXp(dto) }
+      const expense = await this.createExpenseUseCase.execute({
+        profileId: profile.id,
+        input: {
+          title: dto.title,
+          merchant: dto.merchant,
+          amount: dto.amount,
+          currency: profile.baseCurrency ?? 'UYU',
+          date: dto.date,
+          category: dto.category,
+          notes: dto.notes,
+          items: dto.items?.map((item) => ({
+            name: item.name,
+            itemCategory: item.itemCategory,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            total: item.total,
+            rawText: item.rawText,
+          })),
+        },
+        context: { source: 'web' },
+      })
+
+      const earnedXp = this.calculateExpenseXp(dto)
+      if (earnedXp > 0) {
+        await this.prisma.profile.update({
+          where: { id: profile.id },
+          data: { gamificationXp: { increment: earnedXp } },
+        })
+      }
+
+      return { ...expense, scope: 'personal', xpEarned: earnedXp }
     }
-    const expense = isPersonal
-      ? await this.createPersonalExpense(profile.id, dto)
-      : await this.createHouseholdExpense(profile, dto)
+
+    const expense = await this.createHouseholdExpense(profile, dto)
 
     const earnedXp = this.calculateExpenseXp(dto)
 
