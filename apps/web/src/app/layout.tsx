@@ -24,7 +24,12 @@ export const metadata: Metadata = {
     title: 'Finnic',
   },
   icons: {
-    icon: '/icons/favicon.png',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icons/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icons/favicon.png', sizes: '128x128', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
     apple: [
       { url: '/icons/apple-icon-120x120.png', sizes: '120x120', type: 'image/png' },
       { url: '/icons/apple-icon-152x152.png', sizes: '152x152', type: 'image/png' },
