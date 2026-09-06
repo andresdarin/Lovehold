@@ -8,10 +8,16 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
   const configService = app.get(ConfigService)
-  const frontendUrl = configService.get<string>('FRONTEND_URL') ?? 'http://localhost:3000'
+  const frontendOrigins = (configService.get<string>('FRONTEND_URL') ?? 'http://localhost:3000')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+  const allowedOrigins = Array.from(
+    new Set([...frontendOrigins, 'https://lovehold-web.vercel.app']),
+  )
 
   app.enableCors({
-    origin: [frontendUrl],
+    origin: allowedOrigins,
     credentials: true,
   })
 
