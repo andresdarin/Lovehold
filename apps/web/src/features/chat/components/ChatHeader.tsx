@@ -28,12 +28,12 @@ export default function ChatHeader() {
         {/* Identidad de Finnic centrada */}
         <div className="text-center flex-1 px-3 flex flex-col items-center">
           <div className="flex items-center gap-1.5">
-            <h1 className="text-[13px] font-extrabold tracking-tight sm:text-base">
+            <h1 className="text-[var(--chat-header-name-font-size)] [font-weight:var(--chat-header-name-font-weight)] tracking-tight">
               Finnic
             </h1>
             <span className="flex h-2 w-2 rounded-full bg-[#C0D5D6] animate-pulse" />
           </div>
-          <p className="text-[10px] font-medium text-[#C0D5D6] sm:text-[11px]">
+          <p className="text-[var(--chat-header-status-font-size)] [font-weight:var(--chat-header-status-font-weight)] text-[#C0D5D6]">
             Tu copiloto financiero
           </p>
         </div>

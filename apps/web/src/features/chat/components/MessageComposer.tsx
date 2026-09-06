@@ -30,7 +30,7 @@ export default function MessageComposer({ onSend, disabled }: Props) {
       const scrollH = textarea.current.scrollHeight
       const multi = scrollH > 44 || text.includes('\n')
       setIsMultiLine(multi)
-      textarea.current.style.height = multi ? `${Math.min(scrollH, 120)}px` : '40px'
+      textarea.current.style.height = multi ? `${Math.min(scrollH, 120)}px` : 'var(--chat-input-height)'
       textarea.current.scrollTop = textarea.current.scrollHeight
     }
   }, [text])
@@ -63,7 +63,7 @@ export default function MessageComposer({ onSend, disabled }: Props) {
           Mensaje para Finnic
         </label>
         <div
-          className={`relative flex w-full bg-surface/95 p-1.5 shadow-[0_4px_20px_rgba(8,58,79,0.12)] ring-1 ring-black/[0.06] focus-within:ring-primary/40 dark:ring-white/[0.08] transition-[border-radius] duration-200 ${
+          className={`relative flex w-full bg-surface/95 p-[var(--chat-composer-shell-p)] shadow-[0_4px_20px_rgba(8,58,79,0.12)] ring-1 ring-black/[0.06] focus-within:ring-primary/40 dark:ring-white/[0.08] transition-[border-radius] duration-200 ${
             isMultiLine
               ? 'items-end rounded-[1.75rem]'
               : 'items-center rounded-full'
@@ -83,7 +83,7 @@ export default function MessageComposer({ onSend, disabled }: Props) {
             placeholder={placeholder}
             rows={1}
             disabled={disabled}
-            className={`min-w-0 max-h-[120px] flex-1 resize-none bg-transparent pl-4.5 sm:pl-5 pr-13 text-[13.5px] sm:text-[14px] leading-5 text-foreground outline-none placeholder:text-[13.5px] placeholder:leading-5 placeholder:text-muted-foreground disabled:opacity-60 ${
+            className={`min-w-0 flex-1 resize-none bg-transparent pl-4.5 sm:pl-5 pr-13 text-[var(--chat-input-font-size)] [font-weight:var(--chat-input-font-weight)] leading-[var(--chat-input-line-height)] text-foreground outline-none placeholder:text-[var(--chat-placeholder-font-size)] placeholder:leading-[var(--chat-input-line-height)] placeholder:text-muted-foreground disabled:opacity-60 ${
               isMultiLine ? 'py-2.5' : 'py-2.5'
             }`}
           />

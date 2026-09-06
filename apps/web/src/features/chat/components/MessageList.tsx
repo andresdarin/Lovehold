@@ -127,7 +127,7 @@ export default function MessageList({
               alt="Finnic"
               className="h-20 w-20 object-contain sm:h-28 sm:w-28"
             />
-            <h2 className="mt-3 text-xl font-semibold sm:text-2xl">Tus números, más claros.</h2>
+            <h2 className="type-section mt-3 text-xl sm:text-2xl">Tus números, más claros.</h2>
             <p className="mt-2 text-sm leading-6 text-muted-foreground sm:text-base sm:leading-relaxed">
               Revisemos tus movimientos y las opciones que tenés. Si querés registrar un gasto, te
               mostraré los datos antes de confirmarlo.
@@ -148,7 +148,7 @@ export default function MessageList({
           </div>
         </div>
       ) : (
-        <div role="log" aria-label="Conversación con Finnic" aria-live="polite" className="space-y-4">
+        <div role="log" aria-label="Conversación con Finnic" aria-live="polite" className="space-y-[var(--chat-message-gap)]">
           {validMessages.map((msg, index) => {
             const user = msg.role === 'USER'
             const meta = msg.metadata
@@ -189,19 +189,19 @@ export default function MessageList({
               <React.Fragment key={msg.id}>
                 {/* Separador de fecha estilo WhatsApp */}
                 {showDateSeparator && dateLabel && (
-                  <div className="flex justify-center my-3 select-none">
-                    <span className="rounded-full bg-surface-soft/85 border border-border/60 px-3.5 py-1 text-[11px] font-semibold text-muted-foreground shadow-2xs backdrop-blur-sm">
+                  <div className="flex justify-center my-[var(--chat-date-gap)] select-none">
+                    <span className="rounded-full bg-surface-soft/85 border border-border/60 px-3.5 py-1 text-[var(--chat-date-font-size)] [font-weight:var(--chat-date-font-weight)] leading-[var(--chat-meta-line-height)] text-muted-foreground shadow-2xs backdrop-blur-sm">
                       {dateLabel}
                     </span>
                   </div>
                 )}
 
                 <article
-                  className={user ? 'ml-auto max-w-[90%] sm:max-w-[85%]' : 'max-w-[94%] sm:max-w-[90%]'}
+                  className={user ? 'ml-auto max-w-[var(--chat-bubble-max-w)]' : 'max-w-[var(--chat-bubble-max-w)]'}
                 >
                   {/* Remitente: Vos a la derecha, Finnic a la izquierda */}
                   <p
-                    className={`mb-0.5 text-[10px] font-medium text-muted-foreground/75 sm:text-[10.5px] ${
+                    className={`mb-0.5 text-[var(--chat-sender-font-size)] font-medium text-muted-foreground/75 ${
                       user ? 'text-right mr-1' : 'text-left ml-1'
                     }`}
                   >
@@ -211,8 +211,8 @@ export default function MessageList({
                   <div
                     className={
                       user
-                        ? 'relative overflow-hidden rounded-2xl rounded-tr-xs bg-primary px-3 py-2 text-primary-foreground shadow-sm sm:px-3.5 sm:py-2.5'
-                        : 'rounded-2xl rounded-tl-xs bg-surface px-3 py-2.5 shadow-xs ring-1 ring-black/[0.04] dark:ring-white/[0.06] sm:px-3.5 sm:py-3'
+                        ? 'relative overflow-hidden rounded-2xl rounded-tr-xs bg-primary px-[var(--chat-bubble-px)] py-[var(--chat-bubble-py)] text-[var(--chat-message-font-size)] [font-weight:var(--chat-message-font-weight)] leading-[var(--chat-message-line-height)] text-primary-foreground shadow-sm'
+                        : 'rounded-2xl rounded-tl-xs bg-surface px-[var(--chat-bubble-px)] py-[var(--chat-bubble-py)] text-[var(--chat-message-font-size)] [font-weight:var(--chat-message-font-weight)] leading-[var(--chat-message-line-height)] shadow-xs ring-1 ring-black/[0.04] dark:ring-white/[0.06]'
                     }
                   >
                     {/* Fondo de plumas MUY sutil para el globo del usuario */}
@@ -236,7 +236,7 @@ export default function MessageList({
 
                     <div className="relative z-10">
                       {label && (
-                        <p className="mb-1.5 flex items-center gap-1.5 text-[10.5px] font-semibold text-muted-foreground">
+                        <p className="mb-1.5 flex items-center gap-1.5 text-[var(--chat-meta-font-size)] [font-weight:var(--chat-meta-font-weight)] leading-[var(--chat-meta-line-height)] text-muted-foreground">
                           <Icon size={13} />
                           <span>{label}</span>
                         </p>
@@ -244,22 +244,22 @@ export default function MessageList({
 
                       {user ? (
                         <div className="flex flex-col gap-0.5">
-                          <p className="whitespace-pre-wrap break-words text-[13px] sm:text-[13.5px] leading-[1.45] font-normal tracking-tight">
+                          <p className="whitespace-pre-wrap break-words hyphens-auto [font-weight:var(--chat-message-font-weight)] tracking-tight">
                             {msg.content}
                           </p>
                           {msg.createdAt && (
-                            <span className="self-end text-[9.5px] text-white/60 tabular-nums select-none mt-0.5">
+                            <span className="self-end text-[var(--chat-meta-font-size)] [font-weight:var(--chat-meta-font-weight)] leading-[var(--chat-meta-line-height)] text-white/60 tabular-nums select-none mt-0.5">
                               {formatMessageTime(msg.createdAt)}
                             </span>
                           )}
                         </div>
                       ) : (
                         <div className="flex flex-col gap-0.5">
-                          <div className="prose-finnic text-[13px] sm:text-[13.5px] leading-[1.45] font-normal tracking-tight">
+                          <div className="font-ui prose-finnic [font-weight:var(--chat-message-font-weight)] tracking-tight">
                             <FinnicMarkdown content={msg.content} />
                           </div>
                           {msg.createdAt && (
-                            <span className="self-end text-[9.5px] text-muted-foreground/60 tabular-nums select-none mt-0.5">
+                            <span className="self-end text-[var(--chat-meta-font-size)] [font-weight:var(--chat-meta-font-weight)] leading-[var(--chat-meta-line-height)] text-muted-foreground/60 tabular-nums select-none mt-0.5">
                               {formatMessageTime(msg.createdAt)}
                             </span>
                           )}
