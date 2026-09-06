@@ -38,13 +38,17 @@ const BANNER_FEATHERS: FeatherConfig[] = [
 export default function BannerFeatherPattern() {
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none"
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-[inherit] select-none"
+      style={{
+        WebkitMaskImage: '-webkit-radial-gradient(white, black)',
+        clipPath: 'inset(0 round inherit)',
+      }}
       aria-hidden="true"
     >
       {BANNER_FEATHERS.map((f, i) => (
         <div
           key={i}
-          className="absolute transform-gpu filter brightness-150 invert dark:brightness-125 dark:invert"
+          className="absolute filter brightness-150 invert dark:brightness-125 dark:invert"
           style={{
             top: f.top,
             left: f.left,
