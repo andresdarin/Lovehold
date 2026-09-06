@@ -56,6 +56,51 @@
     --muted-foreground: #607078;
     --muted: #E5E1DD;
 
+    /* Two-family system: editorial identity + functional interface. */
+    --font-display: var(--font-display-source), Georgia, serif;
+    --font-ui: var(--font-ui-source), sans-serif;
+
+    /* Chat type and density tokens */
+    --chat-message-font-size: 14.5px;
+    --chat-message-line-height: 20px;
+    --chat-message-font-weight: 400;
+    --chat-meta-font-size: 11px;
+    --chat-meta-line-height: 15px;
+    --chat-meta-font-weight: 400;
+    --chat-sender-font-size: 12.5px;
+    --chat-sender-font-weight: 500;
+    --chat-date-font-size: 12px;
+    --chat-date-font-weight: 500;
+    --chat-header-name-font-size: 16px;
+    --chat-header-name-font-weight: 500;
+    --chat-header-status-font-size: 12.5px;
+    --chat-header-status-font-weight: 400;
+    --chat-input-font-size: 15px;
+    --chat-input-line-height: 20px;
+    --chat-input-font-weight: 400;
+    --chat-placeholder-font-size: 15px;
+    --chat-bubble-px: 12px;
+    --chat-bubble-py: 7px;
+    --chat-message-gap: 8px;
+    --chat-date-gap: 10px;
+    --chat-bubble-max-w: 65%;
+    --chat-input-height: 40px;
+    --chat-input-max-height: 120px;
+    --chat-input-multiline-threshold: 44px;
+    --chat-composer-shell-p: 6px;
+
+    /* Future conversation-list tokens */
+    --chat-contact-font-size: 16px;
+    --chat-contact-line-height: 20px;
+    --chat-contact-font-weight: 500;
+    --chat-preview-font-size: 14px;
+    --chat-preview-line-height: 20px;
+    --chat-preview-font-weight: 400;
+    --chat-list-timestamp-font-size: 12px;
+    --chat-list-timestamp-line-height: 16px;
+    --chat-badge-font-size: 12px;
+    --chat-badge-font-weight: 500;
+
     /* Borders */
     --border: #DDD9D4;
     --border-soft: #EAE7E3;
@@ -207,6 +252,16 @@
     --lh-primary-rose: var(--primary-hover);
     --lh-border-light: var(--border);
     --lh-surface: var(--surface);
+  }
+
+  @media (max-width: 640px) {
+    :root {
+      --chat-message-font-size: 16px;
+      --chat-message-line-height: 21px;
+      --chat-input-font-size: 16px;
+      --chat-placeholder-font-size: 16px;
+      --chat-bubble-max-w: 85%;
+    }
   }
 
   * {
@@ -400,7 +455,44 @@
 }
 
 @theme {
-  --font-sans: "Elms Sans", sans-serif;
+  --font-display: var(--font-display-source), Georgia, serif;
+  --font-ui: var(--font-ui-source), sans-serif;
+  --font-sans: var(--font-ui-source), sans-serif;
+
+  --text-chat-message: var(--chat-message-font-size);
+  --font-weight-chat-message: var(--chat-message-font-weight);
+  --leading-chat-message: var(--chat-message-line-height);
+  --text-chat-meta: var(--chat-meta-font-size);
+  --font-weight-chat-meta: var(--chat-meta-font-weight);
+  --leading-chat-meta: var(--chat-meta-line-height);
+  --text-chat-sender: var(--chat-sender-font-size);
+  --font-weight-chat-sender: var(--chat-sender-font-weight);
+  --text-chat-date: var(--chat-date-font-size);
+  --font-weight-chat-date: var(--chat-date-font-weight);
+  --text-chat-header-name: var(--chat-header-name-font-size);
+  --font-weight-chat-header-name: var(--chat-header-name-font-weight);
+  --text-chat-header-status: var(--chat-header-status-font-size);
+  --font-weight-chat-header-status: var(--chat-header-status-font-weight);
+  --text-chat-input: var(--chat-input-font-size);
+  --font-weight-chat-input: var(--chat-input-font-weight);
+  --leading-chat-input: var(--chat-input-line-height);
+  --text-chat-placeholder: var(--chat-placeholder-font-size);
+  --text-chat-contact: var(--chat-contact-font-size);
+  --font-weight-chat-contact: var(--chat-contact-font-weight);
+  --leading-chat-contact: var(--chat-contact-line-height);
+  --text-chat-preview: var(--chat-preview-font-size);
+  --font-weight-chat-preview: var(--chat-preview-font-weight);
+  --leading-chat-preview: var(--chat-preview-line-height);
+  --text-chat-list-timestamp: var(--chat-list-timestamp-font-size);
+  --leading-chat-list-timestamp: var(--chat-list-timestamp-line-height);
+  --text-chat-badge: var(--chat-badge-font-size);
+  --font-weight-chat-badge: var(--chat-badge-font-weight);
+  --spacing-chat-bubble-px: var(--chat-bubble-px);
+  --spacing-chat-bubble-py: var(--chat-bubble-py);
+  --spacing-chat-message-gap: var(--chat-message-gap);
+  --spacing-chat-date-gap: var(--chat-date-gap);
+  --spacing-chat-input-height: var(--chat-input-height);
+  --spacing-chat-input-max-height: var(--chat-input-max-height);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -469,9 +561,23 @@
 /* Finnic chat markdown prose — conversational, not documentation */
 .prose-finnic {
   font-size: inherit;
-  line-height: 1.45;
+  line-height: inherit;
   color: inherit;
   word-break: break-word;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+/* Semantic type roles keep the serif intentional instead of decorative noise. */
+@layer base {
+  body { font-family: var(--font-ui); font-size: 0.9375rem; line-height: 1.45; }
+  .type-display { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.025em; line-height: 1.15; }
+  .type-section { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.015em; line-height: 1.2; }
+  .financial-number { font-family: var(--font-ui); font-variant-numeric: tabular-nums; font-weight: 600; letter-spacing: -0.02em; }
+  :where(.tabular-nums) { font-family: var(--font-ui); font-weight: 600; letter-spacing: -0.02em; }
+  :where(button, label, select) { font-family: var(--font-ui); }
+  :where(input, textarea, select) { font-family: var(--font-ui); font-size: 1rem; line-height: 1.4; }
+  @media (min-width: 640px) { :where(input, textarea, select) { font-size: 0.875rem; } }
 }
 
 .prose-finnic p {

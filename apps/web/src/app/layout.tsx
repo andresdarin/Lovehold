@@ -1,6 +1,23 @@
 import type { Metadata, Viewport } from 'next'
+import { DM_Sans, Libre_Baskerville } from 'next/font/google'
 import './globals.css'
 import { SwDevCleanup } from './SwDevCleanup'
+
+const displayFont = Libre_Baskerville({
+  subsets: ['latin'],
+  weight: 'variable',
+  style: ['normal', 'italic'],
+  variable: '--font-display-source',
+  display: 'swap',
+})
+
+const uiFont = DM_Sans({
+  subsets: ['latin'],
+  weight: 'variable',
+  style: ['normal', 'italic'],
+  variable: '--font-ui-source',
+  display: 'swap',
+})
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -45,14 +62,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang="es" className={`${displayFont.variable} ${uiFont.variable}`} suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Elms+Sans:ital,wght@0,100..900;1,100..900&display=swap"
-          rel="stylesheet"
-        />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -67,7 +78,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-[100dvh] bg-[#083A4F] text-foreground font-sans antialiased dark:bg-[#071D27]">
+      <body className="min-h-[100dvh] bg-[#083A4F] text-foreground font-ui antialiased dark:bg-[#071D27]">
         <SwDevCleanup />
         {children}
       </body>
