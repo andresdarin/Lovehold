@@ -23,6 +23,16 @@ RUN pnpm --filter @lovehold/shared build
 RUN pnpm --filter @lovehold/api exec prisma generate --schema prisma/schema.prisma
 RUN pnpm --filter @lovehold/api build
 RUN pnpm deploy --filter @lovehold/api --prod --legacy /app/deploy
+RUN set -e; \
+    PRISMA_SRC=$(find /app/node_modules/.pnpm -type d -path '*/node_modules/.prisma/client' -print -quit); \
+    if [ -z "$PRISMA_SRC" ]; then echo "ERROR: generated .prisma/client source not found under /app/node_modules/.pnpm" >&2; exit 1; fi; \
+    PRISMA_CLIENT_DIR=$(find /app/deploy/node_modules/.pnpm -type d -path '*/node_modules/@prisma/client' -print -quit); \
+    if [ -z "$PRISMA_CLIENT_DIR" ]; then echo "ERROR: @prisma/client destination not found under /app/deploy/node_modules/.pnpm" >&2; exit 1; fi; \
+    PRISMA_DST_DIR="$(dirname "$PRISMA_CLIENT_DIR")/.prisma/client"; \
+    mkdir -p "$PRISMA_DST_DIR"; \
+    cp -r "$PRISMA_SRC/." "$PRISMA_DST_DIR/"; \
+    echo "Prisma client copied: $PRISMA_SRC -> $PRISMA_DST_DIR"
+RUN node -e "require('/app/deploy/node_modules/@prisma/client'); console.log('Prisma Client runtime OK')"
 
 FROM node:22-slim AS runner
 ENV NODE_ENV=production
