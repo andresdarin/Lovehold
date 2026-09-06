@@ -16,6 +16,9 @@ FROM deps AS builder
 COPY tsconfig.base.json ./
 COPY apps/api ./apps/api
 COPY packages/shared ./packages/shared
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends openssl ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 RUN pnpm --filter @lovehold/shared build
 RUN pnpm --filter @lovehold/api exec prisma generate --schema prisma/schema.prisma
 RUN pnpm --filter @lovehold/api build
@@ -24,9 +27,9 @@ RUN pnpm deploy --filter @lovehold/api --prod --legacy /app/deploy
 FROM node:22-slim AS runner
 ENV NODE_ENV=production
 ENV PORT=3001
-ENV NODE_OPTIONS=--max-old-space-size=160
+ENV NODE_OPTIONS=--max-old-space-size=320
 WORKDIR /app
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /app/deploy/ ./
 COPY --from=builder /app/apps/api/dist ./dist
