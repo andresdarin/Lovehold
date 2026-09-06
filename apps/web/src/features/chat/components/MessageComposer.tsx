@@ -83,8 +83,8 @@ export default function MessageComposer({ onSend, disabled }: Props) {
             placeholder={placeholder}
             rows={1}
             disabled={disabled}
-            className={`min-w-0 max-h-[120px] flex-1 resize-none bg-transparent pl-5 pr-13 text-[15px] leading-6 text-foreground outline-none placeholder:text-[15px] placeholder:leading-6 placeholder:text-muted-foreground disabled:opacity-60 ${
-              isMultiLine ? 'py-2.5' : 'py-2'
+            className={`min-w-0 max-h-[120px] flex-1 resize-none bg-transparent pl-4.5 sm:pl-5 pr-13 text-[13.5px] sm:text-[14px] leading-5 text-foreground outline-none placeholder:text-[13.5px] placeholder:leading-5 placeholder:text-muted-foreground disabled:opacity-60 ${
+              isMultiLine ? 'py-2.5' : 'py-2.5'
             }`}
           />
 
