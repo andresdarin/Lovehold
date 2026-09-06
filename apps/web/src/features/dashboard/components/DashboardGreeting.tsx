@@ -29,12 +29,12 @@ export default function DashboardGreeting({ displayName, email }: DashboardGreet
       <span className="text-[11px] font-bold uppercase tracking-widest text-[#A58D66] dark:text-[#BCA47B]">
         {capitalizedMonth} {currentYear}
       </span>
-      <h1 className="mt-0.5 text-2xl font-bold tracking-tight text-[#F5F2EE] sm:text-3xl">
+      <h1 className="type-display mt-0.5 text-[clamp(1.75rem,5vw,2rem)] text-[#F5F2EE]">
         {greeting}, {firstName}
       </h1>
       {/* Separador sutil con desvanecimiento hacia la derecha */}
       <div
-        className="mt-3.5 sm:mt-4 h-px w-full bg-gradient-to-r from-white/20 via-white/10 to-transparent"
+        className="mt-2.5 sm:mt-3 h-px w-full bg-gradient-to-r from-white/20 via-white/10 to-transparent"
         aria-hidden="true"
       />
     </div>

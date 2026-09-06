@@ -20,15 +20,15 @@ export default function DashboardFinancialHero() {
   const [activeCurrency, setActiveCurrency] = useState<'UYU' | 'USD'>('UYU')
 
   return (
-    <div className="pt-2 text-[#F5F2EE] w-full min-w-0">
+    <div className="pt-0 text-[#F5F2EE] w-full min-w-0">
       {/* Header con título y link a saldo de cuentas */}
       <div className="flex items-center justify-between gap-2 min-w-0">
-        <h2 className="text-xs sm:text-sm font-medium text-[#C0D5D6] truncate min-w-0">
+        <h2 className="font-ui text-xs font-normal text-[#F5F2EE] truncate min-w-0">
           Tus movimientos del mes
         </h2>
         <Link
           href="/balance"
-          className="inline-flex min-h-8 items-center gap-1.5 text-xs text-[#C0D5D6] hover:text-[#F5F2EE] transition-colors shrink-0 underline-offset-4 hover:underline"
+          className="inline-flex py-0.5 items-center gap-1.5 text-xs font-normal text-[#C0D5D6] hover:text-[#F5F2EE] transition-colors shrink-0 underline-offset-4 hover:underline"
         >
           <span>Ver cuentas</span>
           <ArrowRight size={14} className="shrink-0" />
@@ -38,7 +38,7 @@ export default function DashboardFinancialHero() {
       {loading || error ? (
         <DashboardDataState inverted />
       ) : (
-        <div className="mt-3 flex flex-col gap-3 min-w-0">
+        <div className="mt-1.5 sm:mt-2 flex flex-col gap-2.5 sm:gap-3 min-w-0">
           {/* Selector de moneda en mobile / vista combinada en desktop */}
           <div className="flex sm:hidden items-center justify-between gap-2 min-w-0">
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#A58D66]">
@@ -86,7 +86,7 @@ export default function DashboardFinancialHero() {
                   </div>
 
                   <p
-                    className="mt-1.5 text-2xl sm:text-3xl font-bold tracking-tight text-[#F5F2EE] tabular-nums truncate min-w-0"
+                    className="financial-number mt-1.5 text-2xl sm:text-3xl text-[#F5F2EE] truncate min-w-0"
                     title={money(summary.expenseByCurrency[currency], currency)}
                   >
                     {money(summary.expenseByCurrency[currency], currency)}

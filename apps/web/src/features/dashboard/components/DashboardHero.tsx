@@ -29,7 +29,7 @@ export default function DashboardHero({ profile }: DashboardHeroProps) {
       <div className="pointer-events-none absolute -top-24 left-1/4 h-72 w-72 rounded-full bg-[#407E8C]/15 blur-3xl" />
       <div className="pointer-events-none absolute top-1/2 -right-20 h-64 w-64 rounded-full bg-[#A58D66]/10 blur-3xl" />
 
-      <div className="relative z-10 mx-auto max-w-7xl flex flex-col gap-4 sm:gap-5">
+      <div className="relative z-10 mx-auto max-w-7xl flex flex-col gap-3 sm:gap-4">
         {/* 1. Header superior (Logo + Campana + Avatar) */}
         <DashboardTopBar profile={profile} />
 
