@@ -55,7 +55,7 @@ export function AuthBrand({
       )}
 
       {title && (
-        <h1 className="mt-1.5 text-lg font-bold tracking-tight text-navy sm:text-xl dark:text-foreground">
+        <h1 className="type-display mt-1.5 text-xl text-navy dark:text-foreground">
           {title}
         </h1>
       )}

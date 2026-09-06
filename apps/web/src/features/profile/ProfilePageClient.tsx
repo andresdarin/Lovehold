@@ -28,7 +28,7 @@ export default function ProfilePageClient() {
   return (
     <div className="space-y-6">
       <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-extrabold tracking-tight text-foreground">Perfil</h1>
+        <h1 className="type-display text-2xl text-foreground">Perfil</h1>
         <p className="text-sm text-muted-foreground">Tu identidad y progreso financiero.</p>
       </header>
 

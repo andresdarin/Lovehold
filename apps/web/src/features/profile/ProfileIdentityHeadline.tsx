@@ -25,7 +25,7 @@ export function ProfileIdentityHeadline({
   return (
     <div className="flex flex-col gap-3">
       {/* Name — clear and intentional */}
-      <h1 className="text-3xl font-extrabold tracking-tight text-foreground leading-tight sm:text-4xl">
+      <h1 className="type-display text-3xl leading-tight text-foreground sm:text-4xl">
         {displayName ?? (
           <span className="text-muted-foreground/50 italic font-bold">Sin nombre visible</span>
         )}
