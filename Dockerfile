@@ -28,9 +28,10 @@ RUN set -e; \
     if [ -z "$PRISMA_SRC" ]; then echo "ERROR: generated .prisma/client source not found under /app/node_modules/.pnpm" >&2; exit 1; fi; \
     PRISMA_CLIENT_DIR=$(find /app/deploy/node_modules/.pnpm -type d -path '*/node_modules/@prisma/client' -print -quit); \
     if [ -z "$PRISMA_CLIENT_DIR" ]; then echo "ERROR: @prisma/client destination not found under /app/deploy/node_modules/.pnpm" >&2; exit 1; fi; \
-    PRISMA_DST_DIR="$(dirname "$PRISMA_CLIENT_DIR")/.prisma/client"; \
+    PRISMA_DST_DIR="$(dirname "$(dirname "$PRISMA_CLIENT_DIR")")/.prisma/client"; \
     mkdir -p "$PRISMA_DST_DIR"; \
     cp -r "$PRISMA_SRC/." "$PRISMA_DST_DIR/"; \
+    if [ ! -f "$PRISMA_DST_DIR/default.js" ]; then echo "ERROR: copy verification failed, default.js missing in $PRISMA_DST_DIR" >&2; exit 1; fi; \
     echo "Prisma client copied: $PRISMA_SRC -> $PRISMA_DST_DIR"
 RUN node -e "require('/app/deploy/node_modules/@prisma/client'); console.log('Prisma Client runtime OK')"
 
