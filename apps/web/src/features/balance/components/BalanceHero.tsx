@@ -103,7 +103,7 @@ export default function BalanceHero({ accounts, snapshot }: BalanceProps) {
             {estimatedAmount != null ? 'Patrimonio estimado' : 'Patrimonio disponible'}
           </p>
           <div className="mt-1 flex flex-wrap items-baseline gap-x-2">
-            <strong className="text-3xl font-extrabold tracking-tight text-[#F5F2EE] sm:text-5xl tabular-nums">
+            <strong className="financial-number text-3xl sm:text-5xl text-[#F5F2EE]">
               {estimatedAmount != null
                 ? money(estimatedAmount, (estimated?.currency === 'USD' ? 'USD' : 'UYU'))
                 : available.UYU

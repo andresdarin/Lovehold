@@ -11,7 +11,7 @@ export default function FuelPage() {
           <Fuel className="h-5 w-5 text-gold" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-foreground">Combustible</h1>
+          <h1 className="type-display text-2xl text-foreground">Combustible</h1>
           <p className="text-sm text-muted-foreground">Registro de cargas de nafta y kilómetros</p>
         </div>
       </header>
@@ -21,7 +21,7 @@ export default function FuelPage() {
           <Search className="h-6 w-6 text-muted-foreground animate-pulse" />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-foreground">Próximamente</h3>
+          <h3 className="type-section text-lg text-foreground">Próximamente</h3>
           <p className="mt-1 text-sm text-muted-foreground max-w-sm">
             Control de consumos de combustible de sus vehículos y estadísticas de gastos por viaje.
           </p>

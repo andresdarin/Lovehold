@@ -53,7 +53,7 @@ export default function GoalsPage() {
           <Target className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-foreground">Metas</h1>
+          <h1 className="type-display text-2xl text-foreground">Metas</h1>
           <p className="text-sm text-muted-foreground">Tu progreso financiero y hábitos de registro.</p>
         </div>
       </header>

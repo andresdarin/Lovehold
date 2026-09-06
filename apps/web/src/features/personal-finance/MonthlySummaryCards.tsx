@@ -4,7 +4,7 @@ export default function MonthlySummaryCards({ summary, currency = 'UYU' }: { sum
   const rows = [['Gastos fijos', summary.fixed], ['Gastos variables', summary.variable], ['Supermercado', summary.supermarket]] as const
   return <section className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
     <div className="flex flex-wrap items-baseline justify-between gap-3">
-      <h2 className="text-base font-semibold">Resumen de egresos · {currency}</h2>
+      <h2 className="type-section text-lg">Resumen de egresos · {currency}</h2>
       <p className="text-2xl font-semibold tabular-nums">{formatCurrency(summary.totalExpense, currency)}</p>
     </div>
     <dl className="mt-5 divide-y divide-border">{rows.map(([label, amount]) => <div key={label} className="flex items-center justify-between gap-4 py-3 text-sm">

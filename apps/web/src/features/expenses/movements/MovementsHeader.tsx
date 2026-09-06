@@ -77,7 +77,7 @@ export default function MovementsHeader() {
               Historial de movimientos
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#F5F2EE]">
+          <h1 className="type-display text-2xl sm:text-3xl text-[#F5F2EE]">
             Movimientos
           </h1>
           <p className="text-xs text-[#C0D5D6]/70">

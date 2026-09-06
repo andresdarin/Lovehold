@@ -48,7 +48,7 @@ export default function ReceiptPasteForm({ onSubmit, onCancel, submitting }: Rec
           value={rawText}
           onChange={(e) => setRawText(e.target.value)}
           rows={12}
-          className="w-full rounded-2xl border border-border bg-surface p-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/45 font-mono"
+          className="w-full rounded-2xl border border-border bg-surface p-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/45 font-ui"
           placeholder="Pegá el contenido del ticket de supermercado..."
         />
         <p className="mt-1 text-xs text-muted-foreground">

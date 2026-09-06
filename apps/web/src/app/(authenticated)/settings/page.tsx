@@ -11,7 +11,7 @@ export default function SettingsPage() {
           <Settings className="h-5 w-5 text-foreground/80" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-foreground">Ajustes</h1>
+          <h1 className="type-display text-2xl text-foreground">Ajustes</h1>
           <p className="text-sm text-muted-foreground">Configuración del perfil y del hogar compartido</p>
         </div>
       </header>
@@ -21,7 +21,7 @@ export default function SettingsPage() {
           <Search className="h-6 w-6 text-muted-foreground animate-pulse" />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-foreground">Próximamente</h3>
+          <h3 className="type-section text-lg text-foreground">Próximamente</h3>
           <p className="mt-1 text-sm text-muted-foreground max-w-sm">
             Vas a poder editar tus datos personales, cambiar los colores de tu perfil y desvincular o invitar miembros.
           </p>

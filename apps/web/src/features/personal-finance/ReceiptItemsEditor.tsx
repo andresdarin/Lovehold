@@ -53,7 +53,7 @@ export default function ReceiptItemsEditor({ items, onChange }: ReceiptItemsEdit
             value={rawText}
             onChange={(e) => setRawText(e.target.value)}
             rows={8}
-            className="w-full rounded-xl border border-border bg-surface-soft p-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/45 font-mono"
+            className="w-full rounded-xl border border-border bg-surface-soft p-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/45 font-ui"
             placeholder="Pegá el contenido del ticket de supermercado..."
           />
           <p className="mt-1 text-xs text-muted-foreground">
@@ -134,4 +134,3 @@ export default function ReceiptItemsEditor({ items, onChange }: ReceiptItemsEdit
     </div>
   )
 }
-

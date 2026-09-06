@@ -88,7 +88,7 @@ export default function ExpenseFormFields({
               value={form.merchant}
               onChange={(e) => onUpdate('merchant', e.target.value)}
               placeholder="Ej: Disco, Devoto, Ancap..."
-              className="neu-inset h-11 w-full rounded-2xl border border-border/50 bg-surface-soft/60 px-3.5 text-xs sm:text-sm font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-surface focus:outline-none transition-all"
+              className="neu-inset h-11 w-full rounded-2xl border border-border/50 bg-surface-soft/60 px-3.5 text-base sm:text-sm font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-surface focus:outline-none transition-all"
             />
           </label>
 
@@ -103,7 +103,7 @@ export default function ExpenseFormFields({
               onChange={(e) => onUpdate('title', e.target.value)}
               placeholder="Ej: Compra del mes"
               required
-              className="neu-inset h-11 w-full rounded-2xl border border-border/50 bg-surface-soft/60 px-3.5 text-xs sm:text-sm font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-surface focus:outline-none transition-all"
+              className="neu-inset h-11 w-full rounded-2xl border border-border/50 bg-surface-soft/60 px-3.5 text-base sm:text-sm font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-surface focus:outline-none transition-all"
             />
           </label>
         </div>
@@ -121,7 +121,7 @@ export default function ExpenseFormFields({
               onChange={(e) => onUpdate('category', e.target.value)}
               placeholder="Ej: Supermercado, Salidas..."
               required
-              className="neu-inset h-11 w-full rounded-2xl border border-border/50 bg-surface-soft/60 px-3.5 text-xs sm:text-sm font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-surface focus:outline-none transition-all"
+              className="neu-inset h-11 w-full rounded-2xl border border-border/50 bg-surface-soft/60 px-3.5 text-base sm:text-sm font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-surface focus:outline-none transition-all"
             />
           </label>
 
@@ -135,7 +135,7 @@ export default function ExpenseFormFields({
               value={form.paymentMethod}
               onChange={(e) => onUpdate('paymentMethod', e.target.value)}
               placeholder="Ej: Débito Itaú, Efectivo, Crédito..."
-              className="neu-inset h-11 w-full rounded-2xl border border-border/50 bg-surface-soft/60 px-3.5 text-xs sm:text-sm font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-surface focus:outline-none transition-all"
+              className="neu-inset h-11 w-full rounded-2xl border border-border/50 bg-surface-soft/60 px-3.5 text-base sm:text-sm font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-surface focus:outline-none transition-all"
             />
           </label>
         </div>
@@ -147,7 +147,7 @@ export default function ExpenseFormFields({
             Fecha del gasto
           </span>
           <CustomDatePicker
-            className="neu-inset w-full text-xs sm:text-sm font-medium h-11 rounded-2xl border border-border/50 bg-surface-soft/60 px-3.5 text-foreground focus:border-primary focus:bg-surface focus:outline-none transition-all"
+            className="neu-inset w-full text-base sm:text-sm font-medium h-11 rounded-2xl border border-border/50 bg-surface-soft/60 px-3.5 text-foreground focus:border-primary focus:bg-surface focus:outline-none transition-all"
             value={form.date}
             onChange={(v) => onUpdate('date', v)}
             required
@@ -162,7 +162,7 @@ export default function ExpenseFormFields({
             onChange={(e) => onUpdate('notes', e.target.value)}
             placeholder="Detalles útiles para recordar esta compra..."
             rows={2}
-            className="neu-inset min-h-[64px] w-full resize-none rounded-2xl border border-border/50 bg-surface-soft/60 px-3.5 py-2.5 text-xs sm:text-sm font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-surface focus:outline-none transition-all"
+            className="neu-inset min-h-[64px] w-full resize-none rounded-2xl border border-border/50 bg-surface-soft/60 px-3.5 py-2.5 text-base sm:text-sm font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-surface focus:outline-none transition-all"
           />
         </label>
       </div>
