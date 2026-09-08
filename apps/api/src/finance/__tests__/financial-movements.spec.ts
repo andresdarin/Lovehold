@@ -297,6 +297,27 @@ describe('Finnic Financial Movements & Account Invariants', () => {
     expect(summary.total).toBe(0)
   })
 
+  it('allows received income without an account and leaves the movement unlinked', async () => {
+    await registerIncomeUseCase.execute({
+      profileId: 'profile-1',
+      input: {
+        title: 'Ingreso en efectivo',
+        amount: '1200.00',
+        currency: 'UYU',
+        dueOn: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+      },
+    })
+
+    expect(cashFlowsStore).toHaveLength(1)
+    expect(cashFlowsStore[0].accountId).toBeUndefined()
+
+    const incomeRecord = expensesStore.find((expense) => expense.movementType === 'INCOME')
+    expect(incomeRecord).toBeDefined()
+    expect(incomeRecord.financeAccountId).toBeUndefined()
+    expect(Number(incomeRecord.amount)).toBe(1200)
+    expect(mockPrisma.financeAccount.update).not.toHaveBeenCalled()
+  })
+
   it('Scenario 6 (INTERNAL TRANSFER): Transfer of $1000 from Bank $8800 to Cash $0 results in Bank $7800, Cash $1000, with 0 expense impact', async () => {
     // Arrange: Bank $8800, Cash $0
     accountsStore.set('bank-1', {

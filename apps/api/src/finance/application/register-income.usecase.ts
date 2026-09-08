@@ -33,11 +33,9 @@ export class RegisterIncomeUseCase {
           ? await tx.financeAccount.findFirst({
               where: { id: input.accountId, profileId: command.profileId, currency: input.currency },
             })
-          : await tx.financeAccount.findFirst({
-              where: { profileId: command.profileId, currency: input.currency, isActive: true },
-            })
+          : null
 
-        if (isReceived && !account) throw new NotFoundException('Finance account not found')
+        if (isReceived && input.accountId && !account) throw new NotFoundException('Finance account not found')
 
         const flow = await tx.scheduledCashFlow.create({
           data: {
@@ -56,12 +54,14 @@ export class RegisterIncomeUseCase {
           },
         })
 
-        if (isReceived && account) {
-          // Increment liquid funds in target account
-          await tx.financeAccount.update({
-            where: { id: account.id },
-            data: { balance: { increment: input.amount } },
-          })
+        if (isReceived) {
+          if (account) {
+            // Increment liquid funds in target account
+            await tx.financeAccount.update({
+              where: { id: account.id },
+              data: { balance: { increment: input.amount } },
+            })
+          }
 
           // Register the financial movement
           await tx.personalExpense.create({
@@ -76,7 +76,7 @@ export class RegisterIncomeUseCase {
               inputMethod: 'MANUAL',
               category: input.category?.trim() || 'INGRESOS',
               monthKey,
-              financeAccountId: account.id,
+              financeAccountId: account?.id,
               scheduledCashFlowId: flow.id,
             },
           })

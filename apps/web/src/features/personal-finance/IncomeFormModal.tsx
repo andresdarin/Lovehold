@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { X, ArrowUp, Loader2 } from 'lucide-react'
 import CustomDatePicker from '@/components/ui/CustomDatePicker'
 import CustomSelect from '@/components/ui/CustomSelect'
 import { CURRENCY_OPTIONS, INCOME_CATEGORIES, inputCls } from './constants'
-import { useFinanceAccounts, useRegisterIncome } from './hooks'
+import { useRegisterIncome } from './hooks'
 
 interface IncomeFormModalProps {
   isOpen: boolean
@@ -14,41 +14,20 @@ interface IncomeFormModalProps {
 }
 
 export default function IncomeFormModal({ isOpen, onClose, onSuccess }: IncomeFormModalProps) {
-  const { accounts } = useFinanceAccounts()
   const { income, submitting } = useRegisterIncome()
 
   const [title, setTitle] = useState('')
   const [amount, setAmount] = useState('')
   const [currency, setCurrency] = useState<'UYU' | 'USD'>('UYU')
   const [category, setCategory] = useState(INCOME_CATEGORIES[0]?.value ?? 'sueldo')
-  const [accountId, setAccountId] = useState('')
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
-  // Income deposits must use an account in the income's currency.
-  const liquidAccounts = accounts.filter((a) => a.type !== 'CREDIT' && a.currency === currency)
-
-  useEffect(() => {
-    const selectedAccountIsCompatible = liquidAccounts.some((account) => account.id === accountId)
-    if (!selectedAccountIsCompatible) {
-      setAccountId(liquidAccounts[0]?.id ?? '')
-    }
-  }, [liquidAccounts, accountId])
-
   if (!isOpen) return null
-
-  const accountOptions = liquidAccounts.map((a) => ({
-    value: a.id,
-    label: `${a.name} (${a.type === 'CASH' ? 'Efectivo' : 'Banco'})`,
-  }))
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setErrorMsg(null)
-    if (!accountId || !liquidAccounts.some((account) => account.id === accountId)) {
-      setErrorMsg(`No hay una cuenta líquida disponible en ${currency}. Elegí otra moneda o creá una cuenta compatible.`)
-      return
-    }
     const numAmount = parseFloat(amount)
     if (isNaN(numAmount) || numAmount <= 0) {
       setErrorMsg('Ingresá un monto válido mayor a 0.')
@@ -61,7 +40,6 @@ export default function IncomeFormModal({ isOpen, onClose, onSuccess }: IncomeFo
         amount: numAmount,
         currency,
         dueOn: new Date(date).toISOString(),
-        accountId: accountId || undefined,
         category,
       })
       onSuccess?.()
@@ -83,7 +61,7 @@ export default function IncomeFormModal({ isOpen, onClose, onSuccess }: IncomeFo
             </div>
             <div>
               <h2 className="text-base font-bold text-foreground">Registrar Ingreso</h2>
-              <p className="text-xs text-muted-foreground">Añade fondos a tu cuenta</p>
+              <p className="text-xs text-muted-foreground">Registra el ingreso en tu seguimiento financiero</p>
             </div>
           </div>
           <button
@@ -138,25 +116,6 @@ export default function IncomeFormModal({ isOpen, onClose, onSuccess }: IncomeFo
             </div>
           </div>
 
-          <div>
-            <label className="mb-1 block text-xs font-semibold text-foreground">
-              Cuenta de destino
-            </label>
-            <CustomSelect
-              className="w-full"
-              value={accountId}
-              options={accountOptions}
-              onChange={setAccountId}
-              placeholder="Seleccionar cuenta"
-            />
-          </div>
-
-          {liquidAccounts.length === 0 && (
-            <p className="-mt-2 text-xs text-amber-500">
-              No tenés una cuenta líquida en {currency} para recibir este ingreso.
-            </p>
-          )}
-
           <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
             <div>
               <label className="mb-1 block text-xs font-semibold text-foreground">Categoría</label>
@@ -177,7 +136,7 @@ export default function IncomeFormModal({ isOpen, onClose, onSuccess }: IncomeFo
           <div className="flex gap-3 pt-3">
             <button
               type="submit"
-              disabled={submitting || liquidAccounts.length === 0 || !accountId}
+              disabled={submitting}
               className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-xs transition hover:bg-emerald-700 disabled:opacity-50"
             >
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
