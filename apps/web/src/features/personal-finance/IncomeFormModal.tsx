@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { X, ArrowUp, Loader2 } from 'lucide-react'
 import CustomDatePicker from '@/components/ui/CustomDatePicker'
 import CustomSelect from '@/components/ui/CustomSelect'
+import { CURRENCY_OPTIONS, INCOME_CATEGORIES, inputCls } from './constants'
 import { useFinanceAccounts, useRegisterIncome } from './hooks'
 
 interface IncomeFormModalProps {
@@ -11,22 +12,6 @@ interface IncomeFormModalProps {
   onClose: () => void
   onSuccess?: () => void
 }
-
-const inputCls =
-  'neu-inset h-11 w-full rounded-xl border border-border bg-surface px-3.5 text-sm font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors'
-
-const CURRENCY_OPTIONS = [
-  { value: 'UYU', label: 'UYU ($)' },
-  { value: 'USD', label: 'USD (U$S)' },
-]
-
-const INCOME_CATEGORIES = [
-  { value: 'sueldo', label: 'Sueldo / Salario' },
-  { value: 'honorarios', label: 'Honorarios / Freelance' },
-  { value: 'venta', label: 'Venta de artículo' },
-  { value: 'reembolso', label: 'Reembolso / Devolución' },
-  { value: 'otros_ingresos', label: 'Otros ingresos' },
-]
 
 export default function IncomeFormModal({ isOpen, onClose, onSuccess }: IncomeFormModalProps) {
   const { accounts } = useFinanceAccounts()
@@ -40,12 +25,13 @@ export default function IncomeFormModal({ isOpen, onClose, onSuccess }: IncomeFo
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
-  // Filter liquid accounts (CASH or BANK) for income deposits
-  const liquidAccounts = accounts.filter((a) => a.type !== 'CREDIT')
+  // Income deposits must use an account in the income's currency.
+  const liquidAccounts = accounts.filter((a) => a.type !== 'CREDIT' && a.currency === currency)
 
   useEffect(() => {
-    if (liquidAccounts.length > 0 && !accountId && liquidAccounts[0]?.id) {
-      setAccountId(liquidAccounts[0].id)
+    const selectedAccountIsCompatible = liquidAccounts.some((account) => account.id === accountId)
+    if (!selectedAccountIsCompatible) {
+      setAccountId(liquidAccounts[0]?.id ?? '')
     }
   }, [liquidAccounts, accountId])
 
@@ -59,6 +45,10 @@ export default function IncomeFormModal({ isOpen, onClose, onSuccess }: IncomeFo
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setErrorMsg(null)
+    if (!accountId || !liquidAccounts.some((account) => account.id === accountId)) {
+      setErrorMsg(`No hay una cuenta líquida disponible en ${currency}. Elegí otra moneda o creá una cuenta compatible.`)
+      return
+    }
     const numAmount = parseFloat(amount)
     if (isNaN(numAmount) || numAmount <= 0) {
       setErrorMsg('Ingresá un monto válido mayor a 0.')
@@ -82,10 +72,10 @@ export default function IncomeFormModal({ isOpen, onClose, onSuccess }: IncomeFo
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-3 sm:items-center sm:p-4">
       <div className="fixed inset-0 bg-black/60 backdrop-blur-xs" onClick={onClose} />
 
-      <div className="neu-raised relative w-full max-w-md rounded-3xl border border-border/50 bg-surface p-6 z-10 animate-in fade-in zoom-in-95 duration-200">
+      <div className="neu-raised relative z-10 my-auto max-h-[calc(100dvh-1.5rem)] w-full max-w-md overflow-y-auto rounded-3xl border border-border/50 bg-surface p-4 animate-in fade-in zoom-in-95 duration-200 sm:max-h-[calc(100dvh-2rem)] sm:p-6">
         <div className="flex items-center justify-between pb-4 border-b border-border/60">
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
@@ -122,13 +112,14 @@ export default function IncomeFormModal({ isOpen, onClose, onSuccess }: IncomeFo
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-2">
+          <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-[minmax(0,1fr)_7rem] sm:grid-cols-3">
+            <div className="min-w-0 sm:col-span-2">
               <label className="mb-1 block text-xs font-semibold text-foreground">Monto</label>
               <input
                 type="number"
                 step="0.01"
                 min="0.01"
+                inputMode="decimal"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 required
@@ -136,7 +127,7 @@ export default function IncomeFormModal({ isOpen, onClose, onSuccess }: IncomeFo
                 placeholder="0.00"
               />
             </div>
-            <div>
+            <div className="min-w-0">
               <label className="mb-1 block text-xs font-semibold text-foreground">Moneda</label>
               <CustomSelect
                 className="w-full"
@@ -160,7 +151,13 @@ export default function IncomeFormModal({ isOpen, onClose, onSuccess }: IncomeFo
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          {liquidAccounts.length === 0 && (
+            <p className="-mt-2 text-xs text-amber-500">
+              No tenés una cuenta líquida en {currency} para recibir este ingreso.
+            </p>
+          )}
+
+          <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
             <div>
               <label className="mb-1 block text-xs font-semibold text-foreground">Categoría</label>
               <CustomSelect
@@ -180,7 +177,7 @@ export default function IncomeFormModal({ isOpen, onClose, onSuccess }: IncomeFo
           <div className="flex gap-3 pt-3">
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || liquidAccounts.length === 0 || !accountId}
               className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-xs transition hover:bg-emerald-700 disabled:opacity-50"
             >
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}

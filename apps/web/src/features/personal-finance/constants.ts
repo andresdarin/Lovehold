@@ -4,6 +4,22 @@ export const EXPENSE_TYPES = [
   { value: 'supermarket', label: 'Supermercado', description: 'Compra con detalle por ítem' },
 ] as const
 
+export const inputCls =
+  'neu-inset h-11 w-full rounded-xl border border-border bg-surface px-3.5 text-base font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors sm:text-sm'
+
+export const CURRENCY_OPTIONS = [
+  { value: 'UYU', label: 'UYU ($)' },
+  { value: 'USD', label: 'USD (U$S)' },
+]
+
+export const INCOME_CATEGORIES = [
+  { value: 'sueldo', label: 'Sueldo / Salario' },
+  { value: 'honorarios', label: 'Honorarios / Freelance' },
+  { value: 'venta', label: 'Venta de artículo' },
+  { value: 'reembolso', label: 'Reembolso / Devolución' },
+  { value: 'otros_ingresos', label: 'Otros ingresos' },
+]
+
 export const FIXED_CATEGORIES = [
   { value: 'alquiler', label: 'Alquiler' },
   { value: 'ute', label: 'UTE' },

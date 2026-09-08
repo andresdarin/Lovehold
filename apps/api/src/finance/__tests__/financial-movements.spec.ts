@@ -634,4 +634,49 @@ describe('Finnic Financial Movements & Account Invariants', () => {
     expect(record.notes).toContain('1 USD = 39.00 UYU')
     expect(Number(accountsStore.get('uyu-cash').balance)).toBe(11700)
   })
+
+  it('manual UYU → USD quote derives destination amount from the supplied rate', async () => {
+    accountsStore.set('uyu', { id: 'uyu', profileId: 'profile-1', name: 'UYU', type: 'BANK', currency: 'UYU', balance: '1000.00' })
+    accountsStore.set('usd', { id: 'usd', profileId: 'profile-1', name: 'USD', type: 'BANK', currency: 'USD', balance: '0.00' })
+
+    const result = await createTransferUseCase.execute({ profileId: 'profile-1', input: {
+      sourceAccountId: 'uyu', destinationAccountId: 'usd', amount: '1000.00', currency: 'UYU',
+      exchangeRate: '0.025', date: new Date().toISOString(),
+    } })
+
+    expect(result.destinationAmount).toBe(25)
+    expect(Number(accountsStore.get('usd').balance)).toBe(25)
+  })
+
+  it('manual USD → UYU quote derives destination amount from the supplied rate', async () => {
+    accountsStore.set('usd', { id: 'usd', profileId: 'profile-1', name: 'USD', type: 'BANK', currency: 'USD', balance: '100.00' })
+    accountsStore.set('uyu', { id: 'uyu', profileId: 'profile-1', name: 'UYU', type: 'BANK', currency: 'UYU', balance: '0.00' })
+
+    const result = await createTransferUseCase.execute({ profileId: 'profile-1', input: {
+      sourceAccountId: 'usd', destinationAccountId: 'uyu', amount: '100.00', currency: 'USD',
+      exchangeRate: '39.50', date: new Date().toISOString(),
+    } })
+
+    expect(result.destinationAmount).toBe(3950)
+    expect(Number(accountsStore.get('uyu').balance)).toBe(3950)
+  })
+
+  it('rejects conflicting currencies, an inconsistent manual quote, and insufficient funds before updating balances', async () => {
+    accountsStore.set('usd', { id: 'usd', profileId: 'profile-1', name: 'USD', type: 'BANK', currency: 'USD', balance: '100.00' })
+    accountsStore.set('uyu', { id: 'uyu', profileId: 'profile-1', name: 'UYU', type: 'BANK', currency: 'UYU', balance: '0.00' })
+
+    await expect(createTransferUseCase.execute({ profileId: 'profile-1', input: {
+      sourceAccountId: 'usd', destinationAccountId: 'uyu', amount: '10', currency: 'UYU',
+      destinationAmount: '395', exchangeRate: '39.50', date: new Date().toISOString(),
+    } })).rejects.toThrow('currency')
+    await expect(createTransferUseCase.execute({ profileId: 'profile-1', input: {
+      sourceAccountId: 'usd', destinationAccountId: 'uyu', amount: '10', currency: 'USD',
+      destinationAmount: '300', exchangeRate: '39.50', date: new Date().toISOString(),
+    } })).rejects.toThrow('destinationAmount')
+    await expect(createTransferUseCase.execute({ profileId: 'profile-1', input: {
+      sourceAccountId: 'usd', destinationAccountId: 'uyu', amount: '101', currency: 'USD',
+      exchangeRate: '39.50', date: new Date().toISOString(),
+    } })).rejects.toThrow('Fondos insuficientes')
+    expect(Number(accountsStore.get('usd').balance)).toBe(100)
+  })
 })

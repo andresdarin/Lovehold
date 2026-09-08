@@ -13,6 +13,7 @@ interface ExpenseFormProps {
     title: string
     merchant?: string
     amount: number
+    currency?: 'UYU' | 'USD'
     date: string
     type: string
     category: string
@@ -54,8 +55,9 @@ export default function ExpenseForm({
   const [items, setItems] = useState<DetectedReceiptItem[]>(initialItems ?? [])
 
   useEffect(() => {
-    if (accounts.length > 0 && !financeAccountId && accounts[0]?.id) {
-      setFinanceAccountId(accounts[0].id)
+    const selectedAccountStillExists = accounts.some((account) => account.id === financeAccountId)
+    if (!selectedAccountStillExists) {
+      setFinanceAccountId(accounts[0]?.id ?? '')
     }
   }, [accounts, financeAccountId])
 
@@ -76,7 +78,7 @@ export default function ExpenseForm({
       a.type === 'CREDIT' ? 'Crédito' : a.type === 'CASH' ? 'Efectivo' : 'Banco'
     return {
       value: a.id,
-      label: `${a.name} (${typeLabel})`,
+      label: `${a.name} (${typeLabel} · ${a.currency})`,
     }
   })
 
@@ -86,6 +88,7 @@ export default function ExpenseForm({
       title,
       merchant: merchant || undefined,
       amount: displayAmount,
+      currency: selectedAccount?.currency,
       date: new Date(date).toISOString(),
       type,
       category: type === 'supermarket' ? 'supermercado' : category,

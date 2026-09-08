@@ -11,7 +11,7 @@ export default function CustomSelect({ value, options, onChange, placeholder, cl
   return <div className={`relative ${className}`}>
     <select id={id} value={value} onChange={event => onChange(event.target.value)} disabled={disabled}
       aria-label={ariaLabel || placeholder || 'Seleccionar opción'}
-      className={`min-h-11 w-full appearance-none rounded-xl border border-border bg-surface pl-3 pr-9 text-foreground focus:border-primary disabled:opacity-50 ${size === 'sm' ? 'text-xs' : 'text-sm'}`}>
+      className={`neu-inset h-11 w-full appearance-none rounded-xl border border-border bg-surface pl-3 pr-9 text-base font-medium text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50 sm:text-sm ${size === 'sm' ? 'sm:text-xs' : ''}`}>
       {placeholder && <option value="" disabled>{placeholder}</option>}
       {options.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
     </select>

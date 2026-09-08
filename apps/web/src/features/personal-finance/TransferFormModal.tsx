@@ -15,11 +15,6 @@ interface TransferFormModalProps {
 const inputCls =
   'neu-inset h-11 w-full rounded-xl border border-border bg-surface px-3.5 text-sm font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors'
 
-const CURRENCY_OPTIONS = [
-  { value: 'UYU', label: 'UYU ($)' },
-  { value: 'USD', label: 'USD (U$S)' },
-]
-
 export default function TransferFormModal({
   isOpen,
   onClose,
@@ -31,7 +26,6 @@ export default function TransferFormModal({
   const [sourceAccountId, setSourceAccountId] = useState('')
   const [destinationAccountId, setDestinationAccountId] = useState('')
   const [amount, setAmount] = useState('')
-  const [currency, setCurrency] = useState<'UYU' | 'USD'>('UYU')
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const [description, setDescription] = useState('')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
@@ -48,26 +42,39 @@ export default function TransferFormModal({
       const other = destAccounts.find((a) => a.id !== (sourceAccounts[0]?.id ?? ''))
       if (other) setDestinationAccountId(other.id)
     }
+    const selectedSource = sourceAccounts.find((account) => account.id === sourceAccountId)
+    const selectedDestination = destAccounts.find((account) => account.id === destinationAccountId)
+    if (
+      selectedSource &&
+      (!selectedDestination || selectedDestination.currency !== selectedSource.currency)
+    ) {
+      const compatibleDestination = destAccounts.find(
+        (account) => account.id !== selectedSource.id && account.currency === selectedSource.currency,
+      )
+      setDestinationAccountId(compatibleDestination?.id ?? '')
+    }
   }, [sourceAccounts, destAccounts, sourceAccountId, destinationAccountId])
 
   if (!isOpen) return null
 
   const destAccount = accounts.find((a) => a.id === destinationAccountId)
+  const sourceAccount = accounts.find((a) => a.id === sourceAccountId)
+  const sourceCurrency = sourceAccount?.currency
   const isCreditPayment = destAccount?.type === 'CREDIT'
 
   const sourceOptions = sourceAccounts.map((a) => ({
     value: a.id,
-    label: `${a.name} (${a.type === 'CASH' ? 'Efectivo' : 'Banco'})`,
+    label: `${a.name} (${a.type === 'CASH' ? 'Efectivo' : 'Banco'} · ${a.currency})`,
   }))
 
   const destOptions = destAccounts
-    .filter((a) => a.id !== sourceAccountId)
+    .filter((a) => a.id !== sourceAccountId && a.currency === sourceCurrency)
     .map((a) => {
       const typeLabel =
         a.type === 'CREDIT' ? 'Tarjeta de Crédito' : a.type === 'CASH' ? 'Efectivo' : 'Banco'
       return {
         value: a.id,
-        label: `${a.name} (${typeLabel})`,
+        label: `${a.name} (${typeLabel} · ${a.currency})`,
       }
     })
 
@@ -79,8 +86,12 @@ export default function TransferFormModal({
       setErrorMsg('Ingresá un monto válido mayor a 0.')
       return
     }
-    if (sourceAccountId === destinationAccountId) {
+    if (!sourceAccount || !destAccount || sourceAccountId === destinationAccountId) {
       setErrorMsg('La cuenta de origen y destino deben ser distintas.')
+      return
+    }
+    if (destAccount.currency !== sourceAccount.currency) {
+      setErrorMsg('El origen y el destino deben usar la misma moneda. Para convertir, usá Cambiar Moneda.')
       return
     }
 
@@ -89,7 +100,7 @@ export default function TransferFormModal({
         sourceAccountId,
         destinationAccountId,
         amount: numAmount,
-        currency,
+        currency: sourceAccount.currency,
         date: new Date(date).toISOString(),
         description: description.trim() || undefined,
       })
@@ -204,12 +215,9 @@ export default function TransferFormModal({
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold text-foreground">Moneda</label>
-              <CustomSelect
-                className="w-full"
-                value={currency}
-                options={CURRENCY_OPTIONS}
-                onChange={(val) => setCurrency(val as 'UYU' | 'USD')}
-              />
+              <div className="flex h-11 items-center justify-center rounded-xl border border-border bg-surface-soft px-3 text-sm font-bold text-foreground">
+                {sourceCurrency ?? '—'}
+              </div>
             </div>
           </div>
 

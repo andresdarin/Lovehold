@@ -33,14 +33,70 @@ export class CreateTransferUseCase {
 
       const sourceCurrency = sourceAccount.currency
       const destCurrency = destAccount.currency
-      const isFx = sourceCurrency !== destCurrency || Boolean(input.destinationAmount)
+      const isFx = sourceCurrency !== destCurrency
+
+      // Account currencies are authoritative; the payload fields are only assertions.
+      const currencyAssertions = [
+        ['currency', input.currency, sourceCurrency],
+        ['destinationCurrency', input.destinationCurrency, destCurrency],
+        ['baseCurrency', input.baseCurrency, sourceCurrency],
+        ['quoteCurrency', input.quoteCurrency, destCurrency],
+      ] as const
+      for (const [field, supplied, actual] of currencyAssertions) {
+        if (supplied !== undefined && supplied !== actual) {
+          throw new BadRequestException(`${field} no coincide con la moneda de la cuenta (${actual}).`)
+        }
+      }
+
+      if (!isFx && (input.destinationAmount !== undefined || input.exchangeRate !== undefined)) {
+        throw new BadRequestException('Los datos de conversión solo se permiten entre cuentas de distinta moneda.')
+      }
+      if (isFx && input.destinationAmount === undefined && input.exchangeRate === undefined) {
+        throw new BadRequestException('Una transferencia entre monedas requiere destinationAmount o exchangeRate.')
+      }
 
       // 1. Determinar los montos exactos para cada cuenta
       const sourceAmount = input.amount
       let destinationAmount = input.destinationAmount ?? input.amount
 
-      if (isFx && !input.destinationAmount && input.exchangeRate) {
+      if (isFx && input.destinationAmount === undefined && input.exchangeRate !== undefined) {
         destinationAmount = (Number(sourceAmount) * Number(input.exchangeRate)).toFixed(2)
+      }
+
+      if (isFx && input.destinationAmount !== undefined && input.exchangeRate !== undefined) {
+        const quotedDestination = Number(sourceAmount) * Number(input.exchangeRate)
+        const roundedQuote = Number(quotedDestination.toFixed(2))
+        // Amounts are stored to cents. A supplied quote may differ by at most one cent
+        // from the rate calculation to accommodate decimal rounding at the boundary.
+        if (Math.abs(Number(input.destinationAmount) - roundedQuote) > 0.01) {
+          throw new BadRequestException('destinationAmount no coincide con el exchangeRate (tolerancia: 0.01).')
+        }
+      }
+
+      let feeAccount = sourceAccount
+      if (input.feeAmount !== undefined && input.feeAccountId) {
+        const requestedFeeAccount = await tx.financeAccount.findFirst({
+          where: { id: input.feeAccountId, profileId: command.profileId },
+        })
+        if (!requestedFeeAccount) throw new NotFoundException('Cuenta de comisión no encontrada.')
+        feeAccount = requestedFeeAccount
+      }
+      if (input.feeAmount !== undefined && feeAccount.currency !== sourceCurrency) {
+        throw new BadRequestException(`La cuenta de comisión debe estar en ${sourceCurrency}.`)
+      }
+
+      const feeAmount = Number(input.feeAmount ?? 0)
+      const sourceAmountNumber = Number(sourceAmount)
+      const sourceDebit = sourceAmountNumber + (feeAccount.id === sourceAccount.id ? feeAmount : 0)
+      if (Number(sourceAccount.balance) < sourceDebit) {
+        throw new BadRequestException(
+          `Fondos insuficientes en la cuenta de origen: disponible ${sourceAccount.balance} ${sourceCurrency}, requerido ${sourceDebit.toFixed(2)} ${sourceCurrency}.`,
+        )
+      }
+      if (feeAccount.id !== sourceAccount.id && Number(feeAccount.balance) < feeAmount) {
+        throw new BadRequestException(
+          `Fondos insuficientes para la comisión: disponible ${feeAccount.balance} ${sourceCurrency}, requerido ${feeAmount.toFixed(2)} ${sourceCurrency}.`,
+        )
       }
 
       // 2. Descontar de la cuenta de origen
@@ -63,14 +119,8 @@ export class CreateTransferUseCase {
       }
 
       // 4. Si hubo comisión explícita, registrarla como egreso separado trazable
-      if (input.feeAmount && Number(input.feeAmount) > 0) {
-        const feeAccount = input.feeAccountId
-          ? await tx.financeAccount.findFirst({
-              where: { id: input.feeAccountId, profileId: command.profileId },
-            })
-          : sourceAccount
-
-        if (feeAccount) {
+      if (input.feeAmount !== undefined) {
+        {
           await tx.financeAccount.update({
             where: { id: feeAccount.id },
             data: { balance: { decrement: input.feeAmount } },

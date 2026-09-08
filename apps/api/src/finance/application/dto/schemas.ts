@@ -1,6 +1,11 @@
 import { z } from 'zod'
 
 const decimal = z.union([z.string(), z.number()]).transform((value) => Number(value).toFixed(2))
+const positiveDecimal = decimal.refine((value) => Number.isFinite(Number(value)) && Number(value) > 0, {
+  message: 'Debe ser un número positivo',
+})
+// Rates are not money amounts: retain enough precision for UYU -> USD quotes.
+const exchangeRateDecimal = z.union([z.string(), z.number()]).transform((value) => Number(value).toFixed(8))
 const isoDateTime = z.string().transform((val, ctx) => {
   const d = new Date(val)
   if (isNaN(d.getTime())) {
@@ -56,14 +61,14 @@ export const registerIncomeSchema = z.object({
 export const createTransferSchema = z.object({
   sourceAccountId: z.string().min(1),
   destinationAccountId: z.string().min(1),
-  amount: decimal,
-  currency: z.enum(['UYU', 'USD']).default('UYU'),
-  destinationAmount: decimal.optional(),
+  amount: positiveDecimal,
+  currency: z.enum(['UYU', 'USD']).optional(),
+  destinationAmount: positiveDecimal.optional(),
   destinationCurrency: z.enum(['UYU', 'USD']).optional(),
-  exchangeRate: decimal.optional(),
+  exchangeRate: exchangeRateDecimal.refine((value) => Number(value) > 0, { message: 'La tasa debe ser positiva' }).optional(),
   baseCurrency: z.enum(['UYU', 'USD']).optional(),
   quoteCurrency: z.enum(['UYU', 'USD']).optional(),
-  feeAmount: decimal.optional(),
+  feeAmount: positiveDecimal.optional(),
   feeAccountId: z.string().optional(),
   date: isoDateTime,
   description: z.string().max(200).optional(),

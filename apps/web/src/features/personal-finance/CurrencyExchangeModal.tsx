@@ -15,6 +15,10 @@ interface CurrencyExchangeModalProps {
 const inputCls =
   'w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/45 tabular-nums'
 
+function defaultRate(sourceCurrency: 'UYU' | 'USD', destinationCurrency: 'UYU' | 'USD') {
+  return sourceCurrency === 'USD' && destinationCurrency === 'UYU' ? '39.50' : '0.0253'
+}
+
 export default function CurrencyExchangeModal({
   isOpen,
   onClose,
@@ -32,24 +36,26 @@ export default function CurrencyExchangeModal({
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
-  // Solo cuentas liquidas (efectivo y bancarias)
+  // Solo cuentas líquidas; el destino debe ser la divisa opuesta.
   const liquidAccounts = accounts.filter((a) => a.type !== 'CREDIT')
 
   useEffect(() => {
-    if (liquidAccounts.length > 0 && !sourceAccountId) {
-      // Buscar primera cuenta USD para origen si existe, sino la primera
-      const usdAcc = liquidAccounts.find((a) => a.currency === 'USD')
-      const initialSource = usdAcc ?? liquidAccounts[0]
-      if (initialSource) {
-        setSourceAccountId(initialSource.id)
-        // Destino con moneda opuesta
-        const opposite = liquidAccounts.find((a) => a.id !== initialSource.id && a.currency !== initialSource.currency)
-        if (opposite) {
-          setDestinationAccountId(opposite.id)
-        }
-      }
+    const currentSource = liquidAccounts.find((account) => account.id === sourceAccountId)
+    const nextSource = currentSource ?? liquidAccounts.find((account) => account.currency === 'USD') ?? liquidAccounts[0]
+    if (nextSource && nextSource.id !== sourceAccountId) {
+      setSourceAccountId(nextSource.id)
     }
-  }, [liquidAccounts, sourceAccountId])
+
+    const currentDestination = liquidAccounts.find((account) => account.id === destinationAccountId)
+    const hasOppositeCurrency = currentDestination && nextSource &&
+      currentDestination.id !== nextSource.id && currentDestination.currency !== nextSource.currency
+    if (!hasOppositeCurrency) {
+      const opposite = liquidAccounts.find(
+        (account) => nextSource && account.id !== nextSource.id && account.currency !== nextSource.currency,
+      )
+      setDestinationAccountId(opposite?.id ?? '')
+    }
+  }, [liquidAccounts, sourceAccountId, destinationAccountId])
 
   if (!isOpen) return null
 
@@ -59,33 +65,27 @@ export default function CurrencyExchangeModal({
   const sourceCurrency = sourceAccount?.currency ?? 'USD'
   const destCurrency = destAccount?.currency ?? 'UYU'
 
-  // Recalcular monto recibido cuando cambia el monto origen o la tasa
+  useEffect(() => {
+    if (sourceAccount && destAccount && sourceCurrency !== destCurrency) {
+      setExchangeRate(defaultRate(sourceCurrency, destCurrency))
+    }
+  }, [sourceCurrency, destCurrency, sourceAccount, destAccount])
+
+  useEffect(() => {
+    const amount = parseFloat(sourceAmount)
+    const rate = parseFloat(exchangeRate)
+    if (sourceAccount && destAccount && sourceCurrency !== destCurrency && amount > 0 && rate > 0) {
+      setDestinationAmount((amount * rate).toFixed(2))
+    }
+  }, [sourceAmount, exchangeRate, sourceCurrency, destCurrency, sourceAccount, destAccount])
+
+  // La cotización representa unidades recibidas por cada unidad entregada.
   function handleSourceAmountChange(val: string) {
     setSourceAmount(val)
     const num = parseFloat(val)
     const rate = parseFloat(exchangeRate)
     if (!isNaN(num) && !isNaN(rate) && rate > 0) {
-      if (sourceCurrency === 'USD' && destCurrency === 'UYU') {
-        setDestinationAmount((num * rate).toFixed(2))
-      } else if (sourceCurrency === 'UYU' && destCurrency === 'USD') {
-        setDestinationAmount((num / rate).toFixed(2))
-      } else {
-        setDestinationAmount((num * rate).toFixed(2))
-      }
-    }
-  }
-
-  // Recalcular tasa efectiva si el usuario edita directamente el monto recibido
-  function handleDestAmountChange(val: string) {
-    setDestinationAmount(val)
-    const numDest = parseFloat(val)
-    const numSrc = parseFloat(sourceAmount)
-    if (!isNaN(numDest) && !isNaN(numSrc) && numSrc > 0) {
-      if (sourceCurrency === 'USD' && destCurrency === 'UYU') {
-        setExchangeRate((numDest / numSrc).toFixed(2))
-      } else if (sourceCurrency === 'UYU' && destCurrency === 'USD') {
-        setExchangeRate((numSrc / numDest).toFixed(2))
-      }
+      setDestinationAmount((num * rate).toFixed(2))
     }
   }
 
@@ -94,11 +94,7 @@ export default function CurrencyExchangeModal({
     const num = parseFloat(sourceAmount)
     const rate = parseFloat(val)
     if (!isNaN(num) && !isNaN(rate) && rate > 0) {
-      if (sourceCurrency === 'USD' && destCurrency === 'UYU') {
-        setDestinationAmount((num * rate).toFixed(2))
-      } else if (sourceCurrency === 'UYU' && destCurrency === 'USD') {
-        setDestinationAmount((num / rate).toFixed(2))
-      }
+      setDestinationAmount((num * rate).toFixed(2))
     }
   }
 
@@ -108,7 +104,7 @@ export default function CurrencyExchangeModal({
   }))
 
   const destOptions = liquidAccounts
-    .filter((a) => a.id !== sourceAccountId)
+    .filter((a) => a.id !== sourceAccountId && a.currency !== sourceAccount?.currency)
     .map((a) => ({
       value: a.id,
       label: `${a.name} (${a.currency} • ${a.type === 'CASH' ? 'Efectivo' : 'Banco'})`,
@@ -133,6 +129,15 @@ export default function CurrencyExchangeModal({
       setErrorMsg('Seleccioná cuentas de origen y destino distintas.')
       return
     }
+    if (!sourceAccount || !destAccount || sourceCurrency === destCurrency) {
+      setErrorMsg('Elegí cuentas líquidas en monedas diferentes para convertir.')
+      return
+    }
+    const rate = parseFloat(exchangeRate)
+    if (isNaN(rate) || rate <= 0) {
+      setErrorMsg('Ingresá una cotización válida mayor a 0.')
+      return
+    }
 
     try {
       await transfer({
@@ -142,7 +147,7 @@ export default function CurrencyExchangeModal({
         currency: sourceCurrency,
         destinationAmount: numDest,
         destinationCurrency: destCurrency,
-        exchangeRate: parseFloat(exchangeRate) || undefined,
+        exchangeRate: rate,
         feeAmount: feeAmount ? parseFloat(feeAmount) : undefined,
         date: new Date(date).toISOString(),
       })
@@ -223,10 +228,9 @@ export default function CurrencyExchangeModal({
               <input
                 type="number"
                 step="any"
-                required
+                readOnly
                 placeholder="0.00"
                 value={destinationAmount}
-                onChange={(e) => handleDestAmountChange(e.target.value)}
                 className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-lg font-bold text-[#2E7D6A] dark:text-[#4BE3B5] tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/45"
               />
               <span className="shrink-0 rounded-xl bg-surface border border-border px-3 py-2 text-sm font-bold text-foreground">
@@ -249,7 +253,7 @@ export default function CurrencyExchangeModal({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-semibold text-muted-foreground block mb-1">
-                Tipo de cambio (1 USD =)
+                Cotización (1 {sourceCurrency} =)
               </label>
               <div className="flex items-center gap-1.5">
                 <input
@@ -259,13 +263,13 @@ export default function CurrencyExchangeModal({
                   onChange={(e) => handleRateChange(e.target.value)}
                   className={inputCls}
                 />
-                <span className="text-xs font-bold text-muted-foreground">UYU</span>
+                <span className="text-xs font-bold text-muted-foreground">{destCurrency}</span>
               </div>
             </div>
 
             <div>
               <label className="text-xs font-semibold text-muted-foreground block mb-1">
-                Comisión (opcional)
+                Comisión ({sourceCurrency}, opcional)
               </label>
               <input
                 type="number"
@@ -275,6 +279,7 @@ export default function CurrencyExchangeModal({
                 onChange={(e) => setFeeAmount(e.target.value)}
                 className={inputCls}
               />
+              <p className="mt-1 text-[11px] text-muted-foreground">Se descuenta de la cuenta de origen.</p>
             </div>
           </div>
 
