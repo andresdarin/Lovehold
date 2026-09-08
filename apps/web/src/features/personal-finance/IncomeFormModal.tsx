@@ -107,12 +107,49 @@ export default function IncomeFormModal({ isOpen, onClose, onSuccess }: IncomeFo
             </div>
             <div className="min-w-0">
               <label className="mb-1 block text-xs font-semibold text-foreground">Moneda</label>
-              <CustomSelect
-                className="w-full"
-                value={currency}
-                options={CURRENCY_OPTIONS}
-                onChange={(val) => setCurrency(val as 'UYU' | 'USD')}
-              />
+              <div
+                role="radiogroup"
+                aria-label="Moneda"
+                className="neu-inset grid h-11 grid-cols-2 gap-1 rounded-xl border border-border bg-surface p-1"
+              >
+                {CURRENCY_OPTIONS.map((option, index) => {
+                  const isSelected = currency === option.value
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      role="radio"
+                      aria-checked={isSelected}
+                      tabIndex={isSelected ? 0 : -1}
+                      onClick={() => setCurrency(option.value as 'UYU' | 'USD')}
+                      onKeyDown={(event) => {
+                        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Home' && event.key !== 'End') return
+                        event.preventDefault()
+                        const nextIndex = event.key === 'Home'
+                          ? 0
+                          : event.key === 'End'
+                            ? CURRENCY_OPTIONS.length - 1
+                            : event.key === 'ArrowRight'
+                              ? (index + 1) % CURRENCY_OPTIONS.length
+                              : (index - 1 + CURRENCY_OPTIONS.length) % CURRENCY_OPTIONS.length
+                        const nextOption = CURRENCY_OPTIONS[nextIndex]
+                        if (nextOption) {
+                          setCurrency(nextOption.value as 'UYU' | 'USD')
+                          document.getElementById(`income-currency-${nextOption.value}`)?.focus()
+                        }
+                      }}
+                      id={`income-currency-${option.value}`}
+                      className={`rounded-lg px-1 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
+                        isSelected
+                          ? 'bg-primary text-primary-foreground shadow-sm'
+                          : 'text-muted-foreground hover:bg-surface-soft hover:text-foreground'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
           </div>
 
